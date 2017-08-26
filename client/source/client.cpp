@@ -43,7 +43,8 @@ int main()
 	OspPrintf(TRUE,FALSE,"初始化成功\n");
 
 
- //   clientinterface();
+    void clientinterface(void);
+    clientinterface();
 //	OspQuit();
 
     return 0;
