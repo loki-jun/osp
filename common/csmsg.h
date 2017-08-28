@@ -17,12 +17,12 @@
 #define S_C_GETLIST_NACK             (u16)(OSP_USEREVENT_BASE+0x0009)
 
 /* 文件下载 */
-#define C_S_FILENAME_REQ             (u16)(OSP_USEREVENT_BASE+0x000A)
-#define S_C_FILENAME_ACK             (u16)(OSP_USEREVENT_BASE+0x000B)
+#define C_S_FILENAME_REQ             (u16)(OSP_USEREVENT_BASE+0x000A) /*下载文件请求*/
+#define S_C_FILENAME_ACK             (u16)(OSP_USEREVENT_BASE+0x000B) /*文件存在确认*/
 #define S_C_FILENAME_NACK            (u16)(OSP_USEREVENT_BASE+0x000C)
 
-#define C_S_DOWNLOADDATA_REQ         (u16)(OSP_USEREVENT_BASE+0x000D)
-#define S_C_DOWNLOADDATA_ACK         (u16)(OSP_USEREVENT_BASE+0x000E)
+#define C_S_DOWNLOADDATA_REQ         (u16)(OSP_USEREVENT_BASE+0x000D) /*数据包下载请求*/
+#define S_C_DOWNLOADDATA_ACK         (u16)(OSP_USEREVENT_BASE+0x000E) /*返回数据包的数据*/
 #define S_C_DOWNLOADDATA_NACK        (u16)(OSP_USEREVENT_BASE+0x000F)
 
 /* 取消文件下载 */

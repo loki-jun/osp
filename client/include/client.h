@@ -1,5 +1,5 @@
-#ifndef _CLIENTMACRODEF_H_
-#define _CLIENTMACRODEF_H_
+#ifndef _CLIENT_H_
+#define _CLIENT_H_
 
 #define CLIENT_TELENT_PORT   2501
 #define CLIENT_LISTEN_PORT   6682
@@ -11,6 +11,23 @@
 
 #define MAX_CLIENT_INS_NUM    3
 
+/*
+class CUserData
+{
+	public:
+	s8 m_achIp;
+
+    public:
+    CUserData()
+    {
+        s8 m_achIp[20]  = {0};
+    }
+    ~CUserData()
+    {
+    }
+
+};
+*/
 
 class CClientInstance : public CInstance{
 private:

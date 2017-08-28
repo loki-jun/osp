@@ -38,7 +38,7 @@ int main()
 		CLIENT_APP_PRIO, 
 		CLIENT_APP_QUE_SIZE);	
 
-	Sleep(5000);
+//	Sleep(50);
 	cout << "***初始化成功***" <<endl;
 	OspPrintf(TRUE,FALSE,"初始化成功\n");
 
