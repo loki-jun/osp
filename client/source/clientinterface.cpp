@@ -35,9 +35,10 @@ void clientinterface()
 		if(!strcmp(achUserInput,"connect"))
 		{
 			cout << "ÇëÊäÈëipµØÖ·£º" << endl;
+			cin.clear();
+            cin.sync();
 			s8 m_achIp[20]  = {0};
 			cin.get(m_achIp,20);
-            cout << m_achIp << endl;
 			break;
 		}
 		else if (!strcmp(achUserInput,"dealpartfile"))
