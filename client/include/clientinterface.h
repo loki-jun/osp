@@ -1,6 +1,7 @@
 #ifndef _CLIENTINTERFACE_H_
 #define _CLIENTINTERFACE_H_
 
+#define U_C_CONNECT_CMD        (u16)(OSP_USEREVENT_BASE+0x0013)
 
 #endif
  

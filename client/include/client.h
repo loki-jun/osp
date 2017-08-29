@@ -5,13 +5,16 @@
 #define CLIENT_LISTEN_PORT   6682
 
 #define CLIENT_APP_NAME      "ClientApp"
-#define CLIENT_APP_NO        2
+#define CLIENT_APP_NO        1
 #define CLIENT_APP_PRIO      100
 #define CLIENT_APP_QUE_SIZE  1000
 
-#define MAX_CLIENT_INS_NUM    3
+#define MAX_CLIENT_INS_NUM   3
 
-/*
+#define SERVER_PORT          5444
+
+
+
 class CUserData
 {
 	public:
@@ -27,12 +30,11 @@ class CUserData
     }
 
 };
-*/
+
 
 class CClientInstance : public CInstance{
 private:
-	u16 m_wFileId;
-	s8  m_pbyFilename[256];
+	u16 m_wNormalPackageId[3];
 	u16 m_wDownloadState;
 	u32 m_dwDstIid;
 	u32 m_dwDstNode;
@@ -44,7 +46,8 @@ private:
 };
 
 
-typedef zTemplate<CClientInstance,MAX_CLIENT_INS_NUM>CClientApp;
+typedef zTemplate<CClientInstance,MAX_CLIENT_INS_NUM,CUserData>CClientApp;
+
 
 #endif
 

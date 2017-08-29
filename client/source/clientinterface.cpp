@@ -16,29 +16,42 @@
 #include "../../common/osp.h"
 #include "../../common/kdvdef.h"
 #include "../include/client.h"
+#include "../include/clientinterface.h"
 
 using namespace std;
 
-//CUserData g_CUserData;
+extern CClientApp g_CClientApp;
 
 void clientinterface()
 {
-    cout << "您可以有如下操作：connect,dealpartfile,getfilelist,downloadfile,pausetask,resumetask,canceltask,disconnect,help" << endl;
+    cout << "您可以有如下操作：" << endl;
+	cout << "connect       连接服务器" <<endl;
+	cout << "dealpartfile  处理断点续传" <<endl;
+	cout << "getfilelist   获取文件列表" <<endl;
+	cout << "downloadfile  下载文件" <<endl;
+	cout << "pausetask     暂停下载" <<endl;
+	cout << "resumetask    恢复下载" <<endl;
+	cout << "canceltask    取消下载" <<endl;
+	cout << "disconnect    断开服务器" <<endl;
+	cout << "help          打印帮助信息" <<endl;
+
     s8 achUserInput[20] ={0};
-	//	s8 achUserInput[100] = {"connect","dealpartfile","getfilelist","downloadfile","pausetask","resumetask","canceltask","disconnect","help"};
 
-
-//	u8 flag
 	while (1)
 	{
 		cin.get(achUserInput,20);
+
 		if(!strcmp(achUserInput,"connect"))
 		{
 			cout << "请输入ip地址：" << endl;
+
 			cin.clear();
             cin.sync();
-			s8 m_achIp[20]  = {0};
-			cin.get(m_achIp,20);
+
+			cin.get(&g_CClientApp.m_achIp,20);
+
+			OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CONNECT_CMD);
+
 			break;
 		}
 		else if (!strcmp(achUserInput,"dealpartfile"))
@@ -75,7 +88,16 @@ void clientinterface()
 		}
 		else if (!strcmp(achUserInput,"help"))
 		{
-			
+			cout << "connect       连接服务器" <<endl;
+			cout << "dealpartfile  处理断点续传" <<endl;
+			cout << "getfilelist   获取文件列表" <<endl;
+			cout << "downloadfile  下载文件" <<endl;
+			cout << "pausetask     暂停下载" <<endl;
+			cout << "resumetask    恢复下载" <<endl;
+			cout << "canceltask    取消下载" <<endl;
+			cout << "disconnect    断开服务器" <<endl;
+			cout << "help          打印帮助信息" <<endl;
+			break;
 		}
 		else
 		{
