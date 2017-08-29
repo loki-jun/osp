@@ -2,14 +2,15 @@
 #define _MACRODEF_H_
 
 /* ״̬ */
-#define IDLE_STATE       0
-#define CONNECT_STATE    1
-#define READY_STATE      2
-#define TRANSFER_STATE   3
-#define PAUSE_STATE      4  
+#define IDLE_STATE                  0
+#define READY_STATE                 1
+#define TRANSFER_STATE              2
+#define PAUSEFLG_STATE              3
+#define CONNECT                     4 
 
-#define MAX_SERVER_INS_NUM    60
-//#define MAX_CLIENT_INS_NUM    3
+#define SERVER_TELENT_PORT          2502
+#define SERVER_LISTEN_PORT          6683
 
+#define SERVER_APP_NO               1
 
 #endif

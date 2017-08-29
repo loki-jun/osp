@@ -22,11 +22,10 @@ using namespace std;
 
 extern CClientApp g_CClientApp;
 
-void clientinterface()
+void help()
 {
-    cout << "您可以有如下操作：" << endl;
-	cout << "connect       连接服务器" <<endl;
-	cout << "dealpartfile  处理断点续传" <<endl;
+	cout << "connect       连接服务器  参数：ip " <<endl;
+	cout << "dealpartfile  处理断点续传  " <<endl;
 	cout << "getfilelist   获取文件列表" <<endl;
 	cout << "downloadfile  下载文件" <<endl;
 	cout << "pausetask     暂停下载" <<endl;
@@ -35,24 +34,42 @@ void clientinterface()
 	cout << "disconnect    断开服务器" <<endl;
 	cout << "help          打印帮助信息" <<endl;
 
-    s8 achUserInput[20] ={0};
+}
 
+void connect()
+{
+
+}
+
+void clientinterface()
+{
+    cout << "您可以有如下操作：" << endl;
+	help();
+
+    
 	while (1)
 	{
+		s8 achUserInput[20] ={0};
+
+		cin.clear();
+        cin.sync();
+
 		cin.get(achUserInput,20);
 
 		if(!strcmp(achUserInput,"connect"))
 		{
 			cout << "请输入ip地址：" << endl;
 
-			cin.clear();
-            cin.sync();
+			getchar();
 
 			cin.get(&g_CClientApp.m_achIp,20);
 
-			OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CONNECT_CMD);
+			if(!OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CONNECT_CMD))
+			{
+				cout << "succeed " << endl;
+			}
 
-			break;
+//			break;
 		}
 		else if (!strcmp(achUserInput,"dealpartfile"))
 		{
@@ -103,7 +120,7 @@ void clientinterface()
 		{
 			cout << "输入错误，请重新输入" <<endl;
 		}
-        cin.clear();
-        cin.sync();
+
+
 	}
 }

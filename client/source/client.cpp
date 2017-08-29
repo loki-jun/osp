@@ -30,6 +30,8 @@ int main()
 	if( dwRetCreateTcpNode == INVALID_SOCKET )
 	{
 		cout << "***创建监听节点失败***" <<endl;
+		OspQuit();
+		return -1;
 	}
 
 	//创建APP
@@ -43,7 +45,7 @@ int main()
 	OspPrintf(TRUE,FALSE,"初始化成功\n");
 
 
-    void clientinterface(void);
+
     clientinterface();
 //	OspQuit();
 

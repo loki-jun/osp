@@ -94,6 +94,26 @@ SOURCE=.\source\server.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=..\common\csmsg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\kdvdef.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\kdvtype.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\macrodef.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\osp.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\server.h
 # End Source File
 # End Group

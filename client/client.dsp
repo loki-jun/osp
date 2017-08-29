@@ -90,6 +90,10 @@ SOURCE=.\source\client.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\source\clientcommunication.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\source\clientinterface.cpp
 # End Source File
 # End Group
@@ -99,6 +103,10 @@ SOURCE=.\source\clientinterface.cpp
 # Begin Source File
 
 SOURCE=.\include\client.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\clientcommunication.h
 # End Source File
 # Begin Source File
 

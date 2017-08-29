@@ -25,7 +25,7 @@ int main()
 	}
 	
 	// 在6683端口上创建本地监听结点 
-	u32 dwRetCreateTcpNode = OspCreateTcpNode( 0, SERVER_LISTEN_PORT );   
+	u32 dwRetCreateTcpNode = OspCreateTcpNode( inet_addr("127.0.0.1"), SERVER_LISTEN_PORT );   
 	
 	if( dwRetCreateTcpNode == INVALID_SOCKET )
 	{
@@ -38,7 +38,7 @@ int main()
 		SERVER_APP_PRIO, 
 		SERVER_APP_QUE_SIZE);	
 	
-	Sleep(50);
+//	Sleep(50);
 	cout << "***初始化成功***" <<endl;
 	OspPrintf(TRUE,FALSE,"初始化成功\n");
 	
@@ -46,10 +46,10 @@ int main()
 
 	//	OspQuit();
 	
-    return 0;
-	//	while(1)
-	//	{
+//    return 0;
+		while(1)
+		{
 	
-	//	}
+		}
 	
 }

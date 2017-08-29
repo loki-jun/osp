@@ -9,21 +9,25 @@
 #define CLIENT_APP_PRIO      100
 #define CLIENT_APP_QUE_SIZE  1000
 
-#define MAX_CLIENT_INS_NUM   3
-
-#define SERVER_PORT          5444
 
 
+#define CONNECT_TIME_EVENT   (u16)(OSP_USEREVENT_BASE+0x0014)
+#define REGISTER_TIME_EVENT  (u16)(OSP_USEREVENT_BASE+0x0015)
+#define TIME_WATING          1000
+
+#define MAX_CLIENT_INS_NUM 3
+
+void clientinterface(void);
 
 class CUserData
 {
 	public:
-	s8 m_achIp;
+	s8 m_achIp[20];
 
     public:
     CUserData()
     {
-        s8 m_achIp[20]  = {0};
+        memset();
     }
     ~CUserData()
     {
@@ -39,9 +43,11 @@ private:
 	u32 m_dwDstIid;
 	u32 m_dwDstNode;
  
-private:
+public:
     void InstanceEntry(CMessage *const pMsg){};
-    void DaemonInstanceEntry(CMessage *const pMsg,CApp* pcApp){};
+    void DaemonInstanceEntry(CMessage *const pMsg,CApp* pcApp);
+	void DaemonConnectServer(CMessage *const pcMsg);
+	void DaemonDisConnectServer(){};
 	
 };
 

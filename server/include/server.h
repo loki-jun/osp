@@ -1,11 +1,7 @@
 #ifndef _SERVER_H_
 #define _SERVER_H_
 
-#define SERVER_TELENT_PORT   2502
-#define SERVER_LISTEN_PORT   6683
-
 #define SERVER_APP_NAME      "ServerApp"
-#define SERVER_APP_NO        2
 #define SERVER_APP_PRIO      100
 #define SERVER_APP_QUE_SIZE  1000
 
