@@ -88,6 +88,10 @@ LINK32=link.exe
 
 SOURCE=.\source\server.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\source\servercommunication.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -115,6 +119,14 @@ SOURCE=..\common\osp.h
 # Begin Source File
 
 SOURCE=.\include\server.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\servercommon.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\servercommunication.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
