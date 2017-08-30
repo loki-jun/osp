@@ -50,10 +50,9 @@ void CClientInstance::DaemonConnectServer()
 	cout << "DaemonConnectServer  ok " <<endl;
     s32 dwRet = -1;
 	dwRet = OspConnectTcpNode(g_CClientApp.m_achIp,SERVER_LISTEN_PORT);
-//	cout << dwRet << endl;
 	if(dwRet != INVALID_NODE)
 	{
-		cout << "CONNECT  ok " <<endl;
+		cout << "CONNECT  ok " << endl;
 
 //		OspPost(MAKEIID(SERVER_APP_ID, DAEMON), C_S_CONNECT_REQ,&m_dwDstNode,sizeof(u32));
 
@@ -78,9 +77,8 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
     //u32 curState = CurState();
     u16 curEvent = pcMsg->event;
 	s8 achIp[20];
-	memcpy(achIp,pcMsg->content,sizeof(pcMsg->content));
+	memcpy(achIp,pcMsg->content,pcMsg->length);
 	g_CClientApp.m_achIp = inet_addr(achIp);
-    s32 dwRet = -1;
 
     switch(curEvent)
     {
