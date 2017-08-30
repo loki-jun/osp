@@ -1,58 +1,29 @@
-#include <stdio.h>
-#include <iostream>
-#include <fstream> 
-#include "../../common/kdvtype.h"
+/*==========================================================                        
+文件名：client.h
+相关文件：osp.h，clientcommunication.h，clientinterface.h
+实现功能：主函数入口
+作者：
+版权：
+------------------------------------------------------------
+修改记录：
+日  期	   	  版本		 修改人		  走读人      修改记录
+  
+===========================================================*/
+
 #include "../../common/osp.h"
-#include "../../common/kdvdef.h"
-#include "../../common/csmsg.h"
-#include "../../common/macrodef.h"
-#include "../include/client.h"
-
-using namespace std;
-
-CClientApp g_CClientApp;
+#include "../include/clientcommunication.h"
+#include "../include/clientinterface.h"
 
 int main()
 {
-	if( !( IsOspInitd( ) ) )
-	{
-		// 初始化Osp, 在端口2501启动Telnet
-		BOOL32 bRetOspinit = OspInit( TRUE, CLIENT_TELENT_PORT );         		
-		if( !bRetOspinit )
-		{	
-			cout << "****初始化Osp失败****" <<endl;
-		}
-	}
+	UserInit();
 
-	// 在6682端口上创建本地监听结点 
-	u32 dwRetCreateTcpNode = OspCreateTcpNode( 0, CLIENT_LISTEN_PORT );   
+	clientinterface();
 
-	if( dwRetCreateTcpNode == INVALID_SOCKET )
-	{
-		cout << "***创建监听节点失败***" <<endl;
-		OspQuit();
-		return -1;
-	}
-
-	//创建APP
-	g_CClientApp.CreateApp( CLIENT_APP_NAME, 
-		CLIENT_APP_NO,  
-		CLIENT_APP_PRIO, 
-		CLIENT_APP_QUE_SIZE);	
-
-//	Sleep(50);
-	cout << "***初始化成功***" <<endl;
-	OspPrintf(TRUE,FALSE,"初始化成功\n");
-
-
-
-    clientinterface();
-//	OspQuit();
-
-    return 0;
-//	while(1)
-//	{
-
-//	}
+	return 0;
 	
 }
+
+
+
+

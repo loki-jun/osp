@@ -21,15 +21,17 @@ int main()
 		if( !bRetOspinit )
 		{	
 			cout << "****初始化Osp失败****" <<endl;
+			return;
 		}
 	}
 	
-	// 在6683端口上创建本地监听结点 
+	// 在6682端口上创建本地监听结点 
 	u32 dwRetCreateTcpNode = OspCreateTcpNode( inet_addr("127.0.0.1"), SERVER_LISTEN_PORT );   
 	
 	if( dwRetCreateTcpNode == INVALID_SOCKET )
 	{
 		cout << "***创建监听节点失败***" <<endl;
+		return;
 	}
 	
 	//创建APP
@@ -38,7 +40,6 @@ int main()
 		SERVER_APP_PRIO, 
 		SERVER_APP_QUE_SIZE);	
 	
-//	Sleep(50);
 	cout << "***初始化成功***" <<endl;
 	OspPrintf(TRUE,FALSE,"初始化成功\n");
 	

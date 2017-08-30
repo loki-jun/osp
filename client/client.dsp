@@ -106,6 +106,10 @@ SOURCE=.\include\client.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\clientcommon.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\clientcommunication.h
 # End Source File
 # Begin Source File
