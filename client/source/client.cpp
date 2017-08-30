@@ -1,5 +1,5 @@
 /*==========================================================                        
-文件名：client.h
+文件名：client.cpp
 相关文件：osp.h，clientcommunication.h，clientinterface.h
 实现功能：主函数入口
 作者：
