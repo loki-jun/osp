@@ -51,11 +51,10 @@ void connect()
 
 	s8 achIp[20];
     cin.get(achIp,20);
-	cout << achIp << endl;
 
-	if(!OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CONNECT_CMD,&achIp,sizeof(s8)))
+	if(!OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CONNECT_CMD,achIp,sizeof(achIp)))
 	{
-		cout << "succeed " << endl;
+		cout << "succeed" << endl;
 	}
 
 

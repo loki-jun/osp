@@ -50,6 +50,7 @@ void CClientInstance::DaemonConnectServer()
 	cout << "DaemonConnectServer  ok " <<endl;
     s32 dwRet = -1;
 	dwRet = OspConnectTcpNode(g_CClientApp.m_achIp,SERVER_LISTEN_PORT);
+//	cout << dwRet << endl;
 	if(dwRet != INVALID_NODE)
 	{
 		cout << "CONNECT  ok " <<endl;
@@ -57,10 +58,10 @@ void CClientInstance::DaemonConnectServer()
 //		OspPost(MAKEIID(SERVER_APP_ID, DAEMON), C_S_CONNECT_REQ,&m_dwDstNode,sizeof(u32));
 
 	}
-	else
-	{
-		SetTimer(CONNECT_TIME_EVENT, TIME_WATING);
-	}
+//	else
+//	{
+//		SetTimer(CONNECT_TIME_EVENT, TIME_WATING);
+//	}
 }
 
 
@@ -73,10 +74,12 @@ void CClientInstance::DaemonConnectServer()
 
 void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 {
-	 cout << "are you ok" << endl;
+
     //u32 curState = CurState();
     u16 curEvent = pcMsg->event;
-	u32 g_CClientApp_achIp = inet_addr(pcMsg->content);
+	s8 achIp[20];
+	memcpy(achIp,pcMsg->content,sizeof(pcMsg->content));
+	g_CClientApp.m_achIp = inet_addr(achIp);
     s32 dwRet = -1;
 
     switch(curEvent)
@@ -84,7 +87,6 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
         /* 连接服务器 */
 //        case CONNECT_TIME_EVENT:
         case U_C_CONNECT_CMD:
-			cout << "here is ok" << endl;
             DaemonConnectServer();
             break;
         /* 断开连接 */
