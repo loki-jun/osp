@@ -18,6 +18,7 @@
 #include "../../common/kdvdef.h"
 #include "../include/clientcommon.h"
 #include "../include/clientinterface.h"
+#include "../../common/macrodef.h"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ using namespace std;
 *********************************************************************/
 void help()
 {
-	cout << "connectserver 连接服务器    参数：u32 ip " <<endl;
+	cout << "connect       连接服务器    参数：u32 ip " <<endl;
 	cout << "dealpartfile  处理断点续传  参数：num[]" <<endl;
 	cout << "getfilelist   获取文件列表  参数：NULL" <<endl;
 	cout << "downloadfile  下载文件      参数：u16 FileIndex" <<endl;
@@ -52,11 +53,7 @@ void connect()
 	s8 achIp[20];
     cin.get(achIp,20);
 
-	if(!OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CONNECT_CMD,achIp,sizeof(achIp)))
-	{
-		cout << "succeed" << endl;
-	}
-
+	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CONNECT_CMD,achIp,sizeof(achIp));
 
 }
 
@@ -74,7 +71,9 @@ void connect()
 
 void clientinterface()
 {
+
     cout << "您可以有如下操作：" << endl;
+
 	help();
 
 	while (1)

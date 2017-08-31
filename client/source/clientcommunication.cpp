@@ -19,6 +19,7 @@ CClientApp g_CClientApp;
 *********************************************************************/
 void UserInit()
 {
+
 	if( !( IsOspInitd( ) ) )
 	{
 		// 初始化Osp, 在端口2501启动Telnet
@@ -38,6 +39,7 @@ void UserInit()
 	
 	
 	cout <<"***初始化成功***" <<endl;
+
 	return ;
 }
 
@@ -47,14 +49,14 @@ void UserInit()
 *********************************************************************/
 void CClientInstance::DaemonConnectServer()
 {	
-	cout << "DaemonConnectServer  ok " <<endl;
     s32 dwRet = -1;
 	dwRet = OspConnectTcpNode(g_CClientApp.m_achIp,SERVER_LISTEN_PORT);
 	if(dwRet != INVALID_NODE)
 	{
 		cout << "CONNECT  ok " << endl;
-
-//		OspPost(MAKEIID(SERVER_APP_ID, DAEMON), C_S_CONNECT_REQ,&m_dwDstNode,sizeof(u32));
+	    OspLog(LOG_LVL_DETAIL,"连接成功：");
+		m_dwDstNode = dwRet;
+//		OspPost(MAKEIID(SERVER_APP_NO, DAEMON), C_S_CONNECT_REQ,m_dwDstNode,sizeof(u32));
 
 	}
 //	else

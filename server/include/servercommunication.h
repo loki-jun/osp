@@ -24,9 +24,9 @@ private:
 	
 public:
     void InstanceEntry(CMessage *const pMsg){};
-    void DaemonInstanceEntry(CMessage *const pMsg,CApp* pcApp){};
-	void DaemonConnectServer(){};
-	void DaemonDisConnectServer(){};
+    void DaemonInstanceEntry(CMessage *const pMsg,CApp* pcApp);
+	void DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp);
+	void DaemonCheckConnect(){};
 	
 };
 

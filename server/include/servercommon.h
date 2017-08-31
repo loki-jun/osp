@@ -22,5 +22,6 @@
 #define TIME_WATING          1000
 
 #define MAX_SERVER_INS_NUM   60
+#define MAX_SERVER_NODE_SIZE 20
 
 #endif
