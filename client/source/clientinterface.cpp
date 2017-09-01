@@ -1,7 +1,7 @@
 /*==========================================================
 模块名：交互模块                        
 文件名：clientinterface.cpp
-相关文件：osp.h,clientcommon.h,clientinterface.h
+相关文件：osp.h，macrodef.h，clientinterface.h，clientcommon.h
 实现功能：接收用户输入
 作者：
 版权：
@@ -13,9 +13,7 @@
 
 #include "iostream"
 #include "io.h"
-#include "../../common/kdvtype.h"
 #include "../../common/osp.h"
-#include "../../common/kdvdef.h"
 #include "../include/clientcommon.h"
 #include "../include/clientinterface.h"
 #include "../../common/macrodef.h"
@@ -60,7 +58,7 @@ void connect()
 /*==========================================================
 函数名：clientinterface
 功能：交互模块函数入口
-算法实现：
+算法实现：条件判断接受用户输入
 参数说明：
 返回值说明：
 -------------------------------------------------------------------------------------------------------

@@ -1,5 +1,4 @@
-/*==========================================================
-模块名：文件传输模块                        
+/*==========================================================                      
 文件名：clientcommunication.h
 相关文件：clientcommon.h
 实现功能：声明交互模块APP以及类定义
@@ -15,6 +14,8 @@
 #define _CLIENTCOMMUNICATION_H_
 
 #include "../include/clientcommon.h"
+
+#define C_C_CONNECTSUCCESS_CMD          (u16)(OSP_USEREVENT_BASE+0x001E)
 
 class CUserData
 {
@@ -41,10 +42,11 @@ private:
 	u32 m_dwDstNode;
 	
 public:
-    void InstanceEntry(CMessage *const pMsg){};
+    void InstanceEntry(CMessage *const pMsg);
     void DaemonInstanceEntry(CMessage *const pMsg,CApp* pcApp);
 	void DaemonConnectServer();
 	void DaemonDisConnectServer(){};
+	void ProcRegister(CMessage *const pMsg);
 	
 };
 

@@ -24,7 +24,7 @@ void UserInit()
 		BOOL32 bRetOspinit = OspInit( TRUE, SERVER_TELENT_PORT );         		
 		if( !bRetOspinit )
 		{	
-			cout << "****初始化Osp失败****" <<endl;
+			OspLog(LOG_LVL_DETAIL,"***初始化osp失败***");
 			return ;
 		}
 	}
@@ -34,7 +34,7 @@ void UserInit()
 	u32 dwRetCreateTcpNode = OspCreateTcpNode( inet_addr("172.16.80.200"), SERVER_LISTEN_PORT );	
 	if( dwRetCreateTcpNode == INVALID_SOCKET )
 	{
-		cout << "***创建监听节点失败***" <<endl;
+		OspLog(LOG_LVL_DETAIL,"***创建监听节点失败***");
 		return;
 	}
 	
@@ -44,8 +44,7 @@ void UserInit()
 		SERVER_APP_PRIO, 
 		SERVER_APP_QUE_SIZE);	
 	
-	
-	cout <<"***初始化成功***" <<endl;
+	OspLog(LOG_LVL_DETAIL,"***初始化成功***");
 	return ;
 }
 
@@ -53,34 +52,40 @@ void UserInit()
 /*********************************************************************
     DaemonDealClientConnect函数
 *********************************************************************/
-/*
+
 void CServerInstance::DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp)
 {
-	u32 curState = CurState();
+	if ( m_dwNodeNum <= MAX_SERVER_NODE_SIZE)
+	{
+		post(pcMsg->srcid, S_C_CONNECT_ACK,NULL,0,pcMsg->srcnode);
+	}
+	else
+	{
+        post(pcMsg->srcid, S_C_CONNECT_NACK,NULL,0,pcMsg->srcnode);
+	}
+	/*
     u16 curEvent = pcMsg->event;
-    CServerInstance* pCInstance = NULL;
+	CServerInstance* pCInstance = NULL;
     u32 dwInsCout=0;
-    s8 bystr[MAX_SERVER_NODE_SIZE];
-	
+
     for( dwInsCout = 1; dwInsCout <= MAX_SERVER_INS_NUM; dwInsCout++)
     {
         pCInstance = (CServerInstance* )pcApp->GetInstance(dwInsCout);
         if ( IDLE_STATE == pCInstance->CurState() )
         {
-            memset(bystr,0x00,sizeof(bystr));
-            sprintf(bystr,"%u\n%u",pcMsg->srcid,pcMsg->srcnode);
-            OspPost(MAKEIID(SERVER_APP_NO, dwInsCout), C_S_CONNECT_REQ, bystr, strlen(bystr));
+            post(pcMsg->srcid, S_C_CONNECT_ACK,NULL,0,pcMsg->srcnode);
             pCInstance->NextState(READY_STATE);
             break;
         }
     }
     if ( MAX_SERVER_INS_NUM < dwInsCout )
     {
-        post(pcMsg->srcid, SERVER_CLIENT_REGIST_NACK, NULL, 0, pcMsg->srcnode);
+        OspPost(MAKEIID(pcMsg->srcid, DAEMON), S_C_CONNECT_NACK, pcMsg->content, sizeof(u32));
     }
+	*/
 }
 
-*/
+
 
 /*********************************************************************
     DaemonInstanceEntry函数
@@ -88,7 +93,7 @@ void CServerInstance::DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp
 
 void CServerInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 {
-
+    
     //u32 curState = CurState();
     u16 curEvent = pcMsg->event;
 
@@ -97,7 +102,9 @@ void CServerInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
         /* 连接请求 */
 //        case CONNECT_TIME_EVENT:
         case C_S_CONNECT_REQ:
-//            DaemonClientConnect();
+			m_dwNodeNum++;
+			OspLog(LOG_LVL_DETAIL,"连接请求进入daemon\n");
+            DaemonDealClientConnect(pcMsg, pcApp);
             break;
 
 		/* 注册请求 */
@@ -126,9 +133,10 @@ void CServerInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
             break;
 
         default:
-            printf(".......**.....\n");
+            OspLog(LOG_LVL_DETAIL,".......**.....\n");
             break;
     }
-
+	OspSetHBParam();
+	OspNodeDiscCBReg();
 }
 

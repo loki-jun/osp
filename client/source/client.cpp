@@ -31,10 +31,7 @@ int main()
 	
 }
 
-//void dugprinf()
-
-
-/* 帮助命令*/
+/* 帮助命令接口*/
 API void h()
 {
 	OspPrintf( TRUE, FALSE, "connect       连接服务器    参数：u32 ip \n");

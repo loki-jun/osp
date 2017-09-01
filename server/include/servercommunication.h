@@ -1,5 +1,4 @@
-/*==========================================================
-模块名：文件传输模块                        
+/*==========================================================                        
 文件名：servertcommunication.h
 相关文件：servercommon.h
 实现功能：声明交互模块APP以及类定义
@@ -21,6 +20,15 @@ class CServerInstance : public CInstance{
 private:
 	u32 m_dwDstIid;
 	u32 m_dwDstNode;
+	u32 m_dwNodeNum;
+public:
+    CServerInstance()
+    {
+        m_dwNodeNum = 0;
+    }
+    ~CServerInstance()
+    {
+    }
 	
 public:
     void InstanceEntry(CMessage *const pMsg){};

@@ -1,3 +1,14 @@
+/*==========================================================                        
+文件名：clientcommunication.cpp
+实现功能：负责消息处理以及调用文件处理模块接口
+作者：
+版权：
+------------------------------------------------------------
+修改记录：
+日  期	   	  版本		 修改人		  走读人      修改记录
+  
+===========================================================*/
+
 #include <stdio.h>
 #include <iostream>
 #include <fstream> 
@@ -26,7 +37,7 @@ void UserInit()
 		BOOL32 bRetOspinit = OspInit( TRUE, CLIENT_TELENT_PORT );         		
 		if( !bRetOspinit )
 		{	
-			cout << "****初始化Osp失败****" <<endl;
+			OspLog(LOG_LVL_DETAIL,"***初始化osp失败***");
 			return ;
 		}
 	}
@@ -38,7 +49,7 @@ void UserInit()
 		CLIENT_APP_QUE_SIZE);	
 	
 	
-	cout <<"***初始化成功***" <<endl;
+	OspLog(LOG_LVL_DETAIL,"***初始化成功***");
 
 	return ;
 }
@@ -53,10 +64,9 @@ void CClientInstance::DaemonConnectServer()
 	dwRet = OspConnectTcpNode(g_CClientApp.m_achIp,SERVER_LISTEN_PORT);
 	if(dwRet != INVALID_NODE)
 	{
-		cout << "CONNECT  ok " << endl;
-	    OspLog(LOG_LVL_DETAIL,"连接成功：");
+	    OspLog(LOG_LVL_DETAIL,"连接成功\n");
 		m_dwDstNode = dwRet;
-//		OspPost(MAKEIID(SERVER_APP_NO, DAEMON), C_S_CONNECT_REQ,m_dwDstNode,sizeof(u32));
+		post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_CONNECT_REQ,NULL,0,m_dwDstNode);
 
 	}
 //	else
@@ -65,8 +75,13 @@ void CClientInstance::DaemonConnectServer()
 //	}
 }
 
+/*********************************************************************
+    Instance注册函数
+*********************************************************************/
+void CClientInstance::ProcRegister()
+{
 
-
+}
 
 
 /*********************************************************************
@@ -78,15 +93,16 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 
     //u32 curState = CurState();
     u16 curEvent = pcMsg->event;
-	s8 achIp[20];
-	memcpy(achIp,pcMsg->content,pcMsg->length);
-	g_CClientApp.m_achIp = inet_addr(achIp);
 
     switch(curEvent)
     {
         /* 连接服务器 */
 //        case CONNECT_TIME_EVENT:
         case U_C_CONNECT_CMD:
+			s8 achIp[20];
+			memcpy(achIp,pcMsg->content,pcMsg->length);
+			g_CClientApp.m_achIp = inet_addr(achIp);
+
             DaemonConnectServer();
             break;
         /* 断开连接 */
@@ -121,11 +137,34 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
          case U_C_CANCELPARTFILE_CMD:
 			 
             break;
+		 case S_C_CONNECT_ACK:
+			 cout << "服务器连接成功\n" << endl;
+			 OspLog(LOG_LVL_DETAIL,"服务器连接成功\n");
+
+			 break;
         default:
-            printf(".......**.....\n");
+            OspLog(LOG_LVL_DETAIL,".......**.....\n");
             break;
     }
 
 }
 
+/*********************************************************************
+    InstanceEntry函数
+*********************************************************************/
 
+void CClientInstance::InstanceEntry(CMessage *const pcMsg)
+{
+	u16 curEvent = pcMsg->event;
+	switch(curEvent)
+	{
+		/* 服务器连接成功，注册instance请求*/
+	    case  C_C_CONNECTSUCCESS_CMD:
+			ProcRegister();
+			break;
+
+		default:
+            OspLog(LOG_LVL_DETAIL,".......**.....\n");
+            break;
+	}
+}
