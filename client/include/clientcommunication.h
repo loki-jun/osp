@@ -46,7 +46,6 @@ public:
     void DaemonInstanceEntry(CMessage *const pMsg,CApp* pcApp);
 	void DaemonConnectServer();
 	void DaemonDisConnectServer(){};
-	void ProcRegister(CMessage *const pMsg);
 	
 };
 

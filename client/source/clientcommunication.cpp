@@ -1,4 +1,4 @@
-/*==========================================================                        
+ /*==========================================================                        
 文件名：clientcommunication.cpp
 实现功能：负责消息处理以及调用文件处理模块接口
 作者：
@@ -75,14 +75,6 @@ void CClientInstance::DaemonConnectServer()
 //	}
 }
 
-/*********************************************************************
-    Instance注册函数
-*********************************************************************/
-void CClientInstance::ProcRegister()
-{
-
-}
-
 
 /*********************************************************************
     DaemonInstanceEntry函数
@@ -93,6 +85,8 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 
     //u32 curState = CurState();
     u16 curEvent = pcMsg->event;
+	CClientInstance* pCInstance = NULL;
+	u32 dwInsCout = 0;
 
     switch(curEvent)
     {
@@ -141,7 +135,16 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 			 cout << "服务器连接成功\n" << endl;
 			 OspLog(LOG_LVL_DETAIL,"服务器连接成功\n");
 
+
+			 for( dwInsCout = 1; dwInsCout <= MAX_CLIENT_INS_NUM; dwInsCout++)
+			 {	 
+				 //获取实例对象指针
+				 pCInstance = (CClientInstance*)pcApp->GetInstance(dwInsCout);
+				 pCInstance->NextState(IDLE_STATE);
+				 OspPost(MAKEIID(CLIENT_APP_NO, dwInsCout), C_C_CONNECTSUCCESS_CMD,&m_dwDstNode,sizeof(u32));
+			 }
 			 break;
+
         default:
             OspLog(LOG_LVL_DETAIL,".......**.....\n");
             break;
@@ -158,9 +161,15 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 	u16 curEvent = pcMsg->event;
 	switch(curEvent)
 	{
-		/* 服务器连接成功，注册instance请求*/
-	    case  C_C_CONNECTSUCCESS_CMD:
-			ProcRegister();
+		/* 服务器连接成功，请求注册instance */
+	    case  C_C_CONNECTSUCCESS_CMD:			
+			OspPost(MAKEIID(SERVER_APP_NO, PENDING), C_S_REGISTER_REQ,NULL,0,m_dwDstNode,MAKEIID(CLIENT_APP_NO,pcMsg->));
+			cout << "测试客户端注册" << endl;
+			break;
+
+		case S_C_REGISTER_ACK:
+			NextState(READY_STATE);//此处是否需要等待注册ACK再改状态？不需要，只要前面不超过20个就可以
+			cout << "注册成功" << endl;
 			break;
 
 		default:

@@ -31,7 +31,7 @@ public:
     }
 	
 public:
-    void InstanceEntry(CMessage *const pMsg){};
+    void InstanceEntry(CMessage *const pMsg);
     void DaemonInstanceEntry(CMessage *const pMsg,CApp* pcApp);
 	void DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp);
 	void DaemonCheckConnect(){};
