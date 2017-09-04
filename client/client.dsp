@@ -94,6 +94,10 @@ SOURCE=.\source\clientcommunication.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\source\clientfilemanager.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\source\clientinterface.cpp
 # End Source File
 # End Group
@@ -111,6 +115,10 @@ SOURCE=.\include\clientcommon.h
 # Begin Source File
 
 SOURCE=.\include\clientcommunication.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\clientfilemanager.h
 # End Source File
 # Begin Source File
 

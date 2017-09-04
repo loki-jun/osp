@@ -106,7 +106,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
             break;
 		/* 获取文件列表 */
         case U_C_GETLIST_CMD:
-
+			post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_GETLIST_REQ,NULL,0,g_CClientApp.m_dwDstNode);
             break;
          /* 下载文件 */
          case U_C_DOWNLOADFILE_CMD:
