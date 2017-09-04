@@ -93,7 +93,6 @@ void CServerInstance::DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp
 
 void CServerInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 {
-    
     //u32 curState = CurState();
     u16 curEvent = pcMsg->event;
 	u32 dwInsCout = 0;
@@ -139,7 +138,7 @@ void CServerInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 
 void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 {
-	cout << "测试服务器注册成功" << endl;
+//	cout << "测试服务器注册成功" << endl;
 	u16 curEvent = pcMsg->event;
 	u32 dwInsCout = 0;
 
@@ -147,16 +146,13 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 	{
 		/* 注册请求 */
 	    case C_S_REGISTER_REQ:
-			cout << "测试服务器注册成功" << endl;
 			for( dwInsCout = 1; dwInsCout <= MAX_SERVER_INS_NUM; dwInsCout++)
 			{	 
 				//获取实例对象指针
 				if (IDLE_STATE == CurState())
 				{
-					cout << "服务器注册成功" << endl;
 					NextState(READY_STATE);
 					post(pcMsg->srcid, S_C_REGISTER_ACK,NULL,0,pcMsg->srcnode);
-					//				    OspPost(MAKEIID(SERVER_APP_NO, dwInsCout), S_C_REGISTER_ACK,&m_dwDstNode,sizeof(u32));
 					break;
 				}
 				

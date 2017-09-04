@@ -65,8 +65,8 @@ void CClientInstance::DaemonConnectServer()
 	if(dwRet != INVALID_NODE)
 	{
 	    OspLog(LOG_LVL_DETAIL,"连接成功\n");
-		m_dwDstNode = dwRet;
-		post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_CONNECT_REQ,NULL,0,m_dwDstNode);
+		g_CClientApp.m_dwDstNode = dwRet;
+		post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_CONNECT_REQ,NULL,0,g_CClientApp.m_dwDstNode);
 
 	}
 //	else
@@ -141,7 +141,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 				 //获取实例对象指针
 				 pCInstance = (CClientInstance*)pcApp->GetInstance(dwInsCout);
 				 pCInstance->NextState(IDLE_STATE);
-				 OspPost(MAKEIID(CLIENT_APP_NO, dwInsCout), C_C_CONNECTSUCCESS_CMD,&m_dwDstNode,sizeof(u32));
+				 OspPost(MAKEIID(CLIENT_APP_NO, dwInsCout), C_C_CONNECTSUCCESS_CMD,&g_CClientApp.m_dwDstNode,sizeof(u32));
 			 }
 			 break;
 
@@ -159,17 +159,17 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 {
 	u16 curEvent = pcMsg->event;
+
 	switch(curEvent)
 	{
 		/* 服务器连接成功，请求注册instance */
 	    case  C_C_CONNECTSUCCESS_CMD:			
-			OspPost(MAKEIID(SERVER_APP_NO, PENDING), C_S_REGISTER_REQ,NULL,0,m_dwDstNode,MAKEIID(CLIENT_APP_NO,pcMsg->));
-			cout << "测试客户端注册" << endl;
+			post(MAKEIID(SERVER_APP_NO, PENDING), C_S_REGISTER_REQ,NULL,0,g_CClientApp.m_dwDstNode);
 			break;
 
 		case S_C_REGISTER_ACK:
-			NextState(READY_STATE);//此处是否需要等待注册ACK再改状态？不需要，只要前面不超过20个就可以
-			cout << "注册成功" << endl;
+			NextState(READY_STATE);
+			OspLog(LOG_LVL_DETAIL,"注册成功\n");
 			break;
 
 		default:
