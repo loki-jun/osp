@@ -21,11 +21,13 @@ class CUserData
 {
 public:
 	u32 m_achIp;
+	u32 m_dwDstNode;
 	
 public:
     CUserData()
     {
         m_achIp = 0;
+		m_dwDstNode = 0;
     }
     ~CUserData()
     {
@@ -39,14 +41,13 @@ private:
 	u16 m_wNormalPackageId[MAX_CLIENT_INS_NUM];
 	u16 m_wDownloadState;
 	u32 m_dwDstIid;
-	u32 m_dwDstNode;
+//	u32 m_dwDstNode;
 	
 public:
     void InstanceEntry(CMessage *const pMsg);
     void DaemonInstanceEntry(CMessage *const pMsg,CApp* pcApp);
 	void DaemonConnectServer();
 	void DaemonDisConnectServer(){};
-	void ProcRegister(CMessage *const pMsg);
 	
 };
 
