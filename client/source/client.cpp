@@ -42,7 +42,7 @@ API void h()
 	OspPrintf( TRUE, FALSE, "resumetask    恢复下载      参数：u16 taskID\n");
 	OspPrintf( TRUE, FALSE, "canceltask    取消下载      参数：u16 taskID\n");
 	OspPrintf( TRUE, FALSE, "disconnect    断开服务器    参数：NULL\n");
-	OspPrintf( TRUE, FALSE, "help          打印帮助信息  参数：NULL\n");
+	OspPrintf( TRUE, FALSE, "help          打印帮助信息  参数：NULL");
 }
 
 /* 连接服务器 */
@@ -59,4 +59,8 @@ API void c(LPSTR ip)
 	}
 }
 
+API void list()
+{
+	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_GETLIST_CMD);
+}
 

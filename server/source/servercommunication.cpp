@@ -136,9 +136,11 @@ void CServerInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 //	OspNodeDiscCBReg();
 }
 
+/*********************************************************************
+    InstanceEntry函数
+*********************************************************************/
 void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 {
-//	cout << "测试服务器注册成功" << endl;
 	u16 curEvent = pcMsg->event;
 	u32 dwInsCout = 0;
 

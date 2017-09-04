@@ -42,4 +42,19 @@
 #define S_C_CANCELFILE_ACK           (u16)(OSP_USEREVENT_BASE+0x0011)
 #define S_C_CANCELFILE_NACK          (u16)(OSP_USEREVENT_BASE+0x0012)
 
+class CFileListInfo
+{
+	u16 m_wFileNum;
+	CFileListInfo *m_pbyFileInfo;
+};
+
+class CFileInfo
+{
+	s8 m_pbyFileName[256];
+	u16 m_wNameLen;
+	u32 m_dwFileSize;
+	u32 m_dwMD5Value[32];
+};
+
+
 #endif

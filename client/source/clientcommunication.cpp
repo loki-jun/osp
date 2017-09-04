@@ -25,6 +25,7 @@ using namespace std;
 
 CClientApp g_CClientApp;
 
+
 /*********************************************************************
     初始化函数
 *********************************************************************/
@@ -37,7 +38,7 @@ void UserInit()
 		BOOL32 bRetOspinit = OspInit( TRUE, CLIENT_TELENT_PORT );         		
 		if( !bRetOspinit )
 		{	
-			OspLog(LOG_LVL_DETAIL,"***初始化osp失败***");
+			OspLog(LOG_LVL_ERROR,"***初始化osp失败***");
 			return ;
 		}
 	}
@@ -60,11 +61,11 @@ void UserInit()
 *********************************************************************/
 void CClientInstance::DaemonConnectServer()
 {	
-    s32 dwRet = -1;
-	dwRet = OspConnectTcpNode(g_CClientApp.m_achIp,SERVER_LISTEN_PORT);
+    s32 dwRet = 0;
+	dwRet = OspConnectTcpNode(g_CClientApp.m_dwIp,SERVER_LISTEN_PORT);
 	if(dwRet != INVALID_NODE)
 	{
-	    OspLog(LOG_LVL_DETAIL,"连接成功\n");
+	    OspLog(LOG_LVL_DETAIL,"成功获取服务器node\n");
 		g_CClientApp.m_dwDstNode = dwRet;
 		post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_CONNECT_REQ,NULL,0,g_CClientApp.m_dwDstNode);
 
@@ -95,7 +96,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
         case U_C_CONNECT_CMD:
 			s8 achIp[20];
 			memcpy(achIp,pcMsg->content,pcMsg->length);
-			g_CClientApp.m_achIp = inet_addr(achIp);
+			g_CClientApp.m_dwIp = inet_addr(achIp);
 
             DaemonConnectServer();
             break;
@@ -105,7 +106,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
             break;
 		/* 获取文件列表 */
         case U_C_GETLIST_CMD:
-            
+
             break;
          /* 下载文件 */
          case U_C_DOWNLOADFILE_CMD:
@@ -132,9 +133,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 			 
             break;
 		 case S_C_CONNECT_ACK:
-			 cout << "服务器连接成功\n" << endl;
 			 OspLog(LOG_LVL_DETAIL,"服务器连接成功\n");
-
 
 			 for( dwInsCout = 1; dwInsCout <= MAX_CLIENT_INS_NUM; dwInsCout++)
 			 {	 

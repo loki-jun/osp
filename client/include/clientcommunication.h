@@ -20,13 +20,13 @@
 class CUserData
 {
 public:
-	u32 m_achIp;
+	u32 m_dwIp;
 	u32 m_dwDstNode;
 	
 public:
     CUserData()
     {
-        m_achIp = 0;
+        m_dwIp = 0;
 		m_dwDstNode = 0;
     }
     ~CUserData()

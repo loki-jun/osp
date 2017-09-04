@@ -24,6 +24,7 @@
 #define U_C_CANCELPARTFILE_CMD     (u16)(OSP_USEREVENT_BASE+0x001D)
 
 void clientinterface(void);
+void showlist(CMessage *const pMsg);
 
 #endif
  

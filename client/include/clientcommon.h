@@ -13,7 +13,7 @@
 #ifndef _CLIENTCOMMON_H_
 #define _CLIENTCOMMON_H_
 
-#define CLIENT_TELENT_PORT   2501
+#define CLIENT_TELENT_PORT   (u16)2501
 
 #define CLIENT_APP_NAME      "ClientApp"
 #define CLIENT_APP_NO        1

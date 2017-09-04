@@ -144,3 +144,10 @@ void clientinterface()
 
 }
 
+//向用户展示文件列表内容
+/*
+void showlist(pMsg)
+{
+	cout << pMsg << endl;
+}
+*/

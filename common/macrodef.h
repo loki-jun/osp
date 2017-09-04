@@ -20,8 +20,8 @@
 #define PAUSEFLG_STATE              3
 #define CONNECT                     4 
 
-#define SERVER_TELENT_PORT          2502
-#define SERVER_LISTEN_PORT          6682
+#define SERVER_TELENT_PORT          (u16)2502
+#define SERVER_LISTEN_PORT          (u16)6682
 
 #define SERVER_APP_NO               1
 
