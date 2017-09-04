@@ -48,7 +48,15 @@ API void h()
 /* 连接服务器 */
 API void c(LPSTR ip)
 {
-	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CONNECT_CMD,ip,20);
+	//Ip合法性检验
+	if (INADDR_NONE == inet_addr(ip))
+	{
+		OspPrintf(TRUE,FALSE,"ip地址不合法，请重新输入：");
+	}
+	else
+	{
+		OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CONNECT_CMD,ip,20);
+	}
 }
 
 

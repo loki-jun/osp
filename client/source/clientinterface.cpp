@@ -44,14 +44,27 @@ void help()
 void connect()
 {
 	cout << "请输入ip地址：" << endl;
-
-	cin.clear();
-	cin.sync();
-
-	s8 achIp[20];
-    cin.get(achIp,20);
-
-	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CONNECT_CMD,achIp,sizeof(achIp));
+	//Ip地址合法性检验
+	while(1)
+	{
+		cin.clear();
+		cin.sync();
+		
+		s8 achIp[20];
+		cin.get(achIp,20);
+		
+		if (INADDR_NONE == inet_addr(achIp))
+		{
+			cout << "ip地址不合法，请重新输入：" << endl;
+			
+		}
+		else
+		{
+			OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CONNECT_CMD,achIp,sizeof(achIp));
+			break;
+		}
+	}
+	
 
 }
 
@@ -82,7 +95,7 @@ void clientinterface()
 		if(!strcmp(achUserInput,"connect"))
 		{
 			connect();
-			break;
+//			break;
 		}
 		else if (!strcmp(achUserInput,"dealpartfile"))
 		{
@@ -119,7 +132,6 @@ void clientinterface()
 		else if (!strcmp(achUserInput,"help"))
 		{
 			help();
-			break;
 		}
 		else
 		{
