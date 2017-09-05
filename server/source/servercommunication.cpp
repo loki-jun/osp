@@ -33,7 +33,7 @@ void UserInit()
 
 	// 在6682端口上创建本地监听结点 
 //	u32 dwRetCreateTcpNode = OspCreateTcpNode( inet_addr("127.0.0.1"), SERVER_LISTEN_PORT );   
-	u32 dwRetCreateTcpNode = OspCreateTcpNode( inet_addr("172.16.80.200"), SERVER_LISTEN_PORT );	
+	u32 dwRetCreateTcpNode = OspCreateTcpNode( 0, SERVER_LISTEN_PORT );	
 	if( dwRetCreateTcpNode == INVALID_SOCKET )
 	{
 		OspLog(LOG_LVL_ERROR,"***创建监听节点失败***");
