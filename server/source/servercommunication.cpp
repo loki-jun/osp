@@ -8,11 +8,13 @@
 #include "../../common/macrodef.h"
 #include "../include/servercommon.h"
 #include "../include/servercommunication.h"
+#include "../include/servercreatefilelist.h"
 
 using namespace std;
 
 CServerApp g_CServerApp;
 
+extern CFileListInfo g_CFileListInfo;
 /*********************************************************************
     初始化函数
 *********************************************************************/
@@ -24,7 +26,7 @@ void UserInit()
 		BOOL32 bRetOspinit = OspInit( TRUE, SERVER_TELENT_PORT );         		
 		if( !bRetOspinit )
 		{	
-			OspLog(LOG_LVL_DETAIL,"***初始化osp失败***");
+			OspLog(LOG_LVL_ERROR,"***初始化osp失败***");
 			return ;
 		}
 	}
@@ -34,7 +36,7 @@ void UserInit()
 	u32 dwRetCreateTcpNode = OspCreateTcpNode( inet_addr("172.16.80.200"), SERVER_LISTEN_PORT );	
 	if( dwRetCreateTcpNode == INVALID_SOCKET )
 	{
-		OspLog(LOG_LVL_DETAIL,"***创建监听节点失败***");
+		OspLog(LOG_LVL_ERROR,"***创建监听节点失败***");
 		return;
 	}
 	
@@ -85,6 +87,24 @@ void CServerInstance::DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp
 	*/
 }
 
+/*********************************************************************
+    获取文件列表函数
+*********************************************************************/
+void getlist()
+{
+	FindFiles ff;
+	vector<string> fileNames;
+	fileNames = ff.findFiles( "E:\\学习资料" );//当前文件夹用"."，"\"要加\转义
+	g_CFileListInfo.m_wFileNum = fileNames.size()
+//	u16 wCount = 0;
+//	for ( wCount =0; wCount<fileNames.size(); wCount++ )
+// 	{      
+		
+//		cout << fileNames[wCount] <<endl;
+		
+//	}
+}
+
 
 
 /*********************************************************************
@@ -104,13 +124,14 @@ void CServerInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 //        case CONNECT_TIME_EVENT:
         case C_S_CONNECT_REQ:
 			m_dwNodeNum++;
-			OspLog(LOG_LVL_DETAIL,"连接请求进入daemon\n");
+//			OspLog(LOG_LVL_DETAIL,"连接请求进入daemon\n");
             DaemonDealClientConnect(pcMsg, pcApp);
             break;
 
 		/* 获取文件列表请求 */
         case C_S_GETLIST_REQ:
-            
+			OspLog(LOG_LVL_DETAIL,"服务器测试文件列表生成");
+            getlist();
             break;
 
          /* 下载文件请求 */
