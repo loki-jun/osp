@@ -15,16 +15,32 @@
 
 #include "../include/servercommon.h"
 
+class CUserData
+{
+public:
+	u32 m_dwNodeNum;
+	
+public:
+    CUserData()
+    {
+		m_dwNodeNum = 0;
+    }
+    ~CUserData()
+    {
+    }
+	
+};
+
 
 class CServerInstance : public CInstance{
 private:
 	u32 m_dwDstIid;
 	u32 m_dwDstNode;
-	u32 m_dwNodeNum;
 public:
     CServerInstance()
     {
-        m_dwNodeNum = 0;
+        m_dwDstIid = 0;
+		m_dwDstNode = 0;
     }
     ~CServerInstance()
     {
@@ -40,7 +56,7 @@ public:
 };
 
 
-typedef zTemplate<CServerInstance,MAX_SERVER_INS_NUM>CServerApp;
+typedef zTemplate<CServerInstance,MAX_SERVER_INS_NUM,CUserData>CServerApp;
 
 void UserInit();
 
