@@ -100,7 +100,6 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 	CClientInstance* pCInstance = NULL;
 	u32 dwInsCout = 0;
 
-	cout << curEvent << "1111111" << S_C_GETLIST_ACK << endl;
     switch(pcMsg->event)
     {
 //        case OSP_DISCONNECT:
@@ -195,9 +194,9 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 		/* 服务器文件列表反馈 */
         case S_C_GETLIST_ACK:
 			OspLog(LOG_LVL_DETAIL,"接收文件列表测试\n");
-			memcpy(&CFileListInfo,pcMsg->content,pcMsg->length);
-			cout << pcMsg->content << endl;
-			OspPrintf(TRUE,FALSE,"文件列表内容为：%d\n",CFileListInfo.m_wFileNum);
+//			memcpy(&CFileListInfo,pcMsg->content,pcMsg->length);
+//			cout << pcMsg->content << endl;
+//			OspPrintf(TRUE,FALSE,"文件列表内容为：%d\n",CFileListInfo.m_wFileNum);
 			break;
 
         default:

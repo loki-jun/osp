@@ -107,9 +107,10 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 {
 	FindFiles ff;
 	vector<string> fileNames;
-	fileNames = ff.findFiles( "E:\\测试文件夹" );//当前文件夹用"."，"\"要加\转义
+	fileNames = ff.findFiles( "." );//当前文件夹用"."，"\"要加\转义
 	CFileListInfo.m_wFileNum = fileNames.size();
 	post(pcMsg->srcid,S_C_GETLIST_ACK,&CFileListInfo,sizeof(CFileListInfo),pcMsg->srcnode);
+
 
 //	u16 wCount = 0;
 //	for ( wCount =0; wCount<fileNames.size(); wCount++ )
