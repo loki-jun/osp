@@ -76,6 +76,14 @@ void CClientInstance::DaemonConnectServer()
 //	}
 }
 
+/*********************************************************************
+    DaemonDisConnectServer函数
+*********************************************************************/
+void CClientInstance::DaemonDisConnectServer()
+{
+	
+}
+
 
 /*********************************************************************
     DaemonInstanceEntry函数
@@ -84,7 +92,7 @@ void CClientInstance::DaemonConnectServer()
 void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 {
 
-    //u32 curState = CurState();
+    u32 curState = CurState();
     u16 curEvent = pcMsg->event;
 	CClientInstance* pCInstance = NULL;
 	u32 dwInsCout = 0;
@@ -94,19 +102,46 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
         /* 连接服务器 */
 //        case CONNECT_TIME_EVENT:
         case U_C_CONNECT_CMD:
-			s8 achIp[20];
-			memcpy(achIp,pcMsg->content,pcMsg->length);
-			g_CClientApp.m_dwIp = inet_addr(achIp);
-
+			if (IDLE_STATE == CurState())
+			{
+				s8 achIp[20];
+				memcpy(achIp,pcMsg->content,pcMsg->length);
+				g_CClientApp.m_dwIp = inet_addr(achIp);
             DaemonConnectServer();
+			}
+			else
+			{
+				OspLog(LOG_LVL_WARNING,"与服务器连接中，请勿重复操作！若要重连，请先断开。\n");
+			}
             break;
         /* 断开连接 */
         case U_C_DISCONNECT_CMD:
-            DaemonDisConnectServer();
+			if (CONNECT_STATE == CurState())
+			{
+				for( dwInsCout = 1; dwInsCout <= MAX_CLIENT_INS_NUM; dwInsCout++)
+				{	 
+					//获取实例对象指针
+					pCInstance = (CClientInstance*)pcApp->GetInstance(dwInsCout);
+					pCInstance->NextState(IDLE_STATE);
+				}  
+				NextState(IDLE_STATE);
+				OspLog(LOG_LVL_WARNING,"服务器已断开！\n");
+			}
+			else
+			{
+				OspLog(LOG_LVL_WARNING,"未连接，请先连接服务器！\n");
+			}
             break;
 		/* 获取文件列表 */
         case U_C_GETLIST_CMD:
-			post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_GETLIST_REQ,NULL,0,g_CClientApp.m_dwDstNode);
+			if (CONNECT_STATE == CurState())
+			{
+				post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_GETLIST_REQ,NULL,0,g_CClientApp.m_dwDstNode);
+			}
+			else
+			{
+				OspLog(LOG_LVL_WARNING,"未连接，请先连接服务器！\n");
+			}
             break;
          /* 下载文件 */
          case U_C_DOWNLOADFILE_CMD:
@@ -134,7 +169,8 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
             break;
 		 case S_C_CONNECT_ACK:
 			 OspLog(LOG_LVL_DETAIL,"服务器连接成功\n");
-
+			 NextState(CONNECT_STATE);
+			 OspLog(LOG_LVL_DETAIL,"daemon状态：%u\n",CurState());
 			 for( dwInsCout = 1; dwInsCout <= MAX_CLIENT_INS_NUM; dwInsCout++)
 			 {	 
 				 //获取实例对象指针
@@ -162,13 +198,13 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 	switch(curEvent)
 	{
 		/* 服务器连接成功，请求注册instance */
-	    case  C_C_CONNECTSUCCESS_CMD:			
+	    case C_C_CONNECTSUCCESS_CMD:			
 			post(MAKEIID(SERVER_APP_NO, PENDING), C_S_REGISTER_REQ,NULL,0,g_CClientApp.m_dwDstNode);
 			break;
 
 		case S_C_REGISTER_ACK:
 			NextState(READY_STATE);
-			OspLog(LOG_LVL_DETAIL,"注册成功\n");
+			OspLog(LOG_LVL_DETAIL,"instance注册成功\n");
 			break;
 
 		default:

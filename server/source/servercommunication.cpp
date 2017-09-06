@@ -14,7 +14,7 @@ using namespace std;
 
 CServerApp g_CServerApp;
 
-extern CFileListInfo g_CFileListInfo;
+//extern CFileListInfo g_CFileListInfo;
 /*********************************************************************
     初始化函数
 *********************************************************************/
@@ -57,7 +57,7 @@ void UserInit()
 
 void CServerInstance::DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp)
 {
-	if ( m_dwNodeNum <= MAX_SERVER_NODE_SIZE)
+	if ( g_CServerApp.m_dwNodeNum <= MAX_SERVER_NODE_SIZE)
 	{
 		post(pcMsg->srcid, S_C_CONNECT_ACK,NULL,0,pcMsg->srcnode);
 	}
@@ -95,7 +95,7 @@ void getlist()
 	FindFiles ff;
 	vector<string> fileNames;
 	fileNames = ff.findFiles( "E:\\学习资料" );//当前文件夹用"."，"\"要加\转义
-	g_CFileListInfo.m_wFileNum = fileNames.size()
+//	g_CFileListInfo.m_wFileNum = fileNames.size();
 //	u16 wCount = 0;
 //	for ( wCount =0; wCount<fileNames.size(); wCount++ )
 // 	{      
@@ -123,14 +123,14 @@ void CServerInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
         /* 连接请求 */
 //        case CONNECT_TIME_EVENT:
         case C_S_CONNECT_REQ:
-			m_dwNodeNum++;
+			g_CServerApp.m_dwNodeNum++;
 //			OspLog(LOG_LVL_DETAIL,"连接请求进入daemon\n");
             DaemonDealClientConnect(pcMsg, pcApp);
             break;
 
 		/* 获取文件列表请求 */
         case C_S_GETLIST_REQ:
-			OspLog(LOG_LVL_DETAIL,"服务器测试文件列表生成");
+			OspLog(LOG_LVL_DETAIL,"服务器测试文件列表生成\n");
             getlist();
             break;
 

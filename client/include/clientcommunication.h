@@ -15,7 +15,7 @@
 
 #include "../include/clientcommon.h"
 
-#define C_C_CONNECTSUCCESS_CMD          (u16)(OSP_USEREVENT_BASE+0x001E)
+#define C_C_CONNECTSUCCESS_CMD          (u16)(OSP_USEREVENT_BASE+0x001E) //客户端连接服务器成功，准备注册命令，client(daemon->instance)
 
 class CUserData
 {
@@ -47,7 +47,7 @@ public:
     void InstanceEntry(CMessage *const pMsg);
     void DaemonInstanceEntry(CMessage *const pMsg,CApp* pcApp);
 	void DaemonConnectServer();
-	void DaemonDisConnectServer(){};
+	void DaemonDisConnectServer();
 	
 };
 

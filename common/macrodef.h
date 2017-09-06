@@ -18,7 +18,7 @@
 #define READY_STATE                 1
 #define TRANSFER_STATE              2
 #define PAUSEFLG_STATE              3
-#define CONNECT                     4 
+#define CONNECT_STATE               4 
 
 #define SERVER_TELENT_PORT          (u16)2502
 #define SERVER_LISTEN_PORT          (u16)6682

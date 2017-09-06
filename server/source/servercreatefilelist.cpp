@@ -7,7 +7,7 @@
 #include "../../common/csmsg.h"
 
 using namespace std;
-extern CFileInfo g_CFileInfo;
+//extern CFileInfo g_CFileInfo;
 /*********************************************************************
     Windows平台获取文件列表
 *********************************************************************/
@@ -59,8 +59,8 @@ vector<string> FindFiles::findFiles( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*"
 				u32 file_size = (FindFileData.nFileSizeHigh * (MAXDWORD+1.0)) + FindFileData.nFileSizeLow;
 				cout << FindFileData.cFileName << "  大小："<< file_size <<endl;
 				OspPrintf(TRUE,FALSE,"%s  文件大小：%u\n",FindFileData.cFileName,file_size);
-				g_CFileInfo.m_pbyFileName = FindFileData.cFileName;
-				g_CFileInfo.m_dwFileSize = file_size;
+//				g_CFileInfo.m_pbyFileName = FindFileData.cFileName;
+//				g_CFileInfo.m_dwFileSize = file_size;
 
             }
             else
@@ -71,8 +71,8 @@ vector<string> FindFiles::findFiles( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*"
 				u32 file_size = (FindFileData.nFileSizeHigh * (MAXDWORD+1.0)) + FindFileData.nFileSizeLow;
 				cout << FindFileData.cFileName << "  大小："<< file_size <<endl;
 				OspPrintf(TRUE,FALSE,"%s  文件大小：%d\n",FindFileData.cFileName,file_size);
-				g_CFileInfo.m_pbyFileName = FindFileData.cFileName;
-				g_CFileInfo.m_dwFileSize = file_size;
+//				g_CFileInfo.m_pbyFileName = FindFileData.cFileName;
+//				g_CFileInfo.m_dwFileSize = file_size;
             }
         }
 

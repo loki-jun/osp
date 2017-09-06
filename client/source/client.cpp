@@ -69,6 +69,13 @@ API void getfilelist()
 	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_GETLIST_CMD);
 }
 
+/* 断开连接 */
+API void disconnect()
+{
+	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_DISCONNECT_CMD);
+}
+
+
 
 /*********************************************************************
     单字母调试接口
@@ -86,4 +93,9 @@ API void c(LPSTR ip)
 API void l()
 {
 	getfilelist();
+}
+
+API void dis()
+{
+	disconnect();
 }
