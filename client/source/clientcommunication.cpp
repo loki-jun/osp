@@ -62,7 +62,7 @@ void UserInit()
 void CClientInstance::DaemonConnectServer()
 {	
     s32 dwRet = 0;
-	dwRet = OspConnectTcpNode(g_CClientApp.m_dwIp,SERVER_LISTEN_PORT);
+	dwRet = OspConnectTcpNode(g_CClientApp.m_dwIp,SERVER_LISTEN_PORT,TIME_WATING,NUM_WATING);
 	if(dwRet != INVALID_NODE)
 	{
 	    OspLog(LOG_LVL_DETAIL,"成功获取服务器node\n");
@@ -70,10 +70,11 @@ void CClientInstance::DaemonConnectServer()
 		post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_CONNECT_REQ,NULL,0,g_CClientApp.m_dwDstNode);
 
 	}
-//	else
-//	{
+	else
+	{
+		OspLog(LOG_LVL_WARNING,"连接超时，请重连！\n");
 //		SetTimer(CONNECT_TIME_EVENT, TIME_WATING);
-//	}
+	}
 }
 
 /*********************************************************************
@@ -91,7 +92,7 @@ void CClientInstance::DaemonDisConnectServer()
 
 void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 {
-
+	
     u32 curState = CurState();
     u16 curEvent = pcMsg->event;
 	CClientInstance* pCInstance = NULL;
@@ -107,7 +108,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 				s8 achIp[20];
 				memcpy(achIp,pcMsg->content,pcMsg->length);
 				g_CClientApp.m_dwIp = inet_addr(achIp);
-            DaemonConnectServer();
+                DaemonConnectServer();
 			}
 			else
 			{
@@ -124,6 +125,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 					pCInstance = (CClientInstance*)pcApp->GetInstance(dwInsCout);
 					pCInstance->NextState(IDLE_STATE);
 				}  
+				OspDisconnectTcpNode(g_CClientApp.m_dwDstNode);
 				NextState(IDLE_STATE);
 				OspLog(LOG_LVL_WARNING,"服务器已断开！\n");
 			}
@@ -171,6 +173,10 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 			 OspLog(LOG_LVL_DETAIL,"服务器连接成功\n");
 			 NextState(CONNECT_STATE);
 			 OspLog(LOG_LVL_DETAIL,"daemon状态：%u\n",CurState());
+
+			 OspSetHBParam(g_CClientApp.m_dwDstNode,NODE_TIME_WATING,NUM_WATING);
+//			 OspNodeDiscCBReg();
+
 			 for( dwInsCout = 1; dwInsCout <= MAX_CLIENT_INS_NUM; dwInsCout++)
 			 {	 
 				 //获取实例对象指针
