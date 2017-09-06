@@ -1,3 +1,16 @@
+/*==========================================================                        
+文件名：servercreatefilelist.cpp
+相关文件：
+实现功能：生成文件列表
+作者：
+版权：
+------------------------------------------------------------
+修改记录：
+日  期	   	  版本		 修改人		  走读人      修改记录
+  
+===========================================================*/
+
+
 #include "../include/servercreatefilelist.h"
 #include <iostream>
 #include <fstream>
@@ -7,7 +20,11 @@
 #include "../../common/csmsg.h"
 
 using namespace std;
-//extern CFileInfo g_CFileInfo;
+
+
+
+extern CFileInfo CFileInfo;
+extern CFileListInfo CFileListInfo;
 /*********************************************************************
     Windows平台获取文件列表
 *********************************************************************/
@@ -57,10 +74,10 @@ vector<string> FindFiles::findFiles( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*"
                 filePath += FindFileData.cFileName;
 				file_lists.push_back(filePath);
 				u32 file_size = (FindFileData.nFileSizeHigh * (MAXDWORD+1.0)) + FindFileData.nFileSizeLow;
-				cout << FindFileData.cFileName << "  大小："<< file_size <<endl;
-				OspPrintf(TRUE,FALSE,"%s  文件大小：%u\n",FindFileData.cFileName,file_size);
-//				g_CFileInfo.m_pbyFileName = FindFileData.cFileName;
-//				g_CFileInfo.m_dwFileSize = file_size;
+//				cout << FindFileData.cFileName << "  大小："<< file_size <<endl;
+//				OspPrintf(TRUE,FALSE,"%s  文件大小：%u\n",FindFileData.cFileName,file_size);
+				memcpy(CFileInfo.m_pbyFileName,FindFileData.cFileName,sizeof(CFileInfo.m_pbyFileName));
+				CFileInfo.m_dwFileSize = file_size;
 
             }
             else
@@ -69,10 +86,10 @@ vector<string> FindFiles::findFiles( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*"
                 filePath += FindFileData.cFileName;              				
 				file_lists.push_back(filePath);
 				u32 file_size = (FindFileData.nFileSizeHigh * (MAXDWORD+1.0)) + FindFileData.nFileSizeLow;
-				cout << FindFileData.cFileName << "  大小："<< file_size <<endl;
-				OspPrintf(TRUE,FALSE,"%s  文件大小：%d\n",FindFileData.cFileName,file_size);
-//				g_CFileInfo.m_pbyFileName = FindFileData.cFileName;
-//				g_CFileInfo.m_dwFileSize = file_size;
+//				cout << FindFileData.cFileName << "  大小："<< file_size <<endl;
+//				OspPrintf(TRUE,FALSE,"%s  文件大小：%d\n",FindFileData.cFileName,file_size);
+				memcpy(CFileInfo.m_pbyFileName,FindFileData.cFileName,sizeof(CFileInfo.m_pbyFileName));
+				CFileInfo.m_dwFileSize = file_size;
             }
         }
 

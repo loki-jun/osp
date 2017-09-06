@@ -1,3 +1,15 @@
+/*==========================================================                        
+文件名：servercommunication.cpp
+相关文件：
+实现功能：负责消息处理以及调用文件管理模块接口
+作者：
+版权：
+------------------------------------------------------------
+修改记录：
+日  期	   	  版本		 修改人		  走读人      修改记录
+  
+===========================================================*/
+
 #include <stdio.h>
 #include <iostream>
 #include <fstream> 
@@ -14,7 +26,8 @@ using namespace std;
 
 CServerApp g_CServerApp;
 
-//extern CFileListInfo g_CFileListInfo;
+CFileInfo CFileInfo;
+CFileListInfo CFileListInfo;
 /*********************************************************************
     初始化函数
 *********************************************************************/
@@ -90,12 +103,14 @@ void CServerInstance::DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp
 /*********************************************************************
     获取文件列表函数
 *********************************************************************/
-void getlist()
+void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 {
 	FindFiles ff;
 	vector<string> fileNames;
-	fileNames = ff.findFiles( "E:\\学习资料" );//当前文件夹用"."，"\"要加\转义
-//	g_CFileListInfo.m_wFileNum = fileNames.size();
+	fileNames = ff.findFiles( "E:\\测试文件夹" );//当前文件夹用"."，"\"要加\转义
+	CFileListInfo.m_wFileNum = fileNames.size();
+	post(pcMsg->srcid,S_C_GETLIST_ACK,&CFileListInfo,sizeof(CFileListInfo),pcMsg->srcnode);
+
 //	u16 wCount = 0;
 //	for ( wCount =0; wCount<fileNames.size(); wCount++ )
 // 	{      
@@ -131,7 +146,7 @@ void CServerInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 		/* 获取文件列表请求 */
         case C_S_GETLIST_REQ:
 			OspLog(LOG_LVL_DETAIL,"服务器测试文件列表生成\n");
-            getlist();
+            DaemonGetlist(pcMsg);
             break;
 
          /* 下载文件请求 */

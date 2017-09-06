@@ -51,7 +51,7 @@ public:
     void DaemonInstanceEntry(CMessage *const pMsg,CApp* pcApp);
 	void DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp);
 	void DaemonCheckConnect(){};
-	void CreateFileList(){};
+	void DaemonGetlist(CMessage *const pcMsg);
 	
 };
 

@@ -22,7 +22,9 @@
 
 #define CONNECT_TIME_EVENT   (u16)(OSP_USEREVENT_BASE+0x0014)
 #define REGISTER_TIME_EVENT  (u16)(OSP_USEREVENT_BASE+0x0015)
-#define TIME_WATING          1000
+#define TIME_WATING          10
+#define NODE_TIME_WATING      5
+#define NUM_WATING            3
 
 #define MAX_CLIENT_INS_NUM 3
 

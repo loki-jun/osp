@@ -1,6 +1,6 @@
  /*==========================================================                        
 文件名：clientcommunication.cpp
-实现功能：负责消息处理以及调用文件处理模块接口
+实现功能：负责消息处理以及调用文件管理模块接口
 作者：
 版权：
 ------------------------------------------------------------
@@ -25,6 +25,8 @@ using namespace std;
 
 CClientApp g_CClientApp;
 
+CFileInfo CFileInfo;
+CFileListInfo CFileListInfo;
 
 /*********************************************************************
     初始化函数
@@ -68,11 +70,12 @@ void CClientInstance::DaemonConnectServer()
 	    OspLog(LOG_LVL_DETAIL,"成功获取服务器node\n");
 		g_CClientApp.m_dwDstNode = dwRet;
 		post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_CONNECT_REQ,NULL,0,g_CClientApp.m_dwDstNode);
-
+		OspSetHBParam(g_CClientApp.m_dwDstNode,NODE_TIME_WATING,NUM_WATING);
+//		OspNodeDiscCBRegQ(g_CClientApp.m_dwDstNode,CLIENT_APP_NO,DAEMON);
 	}
 	else
 	{
-		OspLog(LOG_LVL_WARNING,"连接超时，请重连！\n");
+		OspLog(LOG_LVL_WARNING,"连接超时！\n");
 //		SetTimer(CONNECT_TIME_EVENT, TIME_WATING);
 	}
 }
@@ -92,16 +95,20 @@ void CClientInstance::DaemonDisConnectServer()
 
 void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 {
-	
     u32 curState = CurState();
     u16 curEvent = pcMsg->event;
 	CClientInstance* pCInstance = NULL;
 	u32 dwInsCout = 0;
 
-    switch(curEvent)
+	cout << curEvent << "1111111" << S_C_GETLIST_ACK << endl;
+    switch(pcMsg->event)
     {
-        /* 连接服务器 */
-//        case CONNECT_TIME_EVENT:
+//        case OSP_DISCONNECT:
+//			OspLog(LOG_LVL_WARNING,"服务器已断链，重连中……\n");
+//			NextState(IDLE_STATE);
+//			break;
+
+		/* 连接服务器 */
         case U_C_CONNECT_CMD:
 			if (IDLE_STATE == CurState())
 			{
@@ -169,13 +176,12 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
          case U_C_CANCELPARTFILE_CMD:
 			 
             break;
+			
+		/* 服务器连接确认 */
 		 case S_C_CONNECT_ACK:
 			 OspLog(LOG_LVL_DETAIL,"服务器连接成功\n");
 			 NextState(CONNECT_STATE);
 			 OspLog(LOG_LVL_DETAIL,"daemon状态：%u\n",CurState());
-
-			 OspSetHBParam(g_CClientApp.m_dwDstNode,NODE_TIME_WATING,NUM_WATING);
-//			 OspNodeDiscCBReg();
 
 			 for( dwInsCout = 1; dwInsCout <= MAX_CLIENT_INS_NUM; dwInsCout++)
 			 {	 
@@ -185,6 +191,14 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 				 OspPost(MAKEIID(CLIENT_APP_NO, dwInsCout), C_C_CONNECTSUCCESS_CMD,&g_CClientApp.m_dwDstNode,sizeof(u32));
 			 }
 			 break;
+
+		/* 服务器文件列表反馈 */
+        case S_C_GETLIST_ACK:
+			OspLog(LOG_LVL_DETAIL,"接收文件列表测试\n");
+			memcpy(&CFileListInfo,pcMsg->content,pcMsg->length);
+			cout << pcMsg->content << endl;
+			OspPrintf(TRUE,FALSE,"文件列表内容为：%d\n",CFileListInfo.m_wFileNum);
+			break;
 
         default:
             OspLog(LOG_LVL_DETAIL,".......**.....\n");

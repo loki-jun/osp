@@ -42,10 +42,12 @@
 #define S_C_CANCELFILE_ACK           (u16)(OSP_USEREVENT_BASE+0x0011) //服务器响应客户端取消文件下载，server(instance)->client(instance)
 #define S_C_CANCELFILE_NACK          (u16)(OSP_USEREVENT_BASE+0x0012) //服务器拒绝取消下载请求，server(instance)->client(instance)
 
+//#define OSP_DISCONNECT               (u16)(OSP_USEREVENT_BASE+0x001F) //断链提示
+
 class CFileInfo
 {
 public:
-	s8 m_pbyFileName[260];
+	s8 m_pbyFileName[256];
 	u32 m_dwFileSize;
 	u32 m_dwMD5Value[32];
 	
@@ -54,7 +56,7 @@ public:
     {
         m_dwFileSize = 0;
 		memset(m_dwMD5Value,0,32);
-		memset(m_pbyFileName,0,260);
+		memset(m_pbyFileName,0,256);
     }
     ~CFileInfo()
     {
@@ -65,19 +67,17 @@ class CFileListInfo
 {
 public:
 	u16 m_wFileNum;
-	CFileInfo *m_pbyFileInfo[500];
+	CFileInfo m_pbyFileInfo[500];
 
 public:
     CFileListInfo()
     {
         m_wFileNum = 0;
-		memset(m_pbyFileInfo,0,500);
+//		memset(m_pbyFileInfo,0,500);
     }
     ~CFileListInfo()
     {
     }
 };
-
-
 
 #endif
