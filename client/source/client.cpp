@@ -31,8 +31,12 @@ int main()
 	
 }
 
+/*********************************************************************
+    标准API接口
+*********************************************************************/
+
 /* 帮助命令接口*/
-API void h()
+API void help()
 {
 	OspPrintf( TRUE, FALSE, "connect       连接服务器    参数：u32 ip \n");
 	OspPrintf( TRUE, FALSE, "dealpartfile  处理断点续传  参数：num[]\n");
@@ -45,8 +49,8 @@ API void h()
 	OspPrintf( TRUE, FALSE, "help          打印帮助信息  参数：NULL");
 }
 
-/* 连接服务器 */
-API void c(LPSTR ip)
+/* 连接服务器接口 */
+API void connectserver(LPSTR ip)
 {
 	//Ip合法性检验
 	if (INADDR_NONE == inet_addr(ip))
@@ -59,8 +63,27 @@ API void c(LPSTR ip)
 	}
 }
 
-API void list()
+/* 获取文件列表接口 */
+API void getfilelist()
 {
 	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_GETLIST_CMD);
 }
 
+
+/*********************************************************************
+    单字母调试接口
+*********************************************************************/
+API void h()
+{
+	help();
+}
+
+API void c(LPSTR ip)
+{
+	connectserver(ip);
+}
+
+API void l()
+{
+	getfilelist();
+}
