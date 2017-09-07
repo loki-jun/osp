@@ -21,6 +21,7 @@ public:
 
 private:
     vector<string> file_lists;
+	vector<string> file_names;
 };
 
 #endif

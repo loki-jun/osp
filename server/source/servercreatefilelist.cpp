@@ -23,8 +23,8 @@ using namespace std;
 
 
 
-extern CFileInfo CFileInfo;
-extern CFileListInfo CFileListInfo;
+extern CFileInfo FileInfo;
+extern CFileListInfo FileListInfo;
 /*********************************************************************
     Windows平台获取文件列表
 *********************************************************************/
@@ -74,10 +74,13 @@ vector<string> FindFiles::findFiles( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*"
                 filePath += FindFileData.cFileName;
 				file_lists.push_back(filePath);
 				u32 file_size = (FindFileData.nFileSizeHigh * (MAXDWORD+1.0)) + FindFileData.nFileSizeLow;
+				file_names.push_back(FindFileData.cFileName); 
 //				cout << FindFileData.cFileName << "  大小："<< file_size <<endl;
 //				OspPrintf(TRUE,FALSE,"%s  文件大小：%u\n",FindFileData.cFileName,file_size);
-				memcpy(CFileInfo.m_pbyFileName,FindFileData.cFileName,sizeof(CFileInfo.m_pbyFileName));
-				CFileInfo.m_dwFileSize = file_size;
+//		        memcpy(FileInfo.m_pbyFileName,FindFileData.cFileName,sizeof(FileListInfo.m_pbyFileInfo->m_pbyFileName));
+//				memcpy(FileListInfo.m_pbyFileInfo,FileInfo,sizeof(FileListInfo.m_pbyFileInfo[500]));
+
+
 
             }
             else
@@ -86,17 +89,23 @@ vector<string> FindFiles::findFiles( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*"
                 filePath += FindFileData.cFileName;              				
 				file_lists.push_back(filePath);
 				u32 file_size = (FindFileData.nFileSizeHigh * (MAXDWORD+1.0)) + FindFileData.nFileSizeLow;
+				file_names.push_back(FindFileData.cFileName); 
 //				cout << FindFileData.cFileName << "  大小："<< file_size <<endl;
 //				OspPrintf(TRUE,FALSE,"%s  文件大小：%d\n",FindFileData.cFileName,file_size);
-				memcpy(CFileInfo.m_pbyFileName,FindFileData.cFileName,sizeof(CFileInfo.m_pbyFileName));
-				CFileInfo.m_dwFileSize = file_size;
+//		        memcpy(FileInfo.m_pbyFileName,FindFileData.cFileName,sizeof(FileListInfo.m_pbyFileInfo->m_pbyFileName));
+//				memcpy(FileListInfo.m_pbyFileInfo,FileInfo,sizeof(FileListInfo.m_pbyFileInfo[500]));
+//				FileListInfo.m_pbyFileInfo[500].m_dwFileSize = file_size;
+
+
             }
         }
 
     }while(::FindNextFile(hFind,&FindFileData));
-
     ::FindClose(hFind);
-    return file_lists;
+	
+
+    return file_names;
+//	return file_lists;
 }
 
 /*********************************************************************

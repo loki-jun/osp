@@ -52,6 +52,7 @@ public:
 	void DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp);
 	void DaemonCheckConnect(){};
 	void DaemonGetlist(CMessage *const pcMsg);
+	void ProcCheckFile(CMessage *const pcMsg);
 	
 };
 
