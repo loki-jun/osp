@@ -85,9 +85,11 @@ API void h()
 	help();
 }
 
-API void c(LPSTR ip)
+//API void c(LPSTR ip)
+API void c()
 {
-	connectserver(ip);
+//	connectserver(ip);
+	connectserver("127.0.0.1");
 }
 
 API void l()
