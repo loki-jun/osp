@@ -25,8 +25,8 @@ using namespace std;
 
 CClientApp g_CClientApp;
 
-CFileInfo CFileInfo;
-CFileListInfo CFileListInfo;
+CFileInfo FileInfo;
+CFileListInfo FileListInfo;
 
 /*********************************************************************
     初始化函数
@@ -68,9 +68,9 @@ void CClientInstance::DaemonConnectServer()
 	if(dwRet != INVALID_NODE)
 	{
 	    OspLog(LOG_LVL_DETAIL,"成功获取服务器node\n");
-		g_CClientApp.m_dwDstNode = dwRet;
-		post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_CONNECT_REQ,NULL,0,g_CClientApp.m_dwDstNode);
-		OspSetHBParam(g_CClientApp.m_dwDstNode,NODE_TIME_WATING,NUM_WATING);
+		m_dwDstNode = dwRet;
+		post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_CONNECT_REQ,NULL,0,m_dwDstNode);
+		OspSetHBParam(m_dwDstNode,NODE_TIME_WATING,NUM_WATING);
 //		OspNodeDiscCBRegQ(g_CClientApp.m_dwDstNode,CLIENT_APP_NO,DAEMON);
 	}
 	else
@@ -131,7 +131,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 					pCInstance = (CClientInstance*)pcApp->GetInstance(dwInsCout);
 					pCInstance->NextState(IDLE_STATE);
 				}  
-				OspDisconnectTcpNode(g_CClientApp.m_dwDstNode);
+				OspDisconnectTcpNode(m_dwDstNode);
 				NextState(IDLE_STATE);
 				OspLog(LOG_LVL_WARNING,"服务器已断开！\n");
 			}
@@ -144,15 +144,38 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
         case U_C_GETLIST_CMD:
 			if (CONNECT_STATE == CurState())
 			{
-				post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_GETLIST_REQ,NULL,0,g_CClientApp.m_dwDstNode);
+				post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_GETLIST_REQ,NULL,0,m_dwDstNode);
 			}
 			else
 			{
 				OspLog(LOG_LVL_WARNING,"未连接，请先连接服务器！\n");
 			}
             break;
+
          /* 下载文件 */
          case U_C_DOWNLOADFILE_CMD:
+			 if (CONNECT_STATE == CurState())
+			 {
+				 for( dwInsCout = 1; dwInsCout <= MAX_CLIENT_INS_NUM; dwInsCout++)
+				 {	 
+					 //获取实例对象指针
+					 pCInstance = (CClientInstance*)pcApp->GetInstance(dwInsCout);
+					 if (IDLE_STATE == pCInstance->CurState())
+					 {
+						 pCInstance->NextState(TRANSFER_STATE);
+						 post(MAKEIID(CLIENT_APP_NO, dwInsCout), C_C_DOWNLOADFILE_CMD,NULL,0);
+						 break;
+					 }										 
+				 }
+				 if (dwInsCout > MAX_CLIENT_INS_NUM)
+				 {
+					 OspLog(LOG_LVL_WARNING,"暂无空闲instance可用！");
+				 }
+			 }
+			 else
+			 {
+				 OspLog(LOG_LVL_WARNING,"未连接，请先连接服务器！\n");
+			 }
             
              break;
          /* 暂停下载 */
@@ -187,16 +210,18 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 				 //获取实例对象指针
 				 pCInstance = (CClientInstance*)pcApp->GetInstance(dwInsCout);
 				 pCInstance->NextState(IDLE_STATE);
-				 OspPost(MAKEIID(CLIENT_APP_NO, dwInsCout), C_C_CONNECTSUCCESS_CMD,&g_CClientApp.m_dwDstNode,sizeof(u32));
+				 OspPost(MAKEIID(CLIENT_APP_NO, dwInsCout), C_C_CONNECTSUCCESS_CMD,(u32 *)&m_dwDstNode,sizeof(m_dwDstNode));
+				 			OspLog(LOG_LVL_DETAIL,"daemon中node号:%u\n",m_dwDstNode);
+
 			 }
 			 break;
 
 		/* 服务器文件列表反馈 */
         case S_C_GETLIST_ACK:
-			OspLog(LOG_LVL_DETAIL,"接收文件列表测试\n");
-//			memcpy(&CFileListInfo,pcMsg->content,pcMsg->length);
+			OspLog(LOG_LVL_DETAIL,"接收文件列表功能有问题，待开发……\n");
+//			memcpy(&FileListInfo,pcMsg->content,pcMsg->length);
 //			cout << pcMsg->content << endl;
-//			OspPrintf(TRUE,FALSE,"文件列表内容为：%d\n",CFileListInfo.m_wFileNum);
+
 			break;
 
         default:
@@ -213,18 +238,27 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 {
 	u16 curEvent = pcMsg->event;
-
 	switch(curEvent)
 	{
 		/* 服务器连接成功，请求注册instance */
-	    case C_C_CONNECTSUCCESS_CMD:			
-			post(MAKEIID(SERVER_APP_NO, PENDING), C_S_REGISTER_REQ,NULL,0,g_CClientApp.m_dwDstNode);
+	    case C_C_CONNECTSUCCESS_CMD:
+//			m_dwDstNode = pcMsg->content
+//			m_dwDstNode = (u32) &(pcMsg->content);
+            memcpy(&m_dwDstNode, pcMsg->content,pcMsg->length);
+			OspLog(LOG_LVL_DETAIL,"测试注册:%u\n",m_dwDstNode);
+//			memcpy(m_dwDstNode,pcMsg->content,pcMsg->length);
+			post(MAKEIID(SERVER_APP_NO, PENDING), C_S_REGISTER_REQ,NULL,0,m_dwDstNode);
 			break;
 
+		/* 服务器注册成功反馈 */
 		case S_C_REGISTER_ACK:
 			NextState(READY_STATE);
 			OspLog(LOG_LVL_DETAIL,"instance注册成功\n");
 			break;
+
+		/* daemon给instance发送下载指令 */
+		case C_C_DOWNLOADFILE_CMD:
+			post(MAKEIID(SERVER_APP_NO, PENDING), C_S_REGISTER_REQ,NULL,0,m_dwDstNode);
 
 		default:
             OspLog(LOG_LVL_DETAIL,".......**.....\n");
