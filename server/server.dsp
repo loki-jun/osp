@@ -118,6 +118,10 @@ SOURCE=..\common\macrodef.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\md5.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\osp.h
 # End Source File
 # Begin Source File
