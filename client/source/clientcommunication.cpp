@@ -160,10 +160,11 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 				 {	 
 					 //获取实例对象指针
 					 pCInstance = (CClientInstance*)pcApp->GetInstance(dwInsCout);
-					 if (IDLE_STATE == pCInstance->CurState())
+					 if (READY_STATE == pCInstance->CurState())
 					 {
 						 pCInstance->NextState(TRANSFER_STATE);
-						 post(MAKEIID(CLIENT_APP_NO, dwInsCout), C_C_DOWNLOADFILE_CMD,NULL,0);
+						 post(MAKEIID(CLIENT_APP_NO, dwInsCout), C_C_DOWNLOADFILE_CMD,pcMsg->content,pcMsg->length);
+//						 cout << pcMsg->content << endl;
 						 break;
 					 }										 
 				 }
@@ -211,8 +212,6 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 				 pCInstance = (CClientInstance*)pcApp->GetInstance(dwInsCout);
 				 pCInstance->NextState(IDLE_STATE);
 				 OspPost(MAKEIID(CLIENT_APP_NO, dwInsCout), C_C_CONNECTSUCCESS_CMD,(u32 *)&m_dwDstNode,sizeof(m_dwDstNode));
-				 			OspLog(LOG_LVL_DETAIL,"daemon中node号:%u\n",m_dwDstNode);
-
 			 }
 			 break;
 
@@ -242,23 +241,31 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 	{
 		/* 服务器连接成功，请求注册instance */
 	    case C_C_CONNECTSUCCESS_CMD:
-//			m_dwDstNode = pcMsg->content
-//			m_dwDstNode = (u32) &(pcMsg->content);
             memcpy(&m_dwDstNode, pcMsg->content,pcMsg->length);
-			OspLog(LOG_LVL_DETAIL,"测试注册:%u\n",m_dwDstNode);
-//			memcpy(m_dwDstNode,pcMsg->content,pcMsg->length);
 			post(MAKEIID(SERVER_APP_NO, PENDING), C_S_REGISTER_REQ,NULL,0,m_dwDstNode);
 			break;
 
 		/* 服务器注册成功反馈 */
 		case S_C_REGISTER_ACK:
+			m_dwDstId = pcMsg->srcid;
 			NextState(READY_STATE);
-			OspLog(LOG_LVL_DETAIL,"instance注册成功\n");
 			break;
 
 		/* daemon给instance发送下载指令 */
 		case C_C_DOWNLOADFILE_CMD:
-			post(MAKEIID(SERVER_APP_NO, PENDING), C_S_REGISTER_REQ,NULL,0,m_dwDstNode);
+			post(m_dwDstId, C_S_FILENAME_REQ,pcMsg->content,pcMsg->length,m_dwDstNode);
+			break;
+
+		/* 服务为返回文件存在响应 */
+		case S_C_FILENAME_ACK:
+			OspLog(LOG_LVL_DETAIL,"服务器文件存在，放心大胆地下载吧，骚年！！\n");
+
+			break;
+
+		/* 服务器返回文件不存在响应 */
+		case S_C_FILENAME_NACK:
+			OspLog(LOG_LVL_WARNING,"骚年，文件被丢到火星了，重新选一个吧！\n");
+			break;
 
 		default:
             OspLog(LOG_LVL_DETAIL,".......**.....\n");

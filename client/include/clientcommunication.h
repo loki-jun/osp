@@ -41,7 +41,7 @@ class CClientInstance : public CInstance{
 private:
 	u16 m_wNormalPackageId[MAX_CLIENT_INS_NUM];
 	u16 m_wDownloadState;
-	u32 m_dwDstIid;
+	u32 m_dwDstId;
 	u32 m_dwDstNode;
 	
 public:

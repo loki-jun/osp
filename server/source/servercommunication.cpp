@@ -106,8 +106,16 @@ void CServerInstance::DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp
 void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 {
 	FindFiles ff;
+	FindSizes gg;
+	FindMd5   dd;
 	vector<string> fileNames;
-	fileNames = ff.findFiles( "E:\\测试文件夹" );//当前文件夹用"."，"\"要加\转义
+	vector<u32> fileSizes;
+	vector<u32> filemd5s;
+	
+	fileNames = ff.findFiles( "E:\\测试文件夹" );
+	fileSizes = gg.findSizes("E:\\测试文件夹");
+	filemd5s = dd.findMd5("E:\\测试文件夹");
+
 	FileListInfo.m_wFileNum = fileNames.size();
 	post(pcMsg->srcid,S_C_GETLIST_ACK, NULL,0,pcMsg->srcnode);
 //    cout << FileListInfo.m_pbyFileInfo[500].m_pbyFileName << endl;
@@ -128,26 +136,34 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 {
 //	cout << "进入check了吗？" << endl;
 	FindFiles ff;
+
 	vector<string> fileNames;
+
 	fileNames = ff.findFiles( "E:\\测试文件夹" );
+
 	u16 wCount = 0;
 	for ( wCount =0; wCount<fileNames.size(); wCount++ )
-	{    
+	{   
 		s8 achFileName[256];
 		s8 achServerFileName[256];
 		memcpy(&achFileName,pcMsg->content,pcMsg->length);
 		memcpy(&achServerFileName,&fileNames[wCount][0u],256);
+
+//		memcpy(FileInfo.m_pbyFileName,achServerFileName,256);
+//		memcpy(FileInfo.m_dwFileSize,achServerFileName,256);
+
 //		cout << achFileName << endl;
 //		cout << achServerFileName << endl;
+
 		if (0 == strcmp(achServerFileName,achFileName))
 		{
-			OspLog(LOG_LVL_DETAIL,"That's great!");
+			post(pcMsg->srcid,S_C_FILENAME_ACK,NULL,0,pcMsg->srcnode);
 			break;
 		}		
 	}
 	if (wCount >= fileNames.size())
 	{
-		OspLog(LOG_LVL_DETAIL,"文件不存在！");
+		post(pcMsg->srcid,S_C_FILENAME_NACK,NULL,0,pcMsg->srcnode);
 	}
 }
 
@@ -229,9 +245,8 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 
 		/* 下载文件请求 */
 		case C_S_FILENAME_REQ:
-			cout << pcMsg->content << endl;
+//			cout << pcMsg->content << endl;
 			ProcCheckFile(pcMsg);
-
              break;
 
 		default:

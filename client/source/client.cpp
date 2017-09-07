@@ -76,6 +76,12 @@ API void disconnect()
 }
 
 
+/* 下载文件 */
+API void downloadfile(s8* FileName[256])
+{
+	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_DOWNLOADFILE_CMD,FileName,256);
+}
+
 
 /*********************************************************************
     单字母调试接口
@@ -100,4 +106,9 @@ API void l()
 API void dis()
 {
 	disconnect();
+}
+
+API void d(s8* FileName[256])
+{
+	downloadfile(FileName);
 }

@@ -44,6 +44,7 @@
 
 //#define OSP_DISCONNECT               (u16)(OSP_USEREVENT_BASE+0x001F) //∂œ¡¥Ã· æ
 
+
 class CFileInfo
 {
 public:
@@ -78,6 +79,7 @@ public:
     ~CFileListInfo()
     {
     }
+
 };
 
 #endif
