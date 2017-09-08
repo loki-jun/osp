@@ -24,6 +24,7 @@
 #define SERVER_LISTEN_PORT          (u16)6682
 
 #define SERVER_APP_NO               1
+#define STRING_LENGTH               256
 
 // log等级定义
 #define	LOG_LVL_ERROR				(u8)1				// 程序运行错误(逻辑或业务出错),必须输出

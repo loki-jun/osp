@@ -51,7 +51,7 @@
 #define S43 15
 #define S44 21
 
-#define NULL 0  //add by lujun  2017.09.07
+//#define NULL 0  //add by lujun  2017.09.07
 
 
 
@@ -351,7 +351,8 @@ public:
     int len;
     unsigned char buffer[1024] ;
 
-    if( (file = fopen (filename, "rb")) == NULL )
+
+    if(NULL == (file = fopen (filename, "rb")) )
       printf( "%s can't be opened\n", filename ) ;
     else
     {

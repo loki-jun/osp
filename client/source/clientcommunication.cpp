@@ -217,9 +217,9 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 
 		/* 服务器文件列表反馈 */
         case S_C_GETLIST_ACK:
-			OspLog(LOG_LVL_DETAIL,"接收文件列表功能有问题，待开发……\n");
-//			memcpy(&FileListInfo,pcMsg->content,pcMsg->length);
-//			cout << pcMsg->content << endl;
+			memcpy(&FileInfo,pcMsg->content,pcMsg->length);
+			OspPrintf(TRUE,FALSE,"%s 文件大小：%d\n",FileInfo.m_pbyFileName,FileInfo.m_dwFileSize);
+//			cout << FileInfo.m_pbyFileName <<"  size:" << FileInfo.m_dwFileSize << endl;
 
 			break;
 

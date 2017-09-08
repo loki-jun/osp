@@ -19,6 +19,7 @@
 #include <stdio.h> 
 #include "../../common/osp.h"
 #include "../../common/csmsg.h"
+#include "../../common/macrodef.h"
 
 using namespace std;
 
@@ -53,7 +54,7 @@ vector<string> FindFiles::findFiles( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*"
 
     if(INVALID_HANDLE_VALUE == hFind)
     {
-        cout << "Empty folder!" << endl;
+		OspLog(LOG_LVL_WARNING,"Empty folder!");
         return vector<string>();
     }
 
@@ -78,7 +79,6 @@ vector<string> FindFiles::findFiles( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*"
                 filePath += "\\";
                 filePath += FindFileData.cFileName;
 				file_lists.push_back(filePath);
-				u32 md5value = puts( md5.digestFile( FindFileData.cFileName)  ) ;
 				u32 file_size = (FindFileData.nFileSizeHigh * (MAXDWORD+1.0)) + FindFileData.nFileSizeLow;
 				file_names.push_back(FindFileData.cFileName);
 
@@ -95,7 +95,6 @@ vector<string> FindFiles::findFiles( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*"
                 string filePath = achFile;
                 filePath += FindFileData.cFileName;              				
 				file_lists.push_back(filePath);
-				u32 md5value = puts( md5.digestFile( FindFileData.cFileName)  ) ;
 				u32 file_size = (FindFileData.nFileSizeHigh * (MAXDWORD+1.0)) + FindFileData.nFileSizeLow;
 				file_names.push_back(FindFileData.cFileName); 
 
@@ -139,7 +138,7 @@ vector<u32> FindSizes::findSizes( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */
 	
     if(INVALID_HANDLE_VALUE == hFind)
     {
-        cout << "Empty folder!" << endl;
+        OspLog(LOG_LVL_WARNING,"Empty folder!");
         return vector<u32>();
     }
 	
@@ -162,14 +161,14 @@ vector<u32> FindSizes::findSizes( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */
             {
 				u32 file_size = (FindFileData.nFileSizeHigh * (MAXDWORD+1.0)) + FindFileData.nFileSizeLow;
 				file_sizes.push_back(file_size);
-				OspPrintf(TRUE,FALSE,"文件大小：%d\n",file_size);
+//				OspPrintf(TRUE,FALSE,"文件大小：%d\n",file_size);
             }
             else
             {
 
 				u32 file_size = (FindFileData.nFileSizeHigh * (MAXDWORD+1.0)) + FindFileData.nFileSizeLow;
 				file_sizes.push_back(file_size);
-				OspPrintf(TRUE,FALSE,"文件大小：%d\n",file_size);
+//				OspPrintf(TRUE,FALSE,"文件大小：%d\n",file_size);
             }
         }
 		
@@ -183,6 +182,8 @@ vector<u32> FindSizes::findSizes( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */
 /*********************************************************************
     返回MD5值
 *********************************************************************/
+
+
 vector<u32> FindMd5::findMd5( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
 {
     s8 achFind[MAX_PATH];//MAX_PATH
@@ -191,14 +192,14 @@ vector<u32> FindMd5::findMd5( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
     WIN32_FIND_DATA FindFileData;
 	
     strcpy(achFind,lpstrPath);
-    strcat(achFind,"\\*");
+    strcat(achFind,"\\\\*");
     strcat(achFind,lpstrName);
 	
     HANDLE hFind=::FindFirstFile(achFind,&FindFileData);
 	
     if(INVALID_HANDLE_VALUE == hFind)
     {
-        cout << "Empty folder!" << endl;
+        OspLog(LOG_LVL_WARNING,"Empty folder!");
         return vector<u32>();
     }
 	
@@ -209,7 +210,7 @@ vector<u32> FindMd5::findMd5( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
             if(FindFileData.cFileName[0]!='.')
             {
                 strcpy(achFile,lpstrPath);
-                strcat(achFile,"\\");
+                strcat(achFile,"\\\\");
                 strcat(achFile,FindFileData.cFileName);
                 findMd5(achFile);
 				
@@ -219,19 +220,29 @@ vector<u32> FindMd5::findMd5( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
         {
             if ( achFile[0] )
             {
-				u32 file_md5 = puts( md5.digestString( "FindFileData.cFileName" ) ) ;//若有文件夹则需要加路径
-				file_md5values.push_back(file_md5);
-//				cout << file_md5values <<endl;
-				OspPrintf(TRUE,FALSE,"文件md5值：%u\n",file_md5);
+				string filePath = lpstrPath;//变量类型有待修改……
+                filePath += "\\\\";
+                filePath += FindFileData.cFileName;
+				s8 filepath_md5[STRING_LENGTH];
+				memcpy(&filepath_md5,&filePath[0u],STRING_LENGTH);
+//				cout << filepath_md5 << endl;
+//				u32 file_md5 = puts( md5.digestString( filepath_md5 ) ) ;
+//				file_md5values.push_back(file_md5);
+
+//				OspPrintf(TRUE,FALSE,"文件md5值：%u\n",file_md5);
 				
             }
             else
             {
-				
-				u32 file_md5 = puts( md5.digestString( "FindFileData.cFileName" ) );
-				file_md5values.push_back(file_md5);
-//				cout << file_md5values <<endl;
-				OspPrintf(TRUE,FALSE,"文件md5值：%u\n",file_md5);
+				string filePath = achFile;  
+                filePath += FindFileData.cFileName; 
+				s8 filepath_md5[STRING_LENGTH];
+				memcpy(&filepath_md5,&filePath[0u],STRING_LENGTH);
+//				cout << filepath_md5 << endl;
+//				u32 file_md5 = puts( md5.digestString( filepath_md5 ) ) ;
+//				file_md5values.push_back(file_md5);
+
+//				OspPrintf(TRUE,FALSE,"文件md5值：%u\n",file_md5);
             }
         }
 		

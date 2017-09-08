@@ -106,27 +106,31 @@ void CServerInstance::DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp
 void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 {
 	FindFiles ff;
-	FindSizes gg;
-	FindMd5   dd;
+	FindSizes ss;
+	FindMd5   mm;
 	vector<string> fileNames;
 	vector<u32> fileSizes;
 	vector<u32> filemd5s;
 	
 	fileNames = ff.findFiles( "E:\\测试文件夹" );
-	fileSizes = gg.findSizes("E:\\测试文件夹");
-	filemd5s = dd.findMd5("E:\\测试文件夹");
+	fileSizes = ss.findSizes("E:\\测试文件夹");
+	filemd5s = mm.findMd5("E:\\\\测试文件夹");  //md5值没有get到，貌似计算的是字符串，待查……
 
 	FileListInfo.m_wFileNum = fileNames.size();
-	post(pcMsg->srcid,S_C_GETLIST_ACK, NULL,0,pcMsg->srcnode);
+
 //    cout << FileListInfo.m_pbyFileInfo[500].m_pbyFileName << endl;
 
-//	u16 wCount = 0;
-//	for ( wCount =0; wCount<fileNames.size(); wCount++ )
-// 	{      
+	u16 wCount = 0;
+	for ( wCount =0; wCount<fileNames.size(); wCount++ )
+ 	{      
 		
-//		cout << fileNames[wCount] <<endl;
+		memcpy(&FileInfo.m_dwFileSize,&fileSizes[wCount],sizeof(FileInfo.m_dwFileSize));
+		memcpy(&FileInfo.m_pbyFileName,&fileNames[wCount][0u],sizeof(FileInfo.m_pbyFileName));
+
+		post(pcMsg->srcid,S_C_GETLIST_ACK, (u8 *)&FileInfo,sizeof(FileInfo),pcMsg->srcnode);
 		
-//	}
+	}	
+//	cout << FileListInfo.m_pbyFileInfo << endl;
 }
 
 /*********************************************************************
@@ -144,10 +148,10 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 	u16 wCount = 0;
 	for ( wCount =0; wCount<fileNames.size(); wCount++ )
 	{   
-		s8 achFileName[256];
-		s8 achServerFileName[256];
+		s8 achFileName[STRING_LENGTH];
+		s8 achServerFileName[STRING_LENGTH];
 		memcpy(&achFileName,pcMsg->content,pcMsg->length);
-		memcpy(&achServerFileName,&fileNames[wCount][0u],256);
+		memcpy(&achServerFileName,&fileNames[wCount][0u],STRING_LENGTH);
 
 //		memcpy(FileInfo.m_pbyFileName,achServerFileName,256);
 //		memcpy(FileInfo.m_dwFileSize,achServerFileName,256);
