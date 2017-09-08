@@ -140,10 +140,13 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 {
 //	cout << "进入check了吗？" << endl;
 	FindFiles ff;
+	FindSizes ss;
 
 	vector<string> fileNames;
+	vector<u32> fileSizes;
 
 	fileNames = ff.findFiles( "E:\\测试文件夹" );
+	fileSizes = ss.findSizes("E:\\测试文件夹");
 
 	u16 wCount = 0;
 	for ( wCount =0; wCount<fileNames.size(); wCount++ )
@@ -153,6 +156,10 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 		memcpy(&achFileName,pcMsg->content,pcMsg->length);
 		memcpy(&achServerFileName,&fileNames[wCount][0u],STRING_LENGTH);
 
+		memcpy(&FileInfo.m_dwFileSize,&fileSizes[wCount],sizeof(FileInfo.m_dwFileSize));
+		memcpy(&FileInfo.m_pbyFileName,&fileNames[wCount][0u],sizeof(FileInfo.m_pbyFileName));
+
+
 //		memcpy(FileInfo.m_pbyFileName,achServerFileName,256);
 //		memcpy(FileInfo.m_dwFileSize,achServerFileName,256);
 
@@ -161,7 +168,7 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 
 		if (0 == strcmp(achServerFileName,achFileName))
 		{
-			post(pcMsg->srcid,S_C_FILENAME_ACK,NULL,0,pcMsg->srcnode);
+			post(pcMsg->srcid,S_C_FILENAME_ACK,(u8 *)&FileInfo,sizeof(FileInfo),pcMsg->srcnode);
 			break;
 		}		
 	}

@@ -20,6 +20,7 @@
 #include "../include/clientcommon.h"
 #include "../include/clientcommunication.h"
 #include "../include/clientinterface.h"
+#include "../include/clientfilemanager.h"
 
 using namespace std;
 
@@ -27,6 +28,7 @@ CClientApp g_CClientApp;
 
 CFileInfo FileInfo;
 CFileListInfo FileListInfo;
+CFileManager FileManager;
 
 /*********************************************************************
     初始化函数
@@ -220,7 +222,6 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 			memcpy(&FileInfo,pcMsg->content,pcMsg->length);
 			OspPrintf(TRUE,FALSE,"%s 文件大小：%d\n",FileInfo.m_pbyFileName,FileInfo.m_dwFileSize);
 //			cout << FileInfo.m_pbyFileName <<"  size:" << FileInfo.m_dwFileSize << endl;
-
 			break;
 
         default:
@@ -256,10 +257,11 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 			post(m_dwDstId, C_S_FILENAME_REQ,pcMsg->content,pcMsg->length,m_dwDstNode);
 			break;
 
-		/* 服务为返回文件存在响应 */
+		/* 服务器返回文件存在响应 */
 		case S_C_FILENAME_ACK:
+			memcpy(&FileInfo,pcMsg->content,pcMsg->length);
 			OspLog(LOG_LVL_DETAIL,"服务器文件存在，放心大胆地下载吧，骚年！！\n");
-
+			FileManager.CreateSpace(FileInfo.m_pbyFileName,FileInfo.m_dwFileSize);
 			break;
 
 		/* 服务器返回文件不存在响应 */

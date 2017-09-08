@@ -26,6 +26,8 @@
 #define NODE_TIME_WATING      5
 #define NUM_WATING            3
 
+#define BUFFERSIZE            10240000
+
 #define MAX_CLIENT_INS_NUM 3
 
 #endif

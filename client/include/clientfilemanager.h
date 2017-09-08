@@ -13,20 +13,8 @@
 #ifndef _CLIENTFILEMANAGER_H_
 #define _CLIENTFILEMANAGER_H_
 
-class CFileManager
-{
-private:
-	u16 m_wFileNumber;
-	u32 m_dwBuffSize;
-	u32 m_dwBuffOne[dwBuffSize];
-	u32 m_dwBuffTwo[dwBuffSize];
-	u32 m_dwBuffThree[dwBuffSize];
-	CConfigData *m_tConfigInfo[3];
-
-public:
-	boolean FileWrite(u16 m_wNameLen,s8* m_pbyFileName,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent){};
-	boolean ReadAndGetConfigData(u16 m_wNameLen,s8* m_pbyFileName,struct m_tConfigData){};
-};
+#include "../include/clientcommon.h"
+#include "../../common/osp.h"
 
 class CConfigData
 {
@@ -39,3 +27,30 @@ private:
 	u32 m_dwPackageSize;
 };
 
+class CFileManager
+{
+private:
+	u16 m_wFileNumber;
+	u32 m_dwBuffSize;
+	u32 m_dwBuffOne[BUFFERSIZE];
+	u32 m_dwBuffTwo[BUFFERSIZE];
+	u32 m_dwBuffThree[BUFFERSIZE];
+	CConfigData m_tConfigInfo[3];
+
+public:
+	void FileWrite(u16 m_wNameLen,s8* m_pbyFileName,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent){};
+//	void ReadAndGetConfigData(u16 m_wNameLen,s8* m_pbyFileName,struct m_tConfigData){};
+	void CreateSpace(LPSTR lpstrFileName,u32 dwFileSize);
+
+private:
+	void CheckSpace(){};
+	void WriteEmptyFile(){};
+	void FileDelete(){};
+
+};
+
+
+
+
+
+#endif
