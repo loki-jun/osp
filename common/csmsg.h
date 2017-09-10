@@ -82,4 +82,28 @@ public:
 
 };
 
+class CPackageInfo
+{
+public:
+	s8 m_pbyCFileName[STRING_LENGTH];
+	s8 m_pbySFileName[STRING_LENGTH];
+	u16 m_wPartPackageId;
+	u16 m_wNormalPackageId;
+	u16 m_wPackageSize;
+	s8 m_pbyPackageContent;
+	u16 m_wDownloadState;
+	
+public:
+    CPackageInfo()
+    {
+        m_wPartPackageId = 0;
+		m_wNormalPackageId =0;
+    }
+    ~CPackageInfo()
+    {
+    }
+	
+};
+
+
 #endif

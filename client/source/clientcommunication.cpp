@@ -149,7 +149,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 				post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_GETLIST_REQ,NULL,0,m_dwDstNode);
 			}
 			else
-			{
+			{ 
 				OspLog(LOG_LVL_WARNING,"未连接，请先连接服务器！\n");
 			}
             break;
@@ -261,7 +261,12 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 		case S_C_FILENAME_ACK:
 			memcpy(&FileInfo,pcMsg->content,pcMsg->length);
 			OspLog(LOG_LVL_DETAIL,"服务器文件存在，放心大胆地下载吧，骚年！！\n");
+//			cout << FileInfo.m_pbyFileName << endl;
 			FileManager.CreateSpace(FileInfo.m_pbyFileName,FileInfo.m_dwFileSize);
+			if ( TRANSFER_STATE = CurState())
+			{
+				post(m_dwDstId, C_S_DOWNLOADDATA_REQ,pcMsg->content,pcMsg->length,m_dwDstNode);
+			}
 			break;
 
 		/* 服务器返回文件不存在响应 */
