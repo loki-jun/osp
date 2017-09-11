@@ -96,6 +96,10 @@ SOURCE=.\source\servercommunication.cpp
 
 SOURCE=.\source\servercreatefilelist.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\source\serverfilemanager.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -139,6 +143,10 @@ SOURCE=.\include\servercommunication.h
 # Begin Source File
 
 SOURCE=.\include\servercreatefilelist.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\serverfilemanager.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

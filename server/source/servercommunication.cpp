@@ -21,6 +21,7 @@
 #include "../include/servercommon.h"
 #include "../include/servercommunication.h"
 #include "../include/servercreatefilelist.h"
+#include "../include/serverfilemanager.h"
 
 using namespace std;
 
@@ -28,6 +29,8 @@ CServerApp g_CServerApp;
 
 CFileInfo FileInfo;
 CFileListInfo FileListInfo;
+CPackageInfo PackageInfo;
+CReadFile ReadFileContent;
 /*********************************************************************
     初始化函数
 *********************************************************************/
@@ -122,14 +125,14 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 
 	u16 wCount = 0;
 	for ( wCount =0; wCount<fileNames.size(); wCount++ )
- 	{      
-		
-		memcpy(&FileInfo.m_dwFileSize,&fileSizes[wCount],sizeof(FileInfo.m_dwFileSize));
+	{      
+		FileListInfo.m_pbyFileInfo[wCount].m_dwFileSize = fileSizes[wCount];
 		memcpy(&FileInfo.m_pbyFileName,&fileNames[wCount][0u],sizeof(FileInfo.m_pbyFileName));
-
-		post(pcMsg->srcid,S_C_GETLIST_ACK, (u8 *)&FileInfo,sizeof(FileInfo),pcMsg->srcnode);
+		memcpy(&FileListInfo.m_pbyFileInfo[wCount],&FileInfo,sizeof(FileInfo));
 		
 	}	
+
+		post(pcMsg->srcid,S_C_GETLIST_ACK, (u8 *)&FileInfo,sizeof(FileInfo),pcMsg->srcnode);
 //	cout << FileListInfo.m_pbyFileInfo << endl;
 }
 
@@ -208,13 +211,8 @@ void CServerInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 			OspLog(LOG_LVL_DETAIL,"服务器测试文件列表生成\n");
             DaemonGetlist(pcMsg);
             break;
-
-
 		
-		/* 下载文件数据请求 */
-		case C_S_DOWNLOADDATA_REQ:
-
-			 break;
+	
 
 		/* 取消下载 */
 		case C_S_CANCELFILE_REQ:
@@ -259,6 +257,15 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 //			cout << pcMsg->content << endl;
 			ProcCheckFile(pcMsg);
              break;
+
+			 /* 下载文件数据请求 */
+		case C_S_DOWNLOADDATA_REQ:
+			memcpy(&PackageInfo,pcMsg->content,pcMsg->length);
+			if (0 == PackageInfo.m_wDownloadState)
+			{
+				ReadFileContent.FileRead(PackageInfo.m_pbySFileName,PackageInfo.m_dwFileSize,PackageInfo.m_wNormalPackageId);
+			}
+			 break;
 
 		default:
             OspLog(LOG_LVL_DETAIL,".......**.....\n");

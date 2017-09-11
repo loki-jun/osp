@@ -36,6 +36,7 @@ class CServerInstance : public CInstance{
 private:
 	u32 m_dwDstIid;
 	u32 m_dwDstNode;
+	CReadFile m_cFilemgr;
 public:
     CServerInstance()
     {

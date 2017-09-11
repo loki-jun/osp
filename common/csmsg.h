@@ -13,6 +13,8 @@
 #ifndef _CSMSG_H_
 #define _CSMSG_H_
 
+#include "../../common/macrodef.h"
+
 /* 连接服务器 */
 #define C_S_CONNECT_REQ              (u16)(OSP_USEREVENT_BASE+0x0001) //客户端连接请求，client(daemon)->server(daemon)
 #define S_C_CONNECT_ACK              (u16)(OSP_USEREVENT_BASE+0x0002) //服务器响应连接请求，server(daemon)->client(daemon)
@@ -48,7 +50,7 @@
 class CFileInfo
 {
 public:
-	s8 m_pbyFileName[256];
+	s8 m_pbyFileName[STRING_LENGTH];
 	u32 m_dwFileSize;
 	u32 m_dwMD5Value[32];
 	
@@ -57,7 +59,7 @@ public:
     {
         m_dwFileSize = 0;
 		memset(m_dwMD5Value,0,32);
-		memset(m_pbyFileName,0,256);
+		memset(m_pbyFileName,0,STRING_LENGTH);
     }
     ~CFileInfo()
     {
@@ -87,6 +89,7 @@ class CPackageInfo
 public:
 	s8 m_pbyCFileName[STRING_LENGTH];
 	s8 m_pbySFileName[STRING_LENGTH];
+	u32 m_dwFileSize;
 	u16 m_wPartPackageId;
 	u16 m_wNormalPackageId;
 	u16 m_wPackageSize;
@@ -98,6 +101,8 @@ public:
     {
         m_wPartPackageId = 0;
 		m_wNormalPackageId =0;
+		m_dwFileSize =0;
+		m_wDownloadState = 0;
     }
     ~CPackageInfo()
     {

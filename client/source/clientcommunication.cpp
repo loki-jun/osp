@@ -29,7 +29,7 @@ CClientApp g_CClientApp;
 CFileInfo FileInfo;
 CFileListInfo FileListInfo;
 CFileManager FileManager;
-
+CPackageInfo PackageInfo;
 /*********************************************************************
     初始化函数
 *********************************************************************/
@@ -263,15 +263,37 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 			OspLog(LOG_LVL_DETAIL,"服务器文件存在，放心大胆地下载吧，骚年！！\n");
 //			cout << FileInfo.m_pbyFileName << endl;
 			FileManager.CreateSpace(FileInfo.m_pbyFileName,FileInfo.m_dwFileSize);
-			if ( TRANSFER_STATE = CurState())
+			if ( TRANSFER_STATE == CurState() )
 			{
-				post(m_dwDstId, C_S_DOWNLOADDATA_REQ,pcMsg->content,pcMsg->length,m_dwDstNode);
+				if (0 == PackageInfo.m_wDownloadState) 
+				{
+					u32 idcount = 0;
+					u32 MaxId = FileInfo.m_dwFileSize/TransferSize;
+					OspLog(LOG_LVL_DETAIL,"包的总数目为：%u\n",MaxId);
+//					for (idcount = m_wDownloadState; idcount < MaxId; idcount++)//每包传28k
+//					{
+						memcpy(PackageInfo.m_pbySFileName,FileInfo.m_pbyFileName,sizeof(PackageInfo.m_pbySFileName));
+						PackageInfo.m_dwFileSize = FileInfo.m_dwFileSize;
+						PackageInfo.m_wNormalPackageId = idcount;
+						post(m_dwDstId, C_S_DOWNLOADDATA_REQ,(u8 *)&PackageInfo,sizeof(PackageInfo),m_dwDstNode);
+//					}
+				}
+				else
+				{
+					//断点续传
+				}
 			}
+				
 			break;
 
 		/* 服务器返回文件不存在响应 */
 		case S_C_FILENAME_NACK:
 			OspLog(LOG_LVL_WARNING,"骚年，文件被丢到火星了，重新选一个吧！\n");
+			break;
+
+			/* 服务器返回文件包数据 */
+		case S_C_DOWNLOADDATA_ACK:
+
 			break;
 
 		default:

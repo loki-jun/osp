@@ -26,8 +26,10 @@
 #define NODE_TIME_WATING      5
 #define NUM_WATING            3
 
-#define BUFFERSIZE            10240000
+#define BUFFERSIZE            (u32)1045504                        //缓存大小1M
 
-#define MAX_CLIENT_INS_NUM 3
+#define MAX_CLIENT_INS_NUM     3
+
+#define CLIENT_FILE_PATH       "E:\\客户端测试文件夹"         //客户端下载文件存储路径
 
 #endif

@@ -16,6 +16,7 @@
 #include <iostream>
 #include "../../common/macrodef.h"
 #include <stdio.h>
+#include "../include/clientcommon.h"
 
 using namespace std;
 
@@ -32,7 +33,8 @@ void WriteEmptyFile()
 
 void CFileManager::CreateSpace(LPSTR lpstrFileName,u32 dwFileSize)
 {
-	s8 FileName[STRING_LENGTH] = "E:\\客户端测试文件夹\\";
+	s8 FileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+	strcat(FileName,"\\");
 	strcat(FileName,lpstrFileName);
 	FILE *fp;	
 	fp=fopen(FileName,"w+");
@@ -40,12 +42,13 @@ void CFileManager::CreateSpace(LPSTR lpstrFileName,u32 dwFileSize)
 	putw(0,fp);
     fclose(fp);
 
+
 /*
-	方法二
+//	方法二
 	s8 end=EOF;
 	s8 FileName[STRING_LENGTH] = "E:\\客户端测试文件夹\\";
 	strcat(FileName,lpstrFileName);
-	FILE *fp=fopen(FileName,"w+"); 
+	FILE *fp=fopen(FileName,"wb+"); 
 	fseek(fp,dwFileSize-1,SEEK_SET);   //将文件位置指针移动到文件末尾,-1是为了给后面要写入的“结束标志”留空间
 	fwrite(&end,1,1,fp);
 	fclose(fp);
