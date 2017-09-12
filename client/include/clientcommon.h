@@ -32,7 +32,7 @@
 #define NODE_TIME_WATING      5
 #define NUM_WATING            3
 
-#define BUFFERSIZE            (u32)1045504                        //缓存大小1M
+#define CLIENT_BUFFERSIZE     (u32)2560000                       //缓存大小
 
 #define MAX_CLIENT_INS_NUM     3
 

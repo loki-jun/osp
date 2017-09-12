@@ -21,7 +21,7 @@ using namespace std;
 
 CClientApp g_CClientApp;
 
-CFileManager FileManager;
+CConfigData g_CConfigData;
 /*********************************************************************
     初始化函数
 *********************************************************************/
@@ -254,7 +254,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 			memcpy(&m_cFileInfo,pcMsg->content,pcMsg->length);
 			OspLog(LOG_LVL_DETAIL,"服务器文件存在，放心大胆地下载吧，骚年！！\n");
 //			cout << FileInfo.m_pbyFileName << endl;
-			FileManager.CreateSpace(m_cFileInfo.m_pbyFileName,m_cFileInfo.m_dwFileSize);
+			m_cFileManager.CreateSpace(m_cFileInfo.m_pbyFileName,m_cFileInfo.m_dwFileSize);
 			if ( TRANSFER_STATE == CurState() )
 			{
 				if (0 == m_cPackageInfo.m_wDownloadState) 
@@ -267,7 +267,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 						memcpy(m_cPackageInfo.m_pbySFileName,m_cFileInfo.m_pbyFileName,sizeof(m_cPackageInfo.m_pbySFileName));
 						m_cPackageInfo.m_dwFileSize = m_cFileInfo.m_dwFileSize;
 						m_cPackageInfo.m_wNormalPackageId = idcount;
-						post(m_dwDstId, C_S_DOWNLOADDATA_REQ,(u8 *)&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
+						post(m_dwDstId, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
 
 //					}
 				}
@@ -279,11 +279,15 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 				
 			break;
 
-		/* 服务器反馈数据包ACK */
+		/* 服务器返回文件包数据 */
 		case S_C_DOWNLOADDATA_ACK:
 			if (!eof)
 			{
-				post(C_S_DOWNLOADDATA_REQ)
+				post(C_S_DOWNLOADDATA_REQ);
+			}
+			else
+			{
+//				post(C_U_DOWNLOAD_NOTIFY);
 			}
 			break;
 
@@ -292,11 +296,6 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 		/* 服务器返回文件不存在响应 */
 		case S_C_FILENAME_NACK:
 			OspLog(LOG_LVL_WARNING,"骚年，文件被丢到火星了，重新选一个吧！\n");
-			break;
-
-			/* 服务器返回文件包数据 */
-		case S_C_DOWNLOADDATA_ACK:
-
 			break;
 
 		default:

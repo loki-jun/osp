@@ -46,6 +46,7 @@ private:
 	CFileInfo m_cFileInfo;
 	CFileListInfo m_cFileListInfo;
 	CPackageInfo m_cPackageInfo;
+	CFileManager m_cFileManager;
 	
 public:
     void InstanceEntry(CMessage *const pMsg);
