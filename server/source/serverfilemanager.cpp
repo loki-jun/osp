@@ -17,8 +17,6 @@
 
 using namespace std;
 
-extern CPackageInfo PackageInfo;
-
 void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwFileSize, u16 wPackageId)
 {
 
@@ -37,11 +35,11 @@ void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwFileSize, u16 wPackageId)
 		u32 dwPosition = SERVER_BUFFERSIZE*dwBufferNum;
 		out.seekg(dwPosition,ios::beg);
 
-		while(!out.eof())
-		{
+//		while(!out.eof())
+//		{
 			out.getline(m_Buffer,SERVER_BUFFERSIZE,'\n');//getline(char *,int,char) 表示该行字符达到256个或遇到换行就结束
 
-		}
+//		}
         out.close();
 
 		u32 dwPackageNumber;

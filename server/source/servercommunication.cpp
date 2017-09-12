@@ -101,7 +101,7 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 {
 	vector<string> fileNames;
 	vector<u32> fileSizes;
-	vector<u32> filemd5s;
+	vector<u8> filemd5s;
 	
 	fileNames = m_cFindFiles.findFiles( "E:\\测试文件夹" );
 	fileSizes = m_cFindSizes.findSizes("E:\\测试文件夹");

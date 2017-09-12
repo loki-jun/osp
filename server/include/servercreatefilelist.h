@@ -42,9 +42,9 @@ public:
  //   CFindMd5(){}
  //   ~CFindMd5(){}
 	
-    vector<u32> findMd5( LPCSTR lpstrPath, LPCSTR lpstrName = ".*" );
+    vector<u8> findMd5( LPCSTR lpstrPath, LPCSTR lpstrName = ".*" );
 	
 private:
-	vector<u32> file_md5values;
+	vector<u8> file_md5values;
 };
 #endif

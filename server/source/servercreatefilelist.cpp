@@ -180,7 +180,7 @@ vector<u32> CFindSizes::findSizes( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" *
 *********************************************************************/
 
 
-vector<u32> CFindMd5::findMd5( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
+vector<u8> CFindMd5::findMd5( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
 {
     s8 achFind[MAX_PATH];//MAX_PATH
     s8 achFile[MAX_PATH];
@@ -196,7 +196,7 @@ vector<u32> CFindMd5::findMd5( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
     if(INVALID_HANDLE_VALUE == hFind)
     {
         OspLog(LOG_LVL_WARNING,"Empty folder!");
-        return vector<u32>();
+        return vector<u8>();
     }
 	
     do
