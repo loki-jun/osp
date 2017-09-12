@@ -12,11 +12,6 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream> 
-#include "../../common/kdvtype.h"
-#include "../../common/osp.h"
-#include "../../common/kdvdef.h"
-#include "../../common/csmsg.h"
-#include "../../common/macrodef.h"
 #include "../include/clientcommon.h"
 #include "../include/clientcommunication.h"
 #include "../include/clientinterface.h"
@@ -26,10 +21,7 @@ using namespace std;
 
 CClientApp g_CClientApp;
 
-CFileInfo FileInfo;
-CFileListInfo FileListInfo;
 CFileManager FileManager;
-CPackageInfo PackageInfo;
 /*********************************************************************
     初始化函数
 *********************************************************************/
@@ -219,9 +211,9 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 
 		/* 服务器文件列表反馈 */
         case S_C_GETLIST_ACK:
-			memcpy(&FileInfo,pcMsg->content,pcMsg->length);
-			OspPrintf(TRUE,FALSE,"%s 文件大小：%d\n",FileInfo.m_pbyFileName,FileInfo.m_dwFileSize);
-//			cout << FileInfo.m_pbyFileName <<"  size:" << FileInfo.m_dwFileSize << endl;
+			OspPrintf(TRUE,FALSE,"测试文件列表客户端接收\n");
+			memcpy(&m_cFileListInfo,pcMsg->content,pcMsg->length);
+			m_cFileListInfo.printf();
 			break;
 
         default:
@@ -259,23 +251,24 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 
 		/* 服务器返回文件存在响应 */
 		case S_C_FILENAME_ACK:
-			memcpy(&FileInfo,pcMsg->content,pcMsg->length);
+			memcpy(&m_cFileInfo,pcMsg->content,pcMsg->length);
 			OspLog(LOG_LVL_DETAIL,"服务器文件存在，放心大胆地下载吧，骚年！！\n");
 //			cout << FileInfo.m_pbyFileName << endl;
-			FileManager.CreateSpace(FileInfo.m_pbyFileName,FileInfo.m_dwFileSize);
+			FileManager.CreateSpace(m_cFileInfo.m_pbyFileName,m_cFileInfo.m_dwFileSize);
 			if ( TRANSFER_STATE == CurState() )
 			{
-				if (0 == PackageInfo.m_wDownloadState) 
+				if (0 == m_cPackageInfo.m_wDownloadState) 
 				{
 					u32 idcount = 0;
-					u32 MaxId = FileInfo.m_dwFileSize/TransferSize;
+					u32 MaxId = m_cFileInfo.m_dwFileSize/TransferSize;
 					OspLog(LOG_LVL_DETAIL,"包的总数目为：%u\n",MaxId);
 //					for (idcount = m_wDownloadState; idcount < MaxId; idcount++)//每包传28k
 //					{
-						memcpy(PackageInfo.m_pbySFileName,FileInfo.m_pbyFileName,sizeof(PackageInfo.m_pbySFileName));
-						PackageInfo.m_dwFileSize = FileInfo.m_dwFileSize;
-						PackageInfo.m_wNormalPackageId = idcount;
-						post(m_dwDstId, C_S_DOWNLOADDATA_REQ,(u8 *)&PackageInfo,sizeof(PackageInfo),m_dwDstNode);
+						memcpy(m_cPackageInfo.m_pbySFileName,m_cFileInfo.m_pbyFileName,sizeof(m_cPackageInfo.m_pbySFileName));
+						m_cPackageInfo.m_dwFileSize = m_cFileInfo.m_dwFileSize;
+						m_cPackageInfo.m_wNormalPackageId = idcount;
+						post(m_dwDstId, C_S_DOWNLOADDATA_REQ,(u8 *)&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
+
 //					}
 				}
 				else
@@ -285,6 +278,16 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 			}
 				
 			break;
+
+		/* 服务器反馈数据包ACK */
+		case S_C_DOWNLOADDATA_ACK:
+			if (!eof)
+			{
+				post(C_S_DOWNLOADDATA_REQ)
+			}
+			break;
+
+
 
 		/* 服务器返回文件不存在响应 */
 		case S_C_FILENAME_NACK:

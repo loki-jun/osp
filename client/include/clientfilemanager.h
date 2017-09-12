@@ -14,7 +14,6 @@
 #define _CLIENTFILEMANAGER_H_
 
 #include "../include/clientcommon.h"
-#include "../../common/osp.h"
 
 class CConfigData
 {

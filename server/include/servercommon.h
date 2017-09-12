@@ -13,6 +13,11 @@
 #ifndef _SERVERCOMMON_H_
 #define _SERVERCOMMON_H_
 
+#include "../../common/kdvtype.h"
+#include "../../common/osp.h"
+#include "../../common/kdvdef.h"
+#include "../../common/csmsg.h"
+
 #define SERVER_APP_NAME      "ServerApp"
 #define SERVER_APP_PRIO      100
 #define SERVER_APP_QUE_SIZE  1000
@@ -24,7 +29,8 @@
 #define MAX_SERVER_INS_NUM   60
 #define MAX_SERVER_NODE_SIZE 20
 
-#define BUFFERSIZE            (u32)1045504                        //缓存大小1M
+
+#define SERVER_BUFFERSIZE     (u32)1045504                        //缓存大小1M
 
 #define SERVER_FILE_PATH       "E:\\测试文件夹"         //服务器文件存储路径
 

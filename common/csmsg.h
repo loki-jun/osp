@@ -57,30 +57,47 @@ public:
 public:
     CFileInfo()
     {
-        m_dwFileSize = 0;
-		memset(m_dwMD5Value,0,32);
-		memset(m_pbyFileName,0,STRING_LENGTH);
+        clear();
     }
     ~CFileInfo()
     {
     }
+	void clear()
+	{
+        m_dwFileSize = 0;
+		memset(m_dwMD5Value,0,32);
+		memset(m_pbyFileName,0,STRING_LENGTH);
+	}
+	void printf()
+	{
+		OspPrintf(TRUE,FALSE,"size:%d,filename:%s,Md5:%s\n",
+			m_dwFileSize,m_pbyFileName,m_dwMD5Value);
+	}
 };
 
 class CFileListInfo
 {
 public:
 	u16 m_wFileNum;
-	CFileInfo m_pbyFileInfo[500];
+	CFileInfo m_pbyFileInfo[MAX_FILELIST_NUM];
 
 public:
     CFileListInfo()
     {
         m_wFileNum = 0;
-//		memset(m_pbyFileInfo,0,500);
     }
     ~CFileListInfo()
-    {
-    }
+   {
+   }
+
+	void printf()
+	{
+		for (u16 i=0;i<m_wFileNum;i++)
+		{
+			OspPrintf(TRUE,FALSE,"file[%d]:",i);
+			m_pbyFileInfo[i].printf();	
+		}
+	}
 
 };
 

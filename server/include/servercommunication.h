@@ -14,6 +14,8 @@
 #define _SERVERCOMMUNICATION_H_
 
 #include "../include/servercommon.h"
+#include "../include/serverfilemanager.h"
+#include "../include/servercreatefilelist.h"
 
 class CUserData
 {
@@ -37,6 +39,14 @@ private:
 	u32 m_dwDstIid;
 	u32 m_dwDstNode;
 	CReadFile m_cFilemgr;
+	CFileInfo m_cFileInfo;
+	CFileListInfo m_cFileListInfo;
+	CPackageInfo m_cPackageInfo;
+	CFindFiles m_cFindFiles;
+	CFindSizes m_cFindSizes;
+	CFindMd5 m_cFindMd5;
+
+
 public:
     CServerInstance()
     {

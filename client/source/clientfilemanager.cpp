@@ -9,14 +9,10 @@
 日  期	   	  版本		 修改人		  走读人      修改记录
   
 ===========================================================*/
-
-#include "../include/clientfilemanager.h"
-#include "../../common/osp.h"
-#include <WINDOWS.H>
 #include <iostream>
-#include "../../common/macrodef.h"
 #include <stdio.h>
 #include "../include/clientcommon.h"
+#include "../include/clientfilemanager.h"
 
 using namespace std;
 

@@ -11,11 +11,11 @@
 
 using namespace std;
 
-class FindFiles
+class CFindFiles
 {
 public:
-    FindFiles(){}
-    ~FindFiles(){}
+//    CFindFiles(){}
+//    ~CFindFiles(){}
 	
     vector<string> findFiles( LPCSTR lpstrPath, LPCSTR lpstrName = ".*" );
 	
@@ -24,11 +24,11 @@ private:
 	vector<string> file_names;
 };
 
-class FindSizes
+class CFindSizes
 {
 public:
-    FindSizes(){}
-    ~FindSizes(){}
+//    CFindSizes(){}
+//    ~CFindSizes(){}
 	
     vector<u32> findSizes( LPCSTR lpstrPath, LPCSTR lpstrName = ".*" );
 	
@@ -36,11 +36,11 @@ private:
 	vector<u32> file_sizes;
 };
 
-class FindMd5
+class CFindMd5
 {
 public:
-    FindMd5(){}
-    ~FindMd5(){}
+ //   CFindMd5(){}
+ //   ~CFindMd5(){}
 	
     vector<u32> findMd5( LPCSTR lpstrPath, LPCSTR lpstrName = ".*" );
 	

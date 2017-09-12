@@ -13,24 +13,15 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream> 
-#include "../../common/kdvtype.h"
-#include "../../common/osp.h"
-#include "../../common/kdvdef.h"
-#include "../../common/csmsg.h"
-#include "../../common/macrodef.h"
 #include "../include/servercommon.h"
 #include "../include/servercommunication.h"
-#include "../include/servercreatefilelist.h"
-#include "../include/serverfilemanager.h"
+//#include "../include/servercreatefilelist.h"
+//#include "../include/serverfilemanager.h"
 
 using namespace std;
 
 CServerApp g_CServerApp;
 
-CFileInfo FileInfo;
-CFileListInfo FileListInfo;
-CPackageInfo PackageInfo;
-CReadFile ReadFileContent;
 /*********************************************************************
     初始化函数
 *********************************************************************/
@@ -108,32 +99,33 @@ void CServerInstance::DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp
 *********************************************************************/
 void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 {
-	FindFiles ff;
-	FindSizes ss;
-	FindMd5   mm;
 	vector<string> fileNames;
 	vector<u32> fileSizes;
 	vector<u32> filemd5s;
 	
-	fileNames = ff.findFiles( "E:\\测试文件夹" );
-	fileSizes = ss.findSizes("E:\\测试文件夹");
-	filemd5s = mm.findMd5("E:\\\\测试文件夹");  //md5值没有get到，貌似计算的是字符串，待查……
+	fileNames = m_cFindFiles.findFiles( "E:\\测试文件夹" );
+	fileSizes = m_cFindSizes.findSizes("E:\\测试文件夹");
+	filemd5s = m_cFindMd5.findMd5("E:\\\\测试文件夹");  //md5值没有get到，貌似计算的是字符串，待查……
 
-	FileListInfo.m_wFileNum = fileNames.size();
 
-//    cout << FileListInfo.m_pbyFileInfo[500].m_pbyFileName << endl;
+	m_cFileListInfo.m_wFileNum = fileNames.size();
 
 	u16 wCount = 0;
-	for ( wCount =0; wCount<fileNames.size(); wCount++ )
+	CFileInfo cFileInfo;//此处定义局部变量，不需要存储
+
+	for ( wCount =0; wCount<fileNames.size(); wCount++)
 	{      
-		FileListInfo.m_pbyFileInfo[wCount].m_dwFileSize = fileSizes[wCount];
-		memcpy(&FileInfo.m_pbyFileName,&fileNames[wCount][0u],sizeof(FileInfo.m_pbyFileName));
-		memcpy(&FileListInfo.m_pbyFileInfo[wCount],&FileInfo,sizeof(FileInfo));
-		
+		cFileInfo.clear();
+		cFileInfo.m_dwFileSize = fileSizes[wCount];
+		memcpy(&cFileInfo.m_pbyFileName,&fileNames[wCount][0u],sizeof(cFileInfo.m_pbyFileName));//加[0u]可以解决乱码问题
+		memcpy(&m_cFileListInfo.m_pbyFileInfo[wCount],&cFileInfo,sizeof(cFileInfo));
+//		OspPrintf(TRUE,FALSE,"[DaemonGetlist] 3 fileSizes[%d].%d m_dwFileSize.%d \n", 
+//			wCount, fileSizes[wCount],m_cFileListInfo.m_pbyFileInfo[wCount].m_dwFileSize );		
 	}	
 
-		post(pcMsg->srcid,S_C_GETLIST_ACK, (u8 *)&FileInfo,sizeof(FileInfo),pcMsg->srcnode);
-//	cout << FileListInfo.m_pbyFileInfo << endl;
+	m_cFileListInfo.printf();
+	post(pcMsg->srcid,S_C_GETLIST_ACK, &m_cFileListInfo,sizeof(m_cFileListInfo),pcMsg->srcnode);
+	OspLog(LOG_LVL_DETAIL,"文件列表大小：%d\n",sizeof(m_cFileListInfo));
 }
 
 /*********************************************************************
@@ -141,37 +133,26 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 *********************************************************************/
 void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 {
-//	cout << "进入check了吗？" << endl;
-	FindFiles ff;
-	FindSizes ss;
-
 	vector<string> fileNames;
 	vector<u32> fileSizes;
 
-	fileNames = ff.findFiles( "E:\\测试文件夹" );
-	fileSizes = ss.findSizes("E:\\测试文件夹");
+	fileNames = m_cFindFiles.findFiles( "E:\\测试文件夹" );
+	fileSizes = m_cFindSizes.findSizes("E:\\测试文件夹");
 
 	u16 wCount = 0;
 	for ( wCount =0; wCount<fileNames.size(); wCount++ )
 	{   
 		s8 achFileName[STRING_LENGTH];
 		s8 achServerFileName[STRING_LENGTH];
-		memcpy(&achFileName,pcMsg->content,pcMsg->length);
-		memcpy(&achServerFileName,&fileNames[wCount][0u],STRING_LENGTH);
+		memcpy(achFileName,pcMsg->content,pcMsg->length);
+		memcpy(achServerFileName,&fileNames[wCount][0u],sizeof(achServerFileName));
 
-		memcpy(&FileInfo.m_dwFileSize,&fileSizes[wCount],sizeof(FileInfo.m_dwFileSize));
-		memcpy(&FileInfo.m_pbyFileName,&fileNames[wCount][0u],sizeof(FileInfo.m_pbyFileName));
-
-
-//		memcpy(FileInfo.m_pbyFileName,achServerFileName,256);
-//		memcpy(FileInfo.m_dwFileSize,achServerFileName,256);
-
-//		cout << achFileName << endl;
-//		cout << achServerFileName << endl;
+		memcpy(&m_cFileInfo.m_dwFileSize,&fileSizes[wCount],sizeof(m_cFileInfo.m_dwFileSize));
+		memcpy(&m_cFileInfo.m_pbyFileName,&fileNames[wCount][0u],sizeof(m_cFileInfo.m_pbyFileName));
 
 		if (0 == strcmp(achServerFileName,achFileName))
 		{
-			post(pcMsg->srcid,S_C_FILENAME_ACK,(u8 *)&FileInfo,sizeof(FileInfo),pcMsg->srcnode);
+			post(pcMsg->srcid,S_C_FILENAME_ACK,&m_cFileInfo,sizeof(m_cFileInfo),pcMsg->srcnode);
 			break;
 		}		
 	}
@@ -260,10 +241,10 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 
 			 /* 下载文件数据请求 */
 		case C_S_DOWNLOADDATA_REQ:
-			memcpy(&PackageInfo,pcMsg->content,pcMsg->length);
-			if (0 == PackageInfo.m_wDownloadState)
+			memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
+			if (0 == m_cPackageInfo.m_wDownloadState)
 			{
-				ReadFileContent.FileRead(PackageInfo.m_pbySFileName,PackageInfo.m_dwFileSize,PackageInfo.m_wNormalPackageId);
+				m_cFilemgr.FileRead(m_cPackageInfo.m_pbySFileName,m_cPackageInfo.m_dwFileSize,m_cPackageInfo.m_wNormalPackageId);
 			}
 			 break;
 

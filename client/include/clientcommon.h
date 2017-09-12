@@ -10,6 +10,12 @@
   
 ===========================================================*/
 
+#include "../../common/kdvtype.h"
+#include "../../common/osp.h"
+#include "../../common/kdvdef.h"
+#include "../../common/csmsg.h"
+#include "../../common/macrodef.h"
+
 #ifndef _CLIENTCOMMON_H_
 #define _CLIENTCOMMON_H_
 

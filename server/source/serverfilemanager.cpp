@@ -11,13 +11,9 @@
 ===========================================================*/
 #include <iostream>
 #include <stdio.h>
-#include <iostream>
 #include <fstream>
-#include "../../common/osp.h"
-#include "../../common/macrodef.h"
 #include "../include/servercommon.h"
 #include "../include/serverfilemanager.h"
-#include "../../common/csmsg.h"
 
 using namespace std;
 
@@ -26,42 +22,37 @@ extern CPackageInfo PackageInfo;
 void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwFileSize, u16 wPackageId)
 {
 
-    OspLog(LOG_LVL_DETAIL,"hehehahah");
 	s8 achFileName[STRING_LENGTH] = SERVER_FILE_PATH;
 	strcat(achFileName,"\\");
 	strcat(achFileName,lpstrFileName);
 
-	s8 new s8 [1045504];
     u32 dwBufferNum =0;
-	u32 MaxBufferId = dwFileSize/BUFFERSIZE;
+	u32 MaxBufferId = dwFileSize/SERVER_BUFFERSIZE;
 
-    OspLog(LOG_LVL_DETAIL,"heiheihei");
+	for (dwBufferNum = 0; dwBufferNum <= MaxBufferId; dwBufferNum++ )
+	{
 
-/*
-//	for (dwBufferNum = 0; dwBufferNum <= MaxBufferId; dwBufferNum++ )
-//	{
-		memset(achBuffer,0,sizeof(achBuffer));
 		fstream out;
 		out.open(achFileName,ios::in|ios::binary);
-		u32 dwPosition = BUFFERSIZE*dwBufferNum;
+		u32 dwPosition = SERVER_BUFFERSIZE*dwBufferNum;
 		out.seekg(dwPosition,ios::beg);
 
 		while(!out.eof())
 		{
-			out.getline(achBuffer,BUFFERSIZE,'\n');//getline(char *,int,char) 表示该行字符达到256个或遇到换行就结束
-//			cout<<achBuffer<<endl;
+			out.getline(m_Buffer,SERVER_BUFFERSIZE,'\n');//getline(char *,int,char) 表示该行字符达到256个或遇到换行就结束
+
 		}
         out.close();
 
 		u32 dwPackageNumber;
-		u32 MaxPackageNum = BUFFERSIZE/TransferSize;
+		u32 MaxPackageNum = SERVER_BUFFERSIZE/TransferSize;
 		for (dwPackageNumber=0; dwPackageNumber < MaxPackageNum; dwPackageNumber++)
 		{
 			    OspLog(LOG_LVL_DETAIL,"测试服务器文件写功能");
-//			memcpy(PackageInfo.m_pbyPackageContent,buffer[])
-		}
-//	}
 
-*/
+		}
+	}
+
+
 
 }

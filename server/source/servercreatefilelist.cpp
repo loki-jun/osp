@@ -9,24 +9,20 @@
 日  期	   	  版本		 修改人		  走读人      修改记录
   
 ===========================================================*/
-
-
-#include "../include/servercreatefilelist.h"
-#include "../include/md5.h"
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>  
 #include <stdio.h> 
-#include "../../common/osp.h"
-#include "../../common/csmsg.h"
-#include "../../common/macrodef.h"
+#include "../include/md5.h"
+#include "../include/servercommon.h"
+#include "../include/servercreatefilelist.h"
 
 using namespace std;
 
 
-MD5 md5;
-extern CFileInfo FileInfo;
-extern CFileListInfo FileListInfo;
+//MD5 md5;
+//extern CFileInfo FileInfo;
+//extern CFileListInfo FileListInfo;
 /*********************************************************************
     Windows平台获取文件列表
 *********************************************************************/
@@ -39,7 +35,7 @@ extern CFileListInfo FileListInfo;
 /*********************************************************************
     返回文件名
 *********************************************************************/
-vector<string> FindFiles::findFiles( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
+vector<string> CFindFiles::findFiles( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
 {
     s8 achFind[MAX_PATH];//MAX_PATH
     s8 achFile[MAX_PATH];
@@ -75,14 +71,14 @@ vector<string> FindFiles::findFiles( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*"
         {
             if ( achFile[0] )
             {
-                string filePath = lpstrPath;//变量类型有待修改……
+                string filePath= lpstrPath;//变量类型有待修改……
                 filePath += "\\";
                 filePath += FindFileData.cFileName;
 				file_lists.push_back(filePath);
 				u32 file_size = (FindFileData.nFileSizeHigh * (MAXDWORD+1.0)) + FindFileData.nFileSizeLow;
 				file_names.push_back(FindFileData.cFileName);
 
-//				cout << FindFileData.cFileName << "  大小："<< file_size <<endl;
+//				cout << FindFileData.cFileName <<endl;
 //				OspPrintf(TRUE,FALSE,"%s  文件大小：%u\n",FindFileData.cFileName,file_size);
 //		        memcpy(FileInfo.m_pbyFileName,FindFileData.cFileName,sizeof(FileListInfo.m_pbyFileInfo->m_pbyFileName));
 //				memcpy(FileListInfo.m_pbyFileInfo,FileInfo,sizeof(FileListInfo.m_pbyFileInfo[500]));
@@ -123,7 +119,7 @@ vector<string> FindFiles::findFiles( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*"
     返回文件大小
 *********************************************************************/
 
-vector<u32> FindSizes::findSizes( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
+vector<u32> CFindSizes::findSizes( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
 {
     s8 achFind[MAX_PATH];//MAX_PATH
     s8 achFile[MAX_PATH];
@@ -184,7 +180,7 @@ vector<u32> FindSizes::findSizes( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */
 *********************************************************************/
 
 
-vector<u32> FindMd5::findMd5( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
+vector<u32> CFindMd5::findMd5( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
 {
     s8 achFind[MAX_PATH];//MAX_PATH
     s8 achFile[MAX_PATH];
@@ -263,7 +259,7 @@ vector<u32> FindMd5::findMd5( LPCSTR lpstrPath, LPCSTR lpstrName /*= ".*" */ )
 #include <string.h>
 #include <queue>
 
-vector<string> FindFiles::findFiles( const char *lpPath, const char *secName /*= ".*" */ )
+vector<string> CFindFiles::findFiles( const char *lpPath, const char *secName /*= ".*" */ )
 {
     (void)secName;
 

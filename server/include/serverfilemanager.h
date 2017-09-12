@@ -14,17 +14,25 @@
 #define _SERVERFILEMANAGER_H_
 
 #include "../include/servercommon.h"
-#include "../../common/osp.h"
-#include "../../common/macrodef.h"
-
 
 class CReadFile
 {
 private:
-	u32 m_dwBuffSize;
+//	u32 m_dwBuffSize;
+	s8 m_Buffer[SERVER_BUFFERSIZE] ;
 	s8 m_pbyFileName[STRING_LENGTH];
 	u16 m_wPackageId;
 	u16 m_wPackageSize;
+
+public:
+    CReadFile()
+    {
+        memset(m_Buffer,0,sizeof(m_Buffer));
+		
+    }
+    ~CReadFile()
+    {
+    }
 	
 public:
 //	void FileRead(u16 m_wNameLen,s8* m_pbyFileName,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent){};

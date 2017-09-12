@@ -22,13 +22,13 @@ class CUserData
 {
 public:
 	u32 m_dwIp;
-//	u32 m_dwDstNode;
+
 	
 public:
     CUserData()
     {
         m_dwIp = 0;
-//		m_dwDstNode = 0;
+
     }
     ~CUserData()
     {
@@ -43,6 +43,9 @@ private:
 	u16 m_wDownloadState;
 	u32 m_dwDstId;
 	u32 m_dwDstNode;
+	CFileInfo m_cFileInfo;
+	CFileListInfo m_cFileListInfo;
+	CPackageInfo m_cPackageInfo;
 	
 public:
     void InstanceEntry(CMessage *const pMsg);
