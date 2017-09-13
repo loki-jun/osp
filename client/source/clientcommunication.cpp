@@ -148,7 +148,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 
          /* 下载文件 */
          case U_C_DOWNLOADFILE_CMD:
-			 if (CONNECT_STATE == CurState())
+			 if (CONNECT_STATE == CurState())   //判断daemon状态
 			 {
 				 for( dwInsCout = 1; dwInsCout <= MAX_CLIENT_INS_NUM; dwInsCout++)
 				 {	 
@@ -156,7 +156,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 					 pCInstance = (CClientInstance*)pcApp->GetInstance(dwInsCout);
 					 if (READY_STATE == pCInstance->CurState())
 					 {
-						 pCInstance->NextState(TRANSFER_STATE);
+						 pCInstance->NextState(TRANSFER_STATE);   //daemon改instance状态为传输态
 						 post(MAKEIID(CLIENT_APP_NO, dwInsCout), C_C_DOWNLOADFILE_CMD,pcMsg->content,pcMsg->length);
 //						 cout << pcMsg->content << endl;
 						 break;
@@ -257,23 +257,23 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 			m_cFileManager.CreateSpace(m_cFileInfo.m_pbyFileName,m_cFileInfo.m_dwFileSize);
 			if ( TRANSFER_STATE == CurState() )
 			{
+				m_cPackageInfo.m_wDownloadState = 0;
+				//下载的文件名跟配置文件中的文件去对比，若文件在配置中，则m_cPackageInfo.m_wDownloadState设为1，反之为0
+				//后续还需加上文件重命名
 				if (0 == m_cPackageInfo.m_wDownloadState) 
 				{
 					u32 idcount = 0;
 					u32 MaxId = m_cFileInfo.m_dwFileSize/TransferSize;
 					OspLog(LOG_LVL_DETAIL,"包的总数目为：%u\n",MaxId);
-//					for (idcount = m_wDownloadState; idcount < MaxId; idcount++)//每包传28k
-//					{
-						memcpy(m_cPackageInfo.m_pbySFileName,m_cFileInfo.m_pbyFileName,sizeof(m_cPackageInfo.m_pbySFileName));
-						m_cPackageInfo.m_dwFileSize = m_cFileInfo.m_dwFileSize;
-						m_cPackageInfo.m_wNormalPackageId = idcount;
-						post(m_dwDstId, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
 
-//					}
+					memcpy(m_cPackageInfo.m_pbySFileName,m_cFileInfo.m_pbyFileName,sizeof(m_cPackageInfo.m_pbySFileName));
+					m_cPackageInfo.m_dwFileSize = m_cFileInfo.m_dwFileSize;
+					m_cPackageInfo.m_wPackageId = idcount;//若为断点续传，此值为配置中读取的ID值
+					post(m_dwDstId, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
 				}
 				else
 				{
-					//断点续传
+					OspLog(LOG_LVL_DETAIL,"1断点续传功能待开发……\n");
 				}
 			}
 				
@@ -281,14 +281,29 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 
 		/* 服务器返回文件包数据 */
 		case S_C_DOWNLOADDATA_ACK:
-			if (!eof)
+			memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
+			if (0 == m_cPackageInfo.m_wDownloadState)
 			{
-				post(C_S_DOWNLOADDATA_REQ);
+				u32 MaxId = m_cFileInfo.m_dwFileSize/TransferSize;
+				if (m_cPackageInfo.m_wPackageId <= MaxId)
+				{
+					
+
+					memcpy(m_cPackageInfo.m_pbySFileName,m_cFileInfo.m_pbyFileName,sizeof(m_cPackageInfo.m_pbySFileName));
+					m_cPackageInfo.m_dwFileSize = m_cFileInfo.m_dwFileSize;
+					m_cPackageInfo.m_wPackageId++;
+					post(m_dwDstId, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
+				}
+			    else
+				{
+					//				post(C_U_DOWNLOAD_NOTIFY);
+				}
 			}
 			else
 			{
-//				post(C_U_DOWNLOAD_NOTIFY);
+				OspLog(LOG_LVL_DETAIL,"2断点续传功能待开发……\n");
 			}
+			
 			break;
 
 

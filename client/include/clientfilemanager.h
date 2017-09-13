@@ -15,6 +15,13 @@
 
 #include "../include/clientcommon.h"
 
+class CBuffer
+{
+private:
+	s8 m_dwBuffer[CLIENT_BUFFERSIZE];
+	u16 m_wBufferState;
+};
+
 class CConfigData
 {
 private:
@@ -30,11 +37,8 @@ class CFileManager
 {
 private:
 	u16 m_wFileNumber;
-	u32 m_dwBuffSize;
-	u32 m_dwBuffOne[BUFFERSIZE];
-	u32 m_dwBuffTwo[BUFFERSIZE];
-	u32 m_dwBuffThree[BUFFERSIZE];
-	CConfigData m_tConfigInfo[3];
+	CBuffer m_cBuffer[3];
+	CConfigData m_cConfigInfo[3];
 
 public:
 	void FileWrite(u16 m_wNameLen,s8* m_pbyFileName,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent){};

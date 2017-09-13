@@ -38,6 +38,7 @@ class CServerInstance : public CInstance{
 private:
 	u32 m_dwDstIid;
 	u32 m_dwDstNode;
+	u32 m_dwBufferNum;
 	CReadFile m_cFilemgr;
 	CFileInfo m_cFileInfo;
 	CFileListInfo m_cFileListInfo;
@@ -52,6 +53,7 @@ public:
     {
         m_dwDstIid = 0;
 		m_dwDstNode = 0;
+		m_dwBufferNum = 0;
     }
     ~CServerInstance()
     {
@@ -64,6 +66,7 @@ public:
 	void DaemonCheckConnect(){};
 	void DaemonGetlist(CMessage *const pcMsg);
 	void ProcCheckFile(CMessage *const pcMsg);
+	void ProcSendMsg(CMessage *const pcMsg);
 	
 };
 

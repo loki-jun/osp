@@ -30,7 +30,8 @@
 #define MAX_SERVER_NODE_SIZE 20
 
 
-#define SERVER_BUFFERSIZE     (u32)2560000                        //缓存大小
+#define SERVER_BUFFERSIZE     (u32)2560000               //缓存大小
+#define PACKAGENUM_EACHBUFFER 100                        //每个缓存能存的包个数(SERVER_BUFFERSIZE/TransferSize)
 
 #define SERVER_FILE_PATH       "E:\\测试文件夹"         //服务器文件存储路径
 

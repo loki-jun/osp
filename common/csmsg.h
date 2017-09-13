@@ -81,15 +81,6 @@ public:
 	u16 m_wFileNum;
 	CFileInfo m_pbyFileInfo[MAX_FILELIST_NUM];
 
-public:
-    CFileListInfo()
-    {
-        m_wFileNum = 0;
-    }
-    ~CFileListInfo()
-   {
-   }
-
 	void printf()
 	{
 		for (u16 i=0;i<m_wFileNum;i++)
@@ -107,12 +98,13 @@ public:
 	s8 m_pbyCFileName[STRING_LENGTH];
 	s8 m_pbySFileName[STRING_LENGTH];
 	u32 m_dwFileSize;
-	u16 m_wPartPackageId;
-	u16 m_wNormalPackageId;
+	u16 m_wPackageId;
+//	u16 m_wPartPackageId;
+//	u16 m_wNormalPackageId;
 	u16 m_wPackageSize;
-	s8 m_pbyPackageContent;
+	s8 m_pbyPackageContent[TransferSize];
 	u16 m_wDownloadState;
-	
+/*	
 public:
     CPackageInfo()
     {
@@ -120,10 +112,12 @@ public:
 		m_wNormalPackageId =0;
 		m_dwFileSize =0;
 		m_wDownloadState = 0;
+		memset(m_pbyPackageContent,0,sizeof(m_pbyPackageContent));
     }
     ~CPackageInfo()
     {
     }
+*/
 	
 };
 

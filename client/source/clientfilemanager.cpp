@@ -57,3 +57,15 @@ void CFileManager::CreateSpace(LPSTR lpstrFileName,u32 dwFileSize)
 */
 
 }
+
+void CFileManager::FileWrite(LPSTR lpstrFileName,u32 dwBufferNum)
+{
+	s8 achFileName[STRING_LENGTH] = SERVER_FILE_PATH;
+	strcat(achFileName,"\\");
+	strcat(achFileName,lpstrFileName);
+
+
+	ofstream out(lpstrFileName, ios::binary|ios::app);
+	out.write(m_Buffer,sizeof(m_Buffer));
+	out.close();
+}

@@ -21,53 +21,50 @@ using namespace std;
 /**************************************************
 将文件内容读入缓存，
 ***************************************************/
-void CReadFile::ReadCache(LPSTR lpstrFileName,u32 dwBufferNum)
+
+/*
+void CReadFile::ReadCache()
+{
+
+	
+    if ((!in.eof())||(in.gcount() != 0))
+    {
+		
+        if( OSP_OK != post(pMsg->srcid, SERVER_CLIENT_SENDFILEINFO_REQ, m_chFileStr, in.gcount(), pMsg->srcnode) )
+        {
+            OspPrintf( TRUE , FALSE , "CAliasInstance::InstanceEntry post  failed.\n" );
+        }
+        in.close();
+        //OspDelay(1000);
+    }
+    else
+    {
+        printf("download file sucess \n");
+        dwPosition = 0;
+        post(pMsg->srcid, SERVER_CLIENT_ENDSEND_NOTIFY, NULL, 0, pMsg->srcnode);
+        in.close();
+        NextState(READY_STATE);
+	}
+
+
+}
+*/
+
+
+void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwBufferId)
 {
 	s8 achFileName[STRING_LENGTH] = SERVER_FILE_PATH;
 	strcat(achFileName,"\\");
 	strcat(achFileName,lpstrFileName);
+
+	ifstream in;
 	
-//    u32 dwBufferNum =0;
-//	u32 MaxBufferId = dwFileSize/SERVER_BUFFERSIZE;
-
-	fstream out;
-	out.open(achFileName,ios::in|ios::binary);
-	u32 dwPosition = SERVER_BUFFERSIZE*dwBufferNum;
-	out.seekg(dwPosition,ios::beg);
-
-	out.getline(m_Buffer,SERVER_BUFFERSIZE,'\n');//getline(char *,int,char) 表示该行字符达到256个或遇到换行就结束
-	out.close();
-}
-
-
-void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwFileSize, u16 wPackageId)
-{
-
-
-
-    u32 dwBufferNum =0;
-	u32 MaxBufferId = dwFileSize/SERVER_BUFFERSIZE;
-
-	for (dwBufferNum = 0; dwBufferNum <= MaxBufferId; dwBufferNum++ )
-	{
-
-		fstream out;
-		out.open(achFileName,ios::in|ios::binary);
-		u32 dwPosition = SERVER_BUFFERSIZE*dwBufferNum;
-		out.seekg(dwPosition,ios::beg);
-
-//		while(!out.eof())
-//		{
-			out.getline(m_Buffer,SERVER_BUFFERSIZE,'\n');//getline(char *,int,char) 表示该行字符达到256个或遇到换行就结束
-
-//		}
-        out.close();
-
-		ReadCache(LPSTR lpstrFileName,u32 dwFileSize,u32 dwBufferNum);
-
-
-	}
-
-
-
+    in.open(achFileName,ios::in|ios::binary);
+	
+    u32 dwPosition = SERVER_BUFFERSIZE*dwBufferId;
+	
+    in.seekg(dwPosition,ios::beg);
+    memset(m_Buffer,0x00,sizeof(m_Buffer));
+    in.read(m_Buffer,sizeof(m_Buffer));
+	in.close();
 }

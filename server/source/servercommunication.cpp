@@ -107,7 +107,6 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 	fileSizes = m_cFindSizes.findSizes("E:\\测试文件夹");
 	filemd5s = m_cFindMd5.findMd5("E:\\\\测试文件夹");  //md5值没有get到，貌似计算的是字符串，待查……
 
-
 	m_cFileListInfo.m_wFileNum = fileNames.size();
 
 	u16 wCount = 0;
@@ -147,7 +146,8 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 		memcpy(achFileName,pcMsg->content,pcMsg->length);
 		memcpy(achServerFileName,&fileNames[wCount][0u],sizeof(achServerFileName));
 
-		memcpy(&m_cFileInfo.m_dwFileSize,&fileSizes[wCount],sizeof(m_cFileInfo.m_dwFileSize));
+        m_cFileInfo.m_dwFileSize = fileSizes[wCount];
+//		memcpy(&m_cFileInfo.m_dwFileSize,&fileSizes[wCount],sizeof(m_cFileInfo.m_dwFileSize));
 		memcpy(&m_cFileInfo.m_pbyFileName,&fileNames[wCount][0u],sizeof(m_cFileInfo.m_pbyFileName));
 
 		if (0 == strcmp(achServerFileName,achFileName))
@@ -163,8 +163,30 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 }
 
 
+/*********************************************************************
+    服务器发送消息函数
+*********************************************************************/
+void CServerInstance::ProcSendMsg(CMessage *const pcMsg)
+{
+	memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
+	//计算buffer中包的偏移量
+	u32 dwShift = m_cPackageInfo.m_wPackageId - m_dwBufferNum*PACKAGENUM_EACHBUFFER - 1;
+	//判断是否是最后一包，不是最后一包则以TransferSize拷贝，是则以最后一包大小拷贝
+	if ( m_cPackageInfo.m_dwFileSize/TransferSize != m_cPackageInfo.m_wPackageId)
+	{
 
-
+		memset(m_cPackageInfo.m_pbyPackageContent,0,sizeof(m_cPackageInfo.m_pbyPackageContent));
+		memcpy(&m_cPackageInfo.m_pbyPackageContent,&m_cFilemgr.m_Buffer+dwShift,TransferSize);
+		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
+	}
+	else
+	{
+		memset(m_cPackageInfo.m_pbyPackageContent,0,sizeof(m_cPackageInfo.m_pbyPackageContent));
+		memcpy(&m_cPackageInfo.m_pbyPackageContent,&m_cFilemgr.m_Buffer+dwShift,m_cPackageInfo.m_dwFileSize%TransferSize);
+		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
+		NextState(READY_STATE);
+	}
+}
 
 /*********************************************************************
     DaemonInstanceEntry函数
@@ -237,15 +259,47 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 		case C_S_FILENAME_REQ:
 //			cout << pcMsg->content << endl;
 			ProcCheckFile(pcMsg);
-             break;
+            break;
 
 			 /* 下载文件数据请求 */
 		case C_S_DOWNLOADDATA_REQ:
-			memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
-			if (0 == m_cPackageInfo.m_wDownloadState)
+			if (READY_STATE == CurState())
 			{
-				m_cFilemgr.FileRead(m_cPackageInfo.m_pbySFileName,m_cPackageInfo.m_dwFileSize,m_cPackageInfo.m_wNormalPackageId);
+				memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
+
+				if (0 == m_cPackageInfo.m_wDownloadState) //判断为正常下载
+				{
+					//触发写第一个缓存区
+					while(0 == m_dwBufferNum)
+					{
+						m_cFilemgr.FileRead(m_cPackageInfo.m_pbySFileName,m_dwBufferNum);
+						m_dwBufferNum++;
+					}
+					
+					//判断包id是否在当前的缓存区，在则读取数据并发送，不在写下一个缓存，然后发送
+					if (m_cPackageInfo.m_wPackageId > (m_dwBufferNum-1)*PACKAGENUM_EACHBUFFER && 
+						m_cPackageInfo.m_wPackageId < m_dwBufferNum*PACKAGENUM_EACHBUFFER)
+					{
+						ProcSendMsg(pcMsg);
+					}
+					else
+					{
+						m_cFilemgr.FileRead(m_cPackageInfo.m_pbySFileName,m_dwBufferNum);
+						m_dwBufferNum++;
+						ProcSendMsg(pcMsg);				
+					}
+					
+				}
+				else
+				{
+					//断点续传
+				}
 			}
+			else
+			{
+				OspLog(LOG_LVL_WARNING,"%d号instance状态不对！！\n",GetInsID());
+			}
+			
 			 break;
 
 		default:
