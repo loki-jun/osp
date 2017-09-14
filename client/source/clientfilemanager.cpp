@@ -35,7 +35,7 @@ void CFileManager::CreateSpace(LPSTR lpstrFileName,u32 dwFileSize)
 	strcat(FileName,"\\");
 	strcat(FileName,lpstrFileName);
 	FILE *fp;	
-	fp=fopen(FileName,"w+");
+	fp=fopen(FileName,"wb+");
 	fseek(fp, dwFileSize,SEEK_END);
 	putw(0,fp);
     fclose(fp);
@@ -66,8 +66,9 @@ void CFileManager::FileWrite(LPSTR lpstrFileName,u16 dwBufferId,u32 PackageNum,u
 	strcat(achFileName,"\\");
 	strcat(achFileName,lpstrFileName);
 
+	OspPrintf(TRUE,FALSE,"bufferid:%d,总包数:%d,包id:%d\n",dwBufferId,PackageNum,PackageId);
 
-	ofstream out(lpstrFileName, ios::binary|ios::app);
+	ofstream out(achFileName, ios::binary|ios::app);
 	//判断是否是最后一包，不是最后一包则以TransferSize写到文件，是则以最后一包大小写到文件
 	if ( PackageNum != PackageId)
 	{
@@ -76,6 +77,7 @@ void CFileManager::FileWrite(LPSTR lpstrFileName,u16 dwBufferId,u32 PackageNum,u
 	else
 	{
 		out.write(g_CFileManager.m_cBuffer[dwBufferId].m_dwBuffer,(PackageNum*TransferSize)%TransferSize);
+		OspPrintf(TRUE,FALSE,"总包数:%d,传输大小:%d,最后一包大小:%d\n",PackageNum,TransferSize,(PackageNum*TransferSize)%TransferSize);
 	}
 	memset(g_CFileManager.m_cBuffer[dwBufferId].m_dwBuffer,0x00,sizeof(g_CFileManager.m_cBuffer[dwBufferId].m_dwBuffer));
 	out.close();

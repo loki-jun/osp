@@ -181,11 +181,12 @@ void CServerInstance::ProcSendMsg(CMessage *const pcMsg)
 	}
 	else
 	{
-		OspLog(LOG_LVL_DETAIL,"最后一包发送\n");
+		OspLog(LOG_LVL_DETAIL,"服务器发送最后一包数据\n");
 		memset(m_cPackageInfo.m_pbyPackageContent,0x00,sizeof(m_cPackageInfo.m_pbyPackageContent));
 		memcpy(m_cPackageInfo.m_pbyPackageContent,m_cFilemgr.m_Buffer+dwShift,m_cPackageInfo.m_dwFileSize%TransferSize);
 		OspLog(LOG_LVL_DETAIL,"包大小：%d\n",m_cPackageInfo.m_dwFileSize%TransferSize);
 		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
+		m_cPackageInfo.printf();
 		NextState(READY_STATE);
 	}
 }
@@ -266,12 +267,12 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 
 			 /* 下载文件数据请求 */
 		case C_S_DOWNLOADDATA_REQ:
-			OspLog(LOG_LVL_DETAIL,"客户端数据请求进来了\n");
+//			OspLog(LOG_LVL_DETAIL,"客户端数据请求进来了\n");
 			if (TRANSFER_STATE == CurState())
 			{
 				memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
-
-				if (0 == m_cPackageInfo.m_wDownloadState) //判断为正常下载
+				//判断为正常下载还是断点续传
+				if (0 == m_cPackageInfo.m_wDownloadState) 
 				{
 					//触发写第一个缓存区
 					while(0 == m_dwBufferNum)

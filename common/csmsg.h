@@ -107,8 +107,8 @@ public:
 
 	void printf()
 	{
-		OspPrintf(TRUE,FALSE,"SFileName:%s\n,PackageId:%d\n,FileSize:%d\n,PackageContentSize:%d\n,DownloadState:%d\n",
-			m_pbySFileName,m_wPackageId,m_dwFileSize,sizeof(m_pbyPackageContent),m_wDownloadState);
+		OspPrintf(TRUE,FALSE,"SFileName:%s\n,PackageId:%d\n,FileSize:%d\n,PackageContent:%s\n,DownloadState:%d\n",
+			m_pbySFileName,m_wPackageId,m_dwFileSize,m_pbyPackageContent,m_wDownloadState);
 	}	
 	
 	
