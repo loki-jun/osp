@@ -17,14 +17,27 @@
 
 class CBuffer
 {
-private:
+public:
 	s8 m_dwBuffer[CLIENT_BUFFERSIZE];
 	u16 m_wBufferState;
+	u16 m_wBufferAlias;
+	u32 m_dwBufferNum;
+public:
+    CBuffer()
+    {
+        m_wBufferState = 0;
+		m_dwBufferNum = 0;
+		
+    }
+    ~CBuffer()
+    {
+    }
+
 };
 
 class CConfigData
 {
-private:
+public:
 	u16 m_wFileId;
 	u16 m_wNameLen;
 	s8 m_pbyCFileName[256];
@@ -35,13 +48,13 @@ private:
 
 class CFileManager
 {
-private:
+public:
 	u16 m_wFileNumber;
 	CBuffer m_cBuffer[3];
 	CConfigData m_cConfigInfo[3];
 
 public:
-	void FileWrite(u16 m_wNameLen,s8* m_pbyFileName,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent){};
+	void FileWrite(LPSTR lpstrFileName,u16 wIdCount,u32 PackageNum,u32 PackageId);
 //	void ReadAndGetConfigData(u16 m_wNameLen,s8* m_pbyFileName,struct m_tConfigData){};
 	void CreateSpace(LPSTR lpstrFileName,u32 dwFileSize);
 

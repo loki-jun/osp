@@ -24,7 +24,7 @@
 #define U_C_CANCELPARTFILE_CMD     (u16)(OSP_USEREVENT_BASE+0x001D) //取消断点续传文件下载，user->client(daemon)，消息体为s8(pbyFilename)
 
 void clientinterface(void);
-void showlist(CMessage *const pMsg);
+void showlist(CMessage *const pcMsg);
 
 #endif
  

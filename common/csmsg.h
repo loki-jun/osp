@@ -104,6 +104,14 @@ public:
 	u16 m_wPackageSize;
 	s8 m_pbyPackageContent[TransferSize];
 	u16 m_wDownloadState;
+
+	void printf()
+	{
+		OspPrintf(TRUE,FALSE,"SFileName:%s\n,PackageId:%d\n,FileSize:%d\n,PackageContentSize:%d\n,DownloadState:%d\n",
+			m_pbySFileName,m_wPackageId,m_dwFileSize,sizeof(m_pbyPackageContent),m_wDownloadState);
+	}	
+	
+	
 /*	
 public:
     CPackageInfo()

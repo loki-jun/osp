@@ -170,19 +170,21 @@ void CServerInstance::ProcSendMsg(CMessage *const pcMsg)
 {
 	memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
 	//计算buffer中包的偏移量
-	u32 dwShift = m_cPackageInfo.m_wPackageId - m_dwBufferNum*PACKAGENUM_EACHBUFFER - 1;
+	u32 dwShift = m_cPackageInfo.m_wPackageId - (m_dwBufferNum-1)*PACKAGENUM_EACHBUFFER;
 	//判断是否是最后一包，不是最后一包则以TransferSize拷贝，是则以最后一包大小拷贝
 	if ( m_cPackageInfo.m_dwFileSize/TransferSize != m_cPackageInfo.m_wPackageId)
 	{
 
-		memset(m_cPackageInfo.m_pbyPackageContent,0,sizeof(m_cPackageInfo.m_pbyPackageContent));
-		memcpy(&m_cPackageInfo.m_pbyPackageContent,&m_cFilemgr.m_Buffer+dwShift,TransferSize);
+		memset(m_cPackageInfo.m_pbyPackageContent,0x00,sizeof(m_cPackageInfo.m_pbyPackageContent));
+		memcpy(m_cPackageInfo.m_pbyPackageContent,m_cFilemgr.m_Buffer+dwShift,TransferSize);
 		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
 	}
 	else
 	{
-		memset(m_cPackageInfo.m_pbyPackageContent,0,sizeof(m_cPackageInfo.m_pbyPackageContent));
-		memcpy(&m_cPackageInfo.m_pbyPackageContent,&m_cFilemgr.m_Buffer+dwShift,m_cPackageInfo.m_dwFileSize%TransferSize);
+		OspLog(LOG_LVL_DETAIL,"最后一包发送\n");
+		memset(m_cPackageInfo.m_pbyPackageContent,0x00,sizeof(m_cPackageInfo.m_pbyPackageContent));
+		memcpy(m_cPackageInfo.m_pbyPackageContent,m_cFilemgr.m_Buffer+dwShift,m_cPackageInfo.m_dwFileSize%TransferSize);
+		OspLog(LOG_LVL_DETAIL,"包大小：%d\n",m_cPackageInfo.m_dwFileSize%TransferSize);
 		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
 		NextState(READY_STATE);
 	}
@@ -259,11 +261,13 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 		case C_S_FILENAME_REQ:
 //			cout << pcMsg->content << endl;
 			ProcCheckFile(pcMsg);
+			NextState(TRANSFER_STATE);//此处有问题，用户若不请求下载数据则此操作占用instance，后期加到C_S_DOWNLOADDATA_REQ中
             break;
 
 			 /* 下载文件数据请求 */
 		case C_S_DOWNLOADDATA_REQ:
-			if (READY_STATE == CurState())
+			OspLog(LOG_LVL_DETAIL,"客户端数据请求进来了\n");
+			if (TRANSFER_STATE == CurState())
 			{
 				memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
 
@@ -277,13 +281,14 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 					}
 					
 					//判断包id是否在当前的缓存区，在则读取数据并发送，不在写下一个缓存，然后发送
-					if (m_cPackageInfo.m_wPackageId > (m_dwBufferNum-1)*PACKAGENUM_EACHBUFFER && 
+					if (m_cPackageInfo.m_wPackageId >= (m_dwBufferNum-1)*PACKAGENUM_EACHBUFFER && 
 						m_cPackageInfo.m_wPackageId < m_dwBufferNum*PACKAGENUM_EACHBUFFER)
 					{
 						ProcSendMsg(pcMsg);
 					}
 					else
 					{
+//						OspLog(LOG_LVL_DETAIL,"不在当前缓存中\n");
 						m_cFilemgr.FileRead(m_cPackageInfo.m_pbySFileName,m_dwBufferNum);
 						m_dwBufferNum++;
 						ProcSendMsg(pcMsg);				

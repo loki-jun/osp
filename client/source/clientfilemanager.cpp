@@ -11,11 +11,13 @@
 ===========================================================*/
 #include <iostream>
 #include <stdio.h>
+#include <fstream>
 #include "../include/clientcommon.h"
 #include "../include/clientfilemanager.h"
 
 using namespace std;
 
+extern CFileManager g_CFileManager;
 void CheckSpace()
 {
 
@@ -58,14 +60,23 @@ void CFileManager::CreateSpace(LPSTR lpstrFileName,u32 dwFileSize)
 
 }
 
-void CFileManager::FileWrite(LPSTR lpstrFileName,u32 dwBufferNum)
+void CFileManager::FileWrite(LPSTR lpstrFileName,u16 dwBufferId,u32 PackageNum,u32 PackageId)
 {
-	s8 achFileName[STRING_LENGTH] = SERVER_FILE_PATH;
+	s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
 	strcat(achFileName,"\\");
 	strcat(achFileName,lpstrFileName);
 
 
 	ofstream out(lpstrFileName, ios::binary|ios::app);
-	out.write(m_Buffer,sizeof(m_Buffer));
+	//判断是否是最后一包，不是最后一包则以TransferSize写到文件，是则以最后一包大小写到文件
+	if ( PackageNum != PackageId)
+	{
+		out.write(g_CFileManager.m_cBuffer[dwBufferId].m_dwBuffer,TransferSize);
+	}
+	else
+	{
+		out.write(g_CFileManager.m_cBuffer[dwBufferId].m_dwBuffer,(PackageNum*TransferSize)%TransferSize);
+	}
+	memset(g_CFileManager.m_cBuffer[dwBufferId].m_dwBuffer,0x00,sizeof(g_CFileManager.m_cBuffer[dwBufferId].m_dwBuffer));
 	out.close();
 }

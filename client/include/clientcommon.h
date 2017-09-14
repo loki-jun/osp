@@ -32,10 +32,12 @@
 #define NODE_TIME_WATING      5
 #define NUM_WATING            3
 
-#define CLIENT_BUFFERSIZE     (u32)2560000                       //缓存大小
+#define CLIENT_BUFFERSIZE     (u32)2560000                     //缓存大小
+#define PACKAGENUM_EACHBUFFER 100                              //每个缓存能存的包个数(CLIENT_BUFFERSIZE/TransferSize)
 
 #define MAX_CLIENT_INS_NUM     3
 
 #define CLIENT_FILE_PATH       "E:\\客户端测试文件夹"         //客户端下载文件存储路径
+
 
 #endif

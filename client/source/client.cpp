@@ -21,11 +21,11 @@ int main()
 
 	UserInit();
 	OspSetLogLevel(APP_ID,FILE_LEVEL,SCREEN_LEVEL);
-	clientinterface();
+//	clientinterface();
 
 	while(1)
 	{
-
+		OspDelay(1000);
 	}
 	return 0;
 	

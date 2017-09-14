@@ -60,8 +60,8 @@ public:
     }
 	
 public:
-    void InstanceEntry(CMessage *const pMsg);
-    void DaemonInstanceEntry(CMessage *const pMsg,CApp* pcApp);
+    void InstanceEntry(CMessage *const pcMsg);
+    void DaemonInstanceEntry(CMessage *const pcMsg,CApp* pcApp);
 	void DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp);
 	void DaemonCheckConnect(){};
 	void DaemonGetlist(CMessage *const pcMsg);

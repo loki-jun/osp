@@ -60,6 +60,7 @@ void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwBufferId)
 	ifstream in;
 	
     in.open(achFileName,ios::in|ios::binary);
+	OspLog(LOG_LVL_DETAIL,"服务器读取文件成功\n");
 	
     u32 dwPosition = SERVER_BUFFERSIZE*dwBufferId;
 	

@@ -21,7 +21,9 @@ using namespace std;
 
 CClientApp g_CClientApp;
 
-CConfigData g_CConfigData;
+//CConfigData g_CConfigData;
+CFileManager g_CFileManager;
+//CBuffer g_CBuffer;
 /*********************************************************************
     初始化函数
 *********************************************************************/
@@ -82,6 +84,20 @@ void CClientInstance::DaemonDisConnectServer()
 	
 }
 
+
+/*********************************************************************
+    客户端接收服务器数据函数
+*********************************************************************/
+void CClientInstance::ProcClientRecData(CMessage *const pcMsg,u32 dwBufferNum,u16 wIdCount)
+{
+	memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
+	//计算buffer中包的偏移量
+	u32 dwShift = m_cPackageInfo.m_wPackageId - (dwBufferNum-1)*PACKAGENUM_EACHBUFFER;
+
+	memcpy(g_CFileManager.m_cBuffer[wIdCount].m_dwBuffer+dwShift,m_cPackageInfo.m_pbyPackageContent,TransferSize);
+	OspLog(LOG_LVL_DETAIL,"包大小：%d\n",sizeof(g_CFileManager.m_cBuffer[wIdCount].m_dwBuffer));
+
+}
 
 /*********************************************************************
     DaemonInstanceEntry函数
@@ -254,7 +270,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 			memcpy(&m_cFileInfo,pcMsg->content,pcMsg->length);
 			OspLog(LOG_LVL_DETAIL,"服务器文件存在，放心大胆地下载吧，骚年！！\n");
 //			cout << FileInfo.m_pbyFileName << endl;
-			m_cFileManager.CreateSpace(m_cFileInfo.m_pbyFileName,m_cFileInfo.m_dwFileSize);
+			g_CFileManager.CreateSpace(m_cFileInfo.m_pbyFileName,m_cFileInfo.m_dwFileSize);
 			if ( TRANSFER_STATE == CurState() )
 			{
 				m_cPackageInfo.m_wDownloadState = 0;
@@ -264,12 +280,13 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 				{
 					u32 idcount = 0;
 					u32 MaxId = m_cFileInfo.m_dwFileSize/TransferSize;
-					OspLog(LOG_LVL_DETAIL,"包的总数目为：%u\n",MaxId);
+					OspLog(LOG_LVL_DETAIL,"包的总数目为：%u\n",MaxId+1);
 
 					memcpy(m_cPackageInfo.m_pbySFileName,m_cFileInfo.m_pbyFileName,sizeof(m_cPackageInfo.m_pbySFileName));
 					m_cPackageInfo.m_dwFileSize = m_cFileInfo.m_dwFileSize;
 					m_cPackageInfo.m_wPackageId = idcount;//若为断点续传，此值为配置中读取的ID值
-					post(m_dwDstId, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
+//					post(m_dwDstId, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
+					post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
 				}
 				else
 				{
@@ -281,23 +298,95 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 
 		/* 服务器返回文件包数据 */
 		case S_C_DOWNLOADDATA_ACK:
+			OspLog(LOG_LVL_DETAIL,"客户端收到第一包数据\n");
+			m_cPackageInfo.printf();
 			memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
 			if (0 == m_cPackageInfo.m_wDownloadState)
 			{
-				u32 MaxId = m_cFileInfo.m_dwFileSize/TransferSize;
-				if (m_cPackageInfo.m_wPackageId <= MaxId)
-				{
-					
-
-					memcpy(m_cPackageInfo.m_pbySFileName,m_cFileInfo.m_pbyFileName,sizeof(m_cPackageInfo.m_pbySFileName));
-					m_cPackageInfo.m_dwFileSize = m_cFileInfo.m_dwFileSize;
-					m_cPackageInfo.m_wPackageId++;
-					post(m_dwDstId, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
-				}
-			    else
-				{
-					//				post(C_U_DOWNLOAD_NOTIFY);
-				}
+				u16 wIdCount;
+				//遍历3个buffer，若为空则占，并将instance与buffer绑定（通过别名）;
+				//若不为空则判断当前instance该用哪个buffer
+//				for (wIdCount=0; wIdCount < CLIENT_APP_NO; wIdCount++)
+//				{
+						wIdCount = GetInsID()-1;
+						u32 MaxId = m_cFileInfo.m_dwFileSize/TransferSize;
+						if (m_cPackageInfo.m_wPackageId <= MaxId)
+						{
+							u32 dwBufferNum = g_CFileManager.m_cBuffer[wIdCount].m_dwBufferNum;
+							//判断包id是否在当前的缓存区，在则写缓存，不在则将前一个缓存写到文件中，并写下一个缓存
+							if (m_cPackageInfo.m_wPackageId >= (dwBufferNum-1)*PACKAGENUM_EACHBUFFER && 
+								m_cPackageInfo.m_wPackageId < dwBufferNum*PACKAGENUM_EACHBUFFER)
+							{
+								ProcClientRecData(pcMsg,dwBufferNum,wIdCount);
+								//包的数目加1
+								m_cPackageInfo.m_wPackageId++;
+								post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
+							}
+							else
+							{
+								g_CFileManager.FileWrite(m_cPackageInfo.m_pbySFileName,wIdCount,MaxId,m_cPackageInfo.m_wPackageId);
+								g_CFileManager.m_cBuffer[wIdCount].m_dwBufferNum++;
+								//dwBufferNum = g_CFileManager.m_cBuffer[wIdCount].m_dwBufferNum;
+								ProcClientRecData(pcMsg,dwBufferNum,wIdCount);	
+								
+								m_cPackageInfo.m_wPackageId++;
+								post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
+							}
+						}
+						else
+						{
+							//post(C_U_DOWNLOAD_NOTIFY);
+							NextState(READY_STATE);
+						}
+						
+/*
+					//占buffer，并将buffer与instance绑定
+					if (0 == g_CFileManager.m_cBuffer[wIdCount].m_wBufferState)
+					{
+						//寻找空闲buffer：将buffer状态改为1，表明已被占
+						g_CFileManager.m_cBuffer[wIdCount].m_wBufferState = 1;
+						g_CFileManager.m_cBuffer[wIdCount].m_wBufferAlias = GetInsID();
+						OspLog(LOG_LVL_DETAIL,"buffer别名为：%d\n",g_CFileManager.m_cBuffer[wIdCount].m_wBufferAlias);
+					}
+					else
+					{
+						//通过对比别名，确定instance该用哪个buffer
+						if (GetInsID() == g_CFileManager.m_cBuffer[wIdCount].m_wBufferAlias)
+						{
+							u32 MaxId = m_cFileInfo.m_dwFileSize/TransferSize;
+							if (m_cPackageInfo.m_wPackageId <= MaxId)
+							{
+								u32 dwBufferNum = g_CFileManager.m_cBuffer[wIdCount].m_dwBufferNum;
+								//判断包id是否在当前的缓存区，在则写缓存，不在则将前一个缓存写到文件中，并写下一个缓存
+								if (m_cPackageInfo.m_wPackageId >= (dwBufferNum-1)*PACKAGENUM_EACHBUFFER && 
+									m_cPackageInfo.m_wPackageId < dwBufferNum*PACKAGENUM_EACHBUFFER)
+								{
+									ProcClientRecData(pcMsg,dwBufferNum,wIdCount);
+									//包的数目加1
+									m_cPackageInfo.m_wPackageId++;
+									post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
+								}
+								else
+								{
+									g_CFileManager.FileWrite(m_cPackageInfo.m_pbySFileName,wIdCount);
+									g_CFileManager.m_cBuffer[wIdCount].m_dwBufferNum++;
+//									dwBufferNum = g_CFileManager.m_cBuffer[wIdCount].m_dwBufferNum;
+									ProcClientRecData(pcMsg,dwBufferNum,wIdCount);	
+									
+									m_cPackageInfo.m_wPackageId++;
+									post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
+								}
+							}
+							else
+							{
+								//post(C_U_DOWNLOAD_NOTIFY);
+								NextState(READY_STATE);
+							}
+							
+						}
+					}
+*/
+//				}
 			}
 			else
 			{

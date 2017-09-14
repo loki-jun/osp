@@ -17,7 +17,7 @@
 
 class CReadFile
 {
-public://后续改为private
+public://后续改为private，使用set,get接口调用
 	//开辟缓存
 	s8 m_Buffer[SERVER_BUFFERSIZE] ;
 	s8 m_pbyFileName[STRING_LENGTH];

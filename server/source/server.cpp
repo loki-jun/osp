@@ -16,9 +16,10 @@
 int main()
 {
 	UserInit();
+	OspSetLogLevel(APP_ID,FILE_LEVEL,SCREEN_LEVEL);
 	while(1)
 	{
-	
+		OspDelay(1000);
 	}
 	
 }

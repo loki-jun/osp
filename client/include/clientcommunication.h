@@ -46,13 +46,14 @@ private:
 	CFileInfo m_cFileInfo;
 	CFileListInfo m_cFileListInfo;
 	CPackageInfo m_cPackageInfo;
-	CFileManager m_cFileManager;
+
 	
 public:
-    void InstanceEntry(CMessage *const pMsg);
-    void DaemonInstanceEntry(CMessage *const pMsg,CApp* pcApp);
+    void InstanceEntry(CMessage *const pcMsg);
+    void DaemonInstanceEntry(CMessage *const pcMsg,CApp* pcApp);
 	void DaemonConnectServer();
 	void DaemonDisConnectServer();
+	void ProcClientRecData(CMessage *const pcMsg,u32 dwBufferNum,u16 wIdCount);
 	
 };
 

@@ -148,8 +148,8 @@ void clientinterface()
 
 //向用户展示文件列表内容
 /*
-void showlist(pMsg)
+void showlist(pcMsg)
 {
-	cout << pMsg << endl;
+	cout << pcMsg << endl;
 }
 */
