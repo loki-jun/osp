@@ -60,25 +60,25 @@ void CFileManager::CreateSpace(LPSTR lpstrFileName,u32 dwFileSize)
 
 }
 
-void CFileManager::FileWrite(LPSTR lpstrFileName,u16 dwBufferId,u32 PackageNum,u32 PackageId)
+void CFileManager::FileWrite(LPSTR lpstrFileName,u16 dwBufferId,u32 FileSize,u32 PackageId,u32 PackageNum,u16 IdCount)
 {
 	s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
 	strcat(achFileName,"\\");
 	strcat(achFileName,lpstrFileName);
 
-	OspPrintf(TRUE,FALSE,"bufferid:%d,总包数:%d,包id:%d\n",dwBufferId,PackageNum,PackageId);
+//	OspPrintf(TRUE,FALSE,"bufferid:%d,文件大小:%d,包id:%d\n",dwBufferId,FileSize,PackageId);
 
 	ofstream out(achFileName, ios::binary|ios::app);
-	//判断是否是最后一包，不是最后一包则以TransferSize写到文件，是则以最后一包大小写到文件
-	if ( PackageNum != PackageId)
+	//判断buffer是否写满，写满则将buffer写到文件中，否则应该是最后一个buffer的情况
+	if ( PackageId == ((dwBufferId+1)*PACKAGENUM_EACHBUFFER-1))
 	{
-		out.write(g_CFileManager.m_cBuffer[dwBufferId].m_dwBuffer,TransferSize);
+		out.write(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer,sizeof(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer));
 	}
 	else
 	{
-		out.write(g_CFileManager.m_cBuffer[dwBufferId].m_dwBuffer,(PackageNum*TransferSize)%TransferSize);
-		OspPrintf(TRUE,FALSE,"总包数:%d,传输大小:%d,最后一包大小:%d\n",PackageNum,TransferSize,(PackageNum*TransferSize)%TransferSize);
+		out.write(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer,FileSize-dwBufferId*CLIENT_BUFFERSIZE);
+//		OspPrintf(TRUE,FALSE,"文件大小:%d,传输大小:%d,最后一个buffer大小:%d\n",FileSize,TransferSize,FileSize-dwBufferId*CLIENT_BUFFERSIZE);
 	}
-	memset(g_CFileManager.m_cBuffer[dwBufferId].m_dwBuffer,0x00,sizeof(g_CFileManager.m_cBuffer[dwBufferId].m_dwBuffer));
+	memset(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer,0x00,sizeof(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer));
 	out.close();
 }

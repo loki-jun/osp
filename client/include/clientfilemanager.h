@@ -27,6 +27,7 @@ public:
     {
         m_wBufferState = 0;
 		m_dwBufferNum = 0;
+		memset(m_dwBuffer,0,sizeof(m_dwBuffer));
 		
     }
     ~CBuffer()
@@ -54,7 +55,7 @@ public:
 	CConfigData m_cConfigInfo[3];
 
 public:
-	void FileWrite(LPSTR lpstrFileName,u16 wIdCount,u32 PackageNum,u32 PackageId);
+	void FileWrite(LPSTR lpstrFileName,u16 dwBufferId,u32 FileSize,u32 PackageId,u32 PackageNum,u16 IdCount);
 //	void ReadAndGetConfigData(u16 m_wNameLen,s8* m_pbyFileName,struct m_tConfigData){};
 	void CreateSpace(LPSTR lpstrFileName,u32 dwFileSize);
 

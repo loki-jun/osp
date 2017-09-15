@@ -170,7 +170,7 @@ void CServerInstance::ProcSendMsg(CMessage *const pcMsg)
 {
 	memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
 	//计算buffer中包的偏移量
-	u32 dwShift = m_cPackageInfo.m_wPackageId - (m_dwBufferNum-1)*PACKAGENUM_EACHBUFFER;
+	u32 dwShift = (m_cPackageInfo.m_wPackageId - (m_dwBufferNum-1)*PACKAGENUM_EACHBUFFER)*TransferSize;
 	//判断是否是最后一包，不是最后一包则以TransferSize拷贝，是则以最后一包大小拷贝
 	if ( m_cPackageInfo.m_dwFileSize/TransferSize != m_cPackageInfo.m_wPackageId)
 	{

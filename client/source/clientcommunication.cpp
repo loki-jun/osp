@@ -92,10 +92,10 @@ void CClientInstance::ProcClientRecData(CMessage *const pcMsg,u32 dwBufferNum,u1
 {
 	memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
 	//计算buffer中包的偏移量
-	u32 dwShift = m_cPackageInfo.m_wPackageId - (dwBufferNum-1)*PACKAGENUM_EACHBUFFER;
+	u32 dwShift = (m_cPackageInfo.m_wPackageId - dwBufferNum*PACKAGENUM_EACHBUFFER)*TransferSize;
 
 	memcpy(g_CFileManager.m_cBuffer[wIdCount].m_dwBuffer+dwShift,m_cPackageInfo.m_pbyPackageContent,TransferSize);
-	OspLog(LOG_LVL_DETAIL,"包大小：%d\n",sizeof(g_CFileManager.m_cBuffer[wIdCount].m_dwBuffer));
+//	OspLog(LOG_LVL_DETAIL,"包大小：%d\n",sizeof(g_CFileManager.m_cBuffer[wIdCount].m_dwBuffer));
 
 }
 
@@ -269,8 +269,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 		case S_C_FILENAME_ACK:
 			memcpy(&m_cFileInfo,pcMsg->content,pcMsg->length);
 			OspLog(LOG_LVL_DETAIL,"服务器文件存在，放心大胆地下载吧，骚年！！\n");
-//			cout << FileInfo.m_pbyFileName << endl;
-			g_CFileManager.CreateSpace(m_cFileInfo.m_pbyFileName,m_cFileInfo.m_dwFileSize);
+//			g_CFileManager.CreateSpace(m_cFileInfo.m_pbyFileName,m_cFileInfo.m_dwFileSize);
 			if ( TRANSFER_STATE == CurState() )
 			{
 				m_cPackageInfo.m_wDownloadState = 0;
@@ -298,45 +297,67 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 
 		/* 服务器返回文件包数据 */
 		case S_C_DOWNLOADDATA_ACK:
-			OspLog(LOG_LVL_DETAIL,"客户端收到第一包数据\n");
-			m_cPackageInfo.printf();
+//			m_cPackageInfo.printf();
 			memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
 			//判断是正常下载还是断点续传
 			if (0 == m_cPackageInfo.m_wDownloadState)
 			{
-				u16 wIdCount;
+				u16 wIdCount =0;
+				u32 MaxId =0;
 				//将instance与buffer绑定
 				wIdCount = GetInsID()-1;
-				u32 MaxId = m_cFileInfo.m_dwFileSize/TransferSize;
+				MaxId = m_cFileInfo.m_dwFileSize/TransferSize;
+//				OspPrintf(TRUE,FALSE,"MaxId:%d\n",MaxId);
 				//判断数据包是否传完
 				if (m_cPackageInfo.m_wPackageId <= MaxId)
 				{
 					u32 dwBufferNum = g_CFileManager.m_cBuffer[wIdCount].m_dwBufferNum;
 					//判断包id是否在当前的缓存区，在则写缓存，不在则将前一个缓存写到文件中，并写下一个缓存
-					if (m_cPackageInfo.m_wPackageId >= (dwBufferNum-1)*PACKAGENUM_EACHBUFFER && 
-						m_cPackageInfo.m_wPackageId < dwBufferNum*PACKAGENUM_EACHBUFFER)
+					if (m_cPackageInfo.m_wPackageId >= dwBufferNum*PACKAGENUM_EACHBUFFER && 
+						m_cPackageInfo.m_wPackageId < (dwBufferNum+1)*PACKAGENUM_EACHBUFFER)
 					{
 						ProcClientRecData(pcMsg,dwBufferNum,wIdCount);
+						//判断buffer是否写满
+
+						if (m_cPackageInfo.m_wPackageId == ((dwBufferNum+1)*PACKAGENUM_EACHBUFFER-1))
+						{
+							g_CFileManager.FileWrite(m_cPackageInfo.m_pbySFileName,dwBufferNum,m_cPackageInfo.m_dwFileSize,m_cPackageInfo.m_wPackageId,MaxId,wIdCount);
+						}
+						//判断是否到最后一包
+						if(MaxId == m_cPackageInfo.m_wPackageId)
+						{
+							g_CFileManager.FileWrite(m_cPackageInfo.m_pbySFileName,dwBufferNum,m_cPackageInfo.m_dwFileSize,m_cPackageInfo.m_wPackageId,MaxId,wIdCount);
+							NextState(READY_STATE);
+							OspPrintf(TRUE,FALSE,"instance号为：%d,buffer号为：%d\n",GetInsID(),wIdCount);
+                            break;
+						}
 						//包的数目加1
 						m_cPackageInfo.m_wPackageId++;
 						//包数据写完停止给服务器发请求
-						if (m_cPackageInfo.m_wPackageId <= MaxId)
-						{
+//						if (m_cPackageInfo.m_wPackageId <= MaxId)
+//						{
 							post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
-						}						
+//						}						
 					}
 				    else
 					{
-						g_CFileManager.FileWrite(m_cPackageInfo.m_pbySFileName,wIdCount,MaxId,m_cPackageInfo.m_wPackageId);
+//						g_CFileManager.FileWrite(m_cPackageInfo.m_pbySFileName,wIdCount,m_cPackageInfo.m_dwFileSize,m_cPackageInfo.m_wPackageId,MaxId);
 						g_CFileManager.m_cBuffer[wIdCount].m_dwBufferNum++;
 						//dwBufferNum = g_CFileManager.m_cBuffer[wIdCount].m_dwBufferNum;
 						ProcClientRecData(pcMsg,dwBufferNum,wIdCount);	
+						if(MaxId == m_cPackageInfo.m_wPackageId)
+						{
+							g_CFileManager.FileWrite(m_cPackageInfo.m_pbySFileName,dwBufferNum,m_cPackageInfo.m_dwFileSize,m_cPackageInfo.m_wPackageId,MaxId,wIdCount);
+							NextState(READY_STATE);
+							OspPrintf(TRUE,FALSE,"instance号为：%d",GetInsID);
+                            break;
+						}
 								
 						m_cPackageInfo.m_wPackageId++;
-						if (m_cPackageInfo.m_wPackageId <= MaxId)
-						{
+//						if (m_cPackageInfo.m_wPackageId <= MaxId)
+//						{
 							post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
-						}
+//						}
 					}
 				}
 				else
