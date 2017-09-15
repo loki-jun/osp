@@ -40,7 +40,7 @@ public:
 	
 public:
 //	void FileRead(u16 m_wNameLen,s8* m_pbyFileName,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent){};
-	void FileRead(LPSTR lpstrFileName,u32 dwBufferId);
+	void FileRead(LPSTR lpstrFileName,u32 dwBufferId,u32 dwFileSize);
 
 private:
 	void ReadCache(){};

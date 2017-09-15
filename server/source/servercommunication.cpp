@@ -277,7 +277,7 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 					//触发写第一个缓存区
 					while(0 == m_dwBufferNum)
 					{
-						m_cFilemgr.FileRead(m_cPackageInfo.m_pbySFileName,m_dwBufferNum);
+						m_cFilemgr.FileRead(m_cPackageInfo.m_pbySFileName,m_dwBufferNum,m_cPackageInfo.m_dwFileSize);
 						m_dwBufferNum++;
 					}
 					
@@ -290,7 +290,8 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 					else
 					{
 //						OspLog(LOG_LVL_DETAIL,"不在当前缓存中\n");
-						m_cFilemgr.FileRead(m_cPackageInfo.m_pbySFileName,m_dwBufferNum);
+						//m_dwBufferNum++;
+						m_cFilemgr.FileRead(m_cPackageInfo.m_pbySFileName,m_dwBufferNum,m_cPackageInfo.m_dwFileSize);
 						m_dwBufferNum++;
 						ProcSendMsg(pcMsg);				
 					}

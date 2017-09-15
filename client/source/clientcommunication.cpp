@@ -322,6 +322,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 						if (m_cPackageInfo.m_wPackageId == ((dwBufferNum+1)*PACKAGENUM_EACHBUFFER-1))
 						{
 							g_CFileManager.FileWrite(m_cPackageInfo.m_pbySFileName,dwBufferNum,m_cPackageInfo.m_dwFileSize,m_cPackageInfo.m_wPackageId,MaxId,wIdCount);
+							dwBufferNum++;
 						}
 						//判断是否到最后一包
 						if(MaxId == m_cPackageInfo.m_wPackageId)
@@ -336,14 +337,15 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 						//包数据写完停止给服务器发请求
 //						if (m_cPackageInfo.m_wPackageId <= MaxId)
 //						{
+						
 							post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
 //						}						
 					}
+/*
 				    else
 					{
-//						g_CFileManager.FileWrite(m_cPackageInfo.m_pbySFileName,wIdCount,m_cPackageInfo.m_dwFileSize,m_cPackageInfo.m_wPackageId,MaxId);
 						g_CFileManager.m_cBuffer[wIdCount].m_dwBufferNum++;
-						//dwBufferNum = g_CFileManager.m_cBuffer[wIdCount].m_dwBufferNum;
+
 						ProcClientRecData(pcMsg,dwBufferNum,wIdCount);	
 						if(MaxId == m_cPackageInfo.m_wPackageId)
 						{
@@ -359,6 +361,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 							post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
 //						}
 					}
+*/
 				}
 				else
 				{

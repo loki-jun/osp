@@ -51,7 +51,7 @@ void CReadFile::ReadCache()
 */
 
 
-void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwBufferId)
+void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwBufferId,u32 dwFileSize)
 {
 	s8 achFileName[STRING_LENGTH] = SERVER_FILE_PATH;
 	strcat(achFileName,"\\");
@@ -66,6 +66,14 @@ void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwBufferId)
 	
     in.seekg(dwPosition,ios::beg);
     memset(m_Buffer,0x00,sizeof(m_Buffer));
-    in.read(m_Buffer,sizeof(m_Buffer));
+	if (dwBufferId != dwFileSize/SERVER_BUFFERSIZE)
+	{
+		in.read(m_Buffer,sizeof(m_Buffer));
+	}
+	else
+	{
+		in.read(m_Buffer,sizeof(dwFileSize-dwBufferId*SERVER_BUFFERSIZE));
+	}
+    
 	in.close();
 }
