@@ -49,11 +49,11 @@
 
 class CFileInfo
 {
-public:
+private:
 	s8 m_pbyFileName[STRING_LENGTH];
 	u32 m_dwFileSize;
-	u32 m_dwMD5Value[32];
-	
+	u8 m_dwMD5Value[32];
+
 public:
     CFileInfo()
     {
@@ -73,14 +73,54 @@ public:
 		OspPrintf(TRUE,FALSE,"size:%d,filename:%s,Md5:%s\n",
 			m_dwFileSize,m_pbyFileName,m_dwMD5Value);
 	}
+
+	s8 getfilename()
+	{
+		return ntohl(m_pbyFileName);
+	}
+	void setfilename(s8* filename)
+	{
+		m_pbyFileName = htonl(filename);
+	}
+
+	u32 getfilesize()
+	{
+		return ntohl(m_pbyFileName);
+	}
+	void setfilesize(u32 filesize)
+	{
+		m_pbyFileName = htonl(filesize);
+	}
+
+	u8 getfilemd5()
+	{
+		return ntohl(m_dwMD5Value);
+	}
+	void setfilemd5(u8 filemd5)
+	{
+		memcpy(m_dwMD5Value,htonl(filemd5),sizeof(m_dwMD5Value));
+	}
 };
 
 class CFileListInfo
 {
-public:
+private:
 	u16 m_wFileNum;
-	CFileInfo m_pbyFileInfo[MAX_FILELIST_NUM];
+	CFileInfo m_pbyFileInfo[MAX_FILELIST_NUM];	
 
+public:
+	CFileListInfo()
+    {
+        clear();
+    }
+    ~CFileListInfo()
+    {
+    }
+	void clear()
+	{
+        m_wFileNum = 0;
+		memset(m_pbyFileInfo,0,sizeof(m_pbyFileInfo));
+	}
 	void printf()
 	{
 		for (u16 i=0;i<m_wFileNum;i++)
@@ -90,42 +130,122 @@ public:
 		}
 	}
 
+	//文件列表中的文件个数
+	u16 getfilenum()
+	{
+		return ntohl(m_wFileNum);
+	}
+	void setfilenum(u16 filenum)
+	{
+		m_wFileNum = htonl(filenum);
+	}
+
+	//文件列表信息
+	CFileInfo getfileinfo()
+	{
+		return ntohl(m_pbyFileInfo);
+	}
+	void setfileinfo(CFileInfo fileinfo)
+	{
+		memcpy(m_pbyFileInfo,htonl(fileinfo),sizeof(m_pbyFileInfo));
+	}
+
 };
 
 class CPackageInfo
 {
-public:
+private:
 	s8 m_pbyCFileName[STRING_LENGTH];
 	s8 m_pbySFileName[STRING_LENGTH];
 	u32 m_dwFileSize;
 	u16 m_wPackageId;
-//	u16 m_wPartPackageId;
-//	u16 m_wNormalPackageId;
 	u16 m_wPackageSize;
 	s8 m_pbyPackageContent[TransferSize];
 	u16 m_wDownloadState;
 
+public:
+	CPackageInfo()
+    {
+        clear();
+    }
+    ~CPackageInfo()
+    {
+    }
+	void clear()
+	{
+        m_dwFileSize = 0;
+		m_wPackageId = 0;
+		m_wPackageSize = 0;
+		m_wDownloadState = 0;
+		memset(m_pbyPackageContent,0,sizeof(m_pbyPackageContent));
+		memset(m_pbyCFileName,0,sizeof(m_pbyCFileName));
+		memset(m_pbySFileName,0,sizeof(m_pbySFileName));
+	}
 	void printf()
 	{
 		OspPrintf(TRUE,FALSE,"SFileName:%s\n,PackageId:%d\n,FileSize:%d\n,PackageContent:%s\n,DownloadState:%d\n",
 			m_pbySFileName,m_wPackageId,m_dwFileSize,m_pbyPackageContent,m_wDownloadState);
 	}	
-	
-	
-/*	
-public:
-    CPackageInfo()
-    {
-        m_wPartPackageId = 0;
-		m_wNormalPackageId =0;
-		m_dwFileSize =0;
-		m_wDownloadState = 0;
-		memset(m_pbyPackageContent,0,sizeof(m_pbyPackageContent));
-    }
-    ~CPackageInfo()
-    {
-    }
-*/
+
+	//客户端文件名
+	s8 getcfilename()
+	{
+		return ntohl(m_pbyCFileName);
+	}
+	void setfilename(s8* cfilename)
+	{
+		memcpy(m_pbyCFileName,htonl(cfilename),sizeof(m_pbyCFileName));
+	}
+
+	//服务器文件名
+	s8 getsfilename()
+	{
+		return ntohl(m_pbySFileName);
+	}
+	void setfilename(s8* sfilename)
+	{
+		memcpy(m_pbySFileName,htonl(sfilename),sizeof(m_pbySFileName));
+	}
+
+	//文件大小
+	u32 getfilesize()
+	{
+		return ntohl(m_dwFileSize);
+	}
+	void setfilesize(u32 filesize)
+	{
+		m_dwFileSize = htonl(filesize);
+	}
+
+	//包id
+	u16 getpackageid()
+	{
+		return ntohl(m_wPackageId);
+	}
+	void setpackageid(u16 packageid)
+	{
+		m_wPackageId = htonl(packageid);
+	}
+
+	//包大小
+	u16 getpackagesize()
+	{
+		return ntohl(m_wPackageSize);
+	}
+	void setpackagesize(u16 packagesize)
+	{
+		m_wPackageSize = htonl(packagesize);
+	}
+
+	//包内容
+	s8 getpackagecontent()
+	{
+		return ntohl(m_pbyPackageContent);
+	}
+	void setpackagecontent(m_pbyPackageContent)
+	{
+		memcpy(m_pbyPackageContent,htonl(m_pbyPackageContent),sizeof(m_pbyPackageContent));
+	}
 	
 };
 

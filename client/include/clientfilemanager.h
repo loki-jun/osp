@@ -17,10 +17,9 @@
 
 class CBuffer
 {
-public:
+private:
 	s8 m_dwBuffer[CLIENT_BUFFERSIZE];
 	u16 m_wBufferState;
-	u16 m_wBufferAlias;
 	u32 m_dwBufferNum;
 public:
     CBuffer()
@@ -38,7 +37,7 @@ public:
 
 class CConfigData
 {
-public:
+private:
 	u16 m_wFileId;
 	u16 m_wNameLen;
 	s8 m_pbyCFileName[256];
@@ -49,7 +48,7 @@ public:
 
 class CFileManager
 {
-public:
+private:
 	u16 m_wFileNumber;
 	CBuffer m_cBuffer[3];
 	CConfigData m_cConfigInfo[3];
