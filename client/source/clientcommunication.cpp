@@ -323,6 +323,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 						{
 							g_CFileManager.FileWrite(m_cPackageInfo.m_pbySFileName,dwBufferNum,m_cPackageInfo.m_dwFileSize,m_cPackageInfo.m_wPackageId,MaxId,wIdCount);
 							dwBufferNum++;
+							OspPrintf(TRUE,FALSE,"重新写一个buffer，buffer计数号为：%d\n",dwBufferNum);
 						}
 						//判断是否到最后一包
 						if(MaxId == m_cPackageInfo.m_wPackageId)

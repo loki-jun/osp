@@ -66,14 +66,14 @@ void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwBufferId,u32 dwFileSize)
 	
     in.seekg(dwPosition,ios::beg);
     memset(m_Buffer,0x00,sizeof(m_Buffer));
-	if (dwBufferId != dwFileSize/SERVER_BUFFERSIZE)
-	{
+//	if (dwBufferId != (dwFileSize/SERVER_BUFFERSIZE+1))
+//	{
 		in.read(m_Buffer,sizeof(m_Buffer));
-	}
-	else
-	{
-		in.read(m_Buffer,sizeof(dwFileSize-dwBufferId*SERVER_BUFFERSIZE));
-	}
+//	}
+//	else
+//	{
+//		in.read(m_Buffer,sizeof(dwFileSize-dwBufferId*SERVER_BUFFERSIZE));
+//	}
     
 	in.close();
 }
