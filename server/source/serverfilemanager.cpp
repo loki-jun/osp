@@ -50,7 +50,7 @@ void CReadFile::ReadCache()
 }
 */
 
-
+//void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 &m_wPackageSize,s8* pbyPackageContent)
 void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwBufferId,u32 dwFileSize)
 {
 	s8 achFileName[STRING_LENGTH] = SERVER_FILE_PATH;
