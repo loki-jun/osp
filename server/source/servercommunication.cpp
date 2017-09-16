@@ -291,8 +291,7 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 					{
 //						OspLog(LOG_LVL_DETAIL,"不在当前缓存中\n");
 						//m_dwBufferNum++;
-						OspPrintf(TRUE,FALSE,"服务器开辟新的缓存，buffer号为：%d\n",m_dwBufferNum);
-						m_cFilemgr.FileRead(m_cPackageInfo.m_pbySFileName,m_cPackageInfo.m_wPackageId,&m_cPackageInfo.m_dwFileSize,&m_cPackageInfo.m_pbyPackageContent);
+						m_cFilemgr.FileRead(m_cPackageInfo.m_pbySFileName,m_dwBufferNum,m_cPackageInfo.m_dwFileSize);
 						m_dwBufferNum++;
 						ProcSendMsg(pcMsg);				
 					}
