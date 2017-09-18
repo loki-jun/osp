@@ -107,7 +107,7 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 	fileSizes = m_cFindSizes.findSizes("E:\\测试文件夹");
 	filemd5s = m_cFindMd5.findMd5("E:\\\\测试文件夹");  //md5值没有get到，貌似计算的是字符串，待查……
 
-	m_cFileListInfo.m_wFileNum = fileNames.size();
+	m_cFileListInfo.setfilenum(fileNames.size());
 
 	u16 wCount = 0;
 	CFileInfo cFileInfo;//此处定义局部变量，不需要存储
@@ -115,11 +115,14 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 	for ( wCount =0; wCount<fileNames.size(); wCount++)
 	{      
 		cFileInfo.clear();
-		cFileInfo.m_dwFileSize = fileSizes[wCount];
-		memcpy(&cFileInfo.m_pbyFileName,&fileNames[wCount][0u],sizeof(cFileInfo.m_pbyFileName));//加[0u]可以解决乱码问题
-		memcpy(&m_cFileListInfo.m_pbyFileInfo[wCount],&cFileInfo,sizeof(cFileInfo));
-//		OspPrintf(TRUE,FALSE,"[DaemonGetlist] 3 fileSizes[%d].%d m_dwFileSize.%d \n", 
-//			wCount, fileSizes[wCount],m_cFileListInfo.m_pbyFileInfo[wCount].m_dwFileSize );		
+		cFileInfo.setnetfilesize(fileSizes[wCount]);
+		cFileInfo.setfilename(&fileNames[wCount][0u]);
+		m_cFileListInfo.setfileinfo(&cFileInfo);
+//		memcpy(&cFileInfo.getfilename(),&fileNames[wCount][0u],sizeof(cFileInfo.getfilename()));//加[0u]可以解决乱码问题
+//		memcpy(&m_cFileListInfo.m_pbyFileInfo[wCount],&cFileInfo,sizeof(cFileInfo));
+		OspPrintf(TRUE,FALSE,"[DaemonGetlist] 3 fileSizes[%d].%d m_dwFileSize.%d \n", 
+			wCount, fileSizes[wCount],cFileInfo.getfilesize());
+
 	}	
 
 	m_cFileListInfo.printf();
@@ -146,9 +149,10 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 		memcpy(achFileName,pcMsg->content,pcMsg->length);
 		memcpy(achServerFileName,&fileNames[wCount][0u],sizeof(achServerFileName));
 
-        m_cFileInfo.m_dwFileSize = fileSizes[wCount];
+        m_cFileInfo.setfilesize(fileSizes[wCount]);
 //		memcpy(&m_cFileInfo.m_dwFileSize,&fileSizes[wCount],sizeof(m_cFileInfo.m_dwFileSize));
-		memcpy(&m_cFileInfo.m_pbyFileName,&fileNames[wCount][0u],sizeof(m_cFileInfo.m_pbyFileName));
+		m_cFileInfo.setfilename(&fileNames[wCount][0u]);
+//		memcpy(&m_cFileInfo.getfilename(),&fileNames[wCount][0u],sizeof(m_cFileInfo.getfilename()));
 
 		if (0 == strcmp(achServerFileName,achFileName))
 		{
@@ -166,6 +170,8 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 /*********************************************************************
     服务器发送消息函数
 *********************************************************************/
+
+/*
 void CServerInstance::ProcSendMsg(CMessage *const pcMsg)
 {
 	memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
@@ -190,6 +196,8 @@ void CServerInstance::ProcSendMsg(CMessage *const pcMsg)
 		NextState(READY_STATE);
 	}
 }
+*/
+
 
 /*********************************************************************
     DaemonInstanceEntry函数
@@ -272,30 +280,15 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 			{
 				memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
 				//判断为正常下载还是断点续传
-				if (0 == m_cPackageInfo.m_wDownloadState) 
+				if (0 == m_cPackageInfo.getdownloadstate()) 
 				{
-					//触发写第一个缓存区
-					while(0 == m_dwBufferNum)
+					m_cFilemgr.FileRead(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent());
+					post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
+					if (m_cPackageInfo.getfilesize()/TransferSize == m_cPackageInfo.getpackageid())
 					{
-						m_cFilemgr.FileRead(m_cPackageInfo.m_pbySFileName,m_dwBufferNum,m_cPackageInfo.m_dwFileSize);
-						m_dwBufferNum++;
+						NextState(READY_STATE);
+						OspLog(LOG_LVL_DETAIL,"服务器文件传输完毕\n");
 					}
-					
-					//判断包id是否在当前的缓存区，在则读取数据并发送，不在写下一个缓存，然后发送
-					if (m_cPackageInfo.m_wPackageId >= (m_dwBufferNum-1)*PACKAGENUM_EACHBUFFER && 
-						m_cPackageInfo.m_wPackageId < m_dwBufferNum*PACKAGENUM_EACHBUFFER)
-					{
-						ProcSendMsg(pcMsg);
-					}
-					else
-					{
-//						OspLog(LOG_LVL_DETAIL,"不在当前缓存中\n");
-						//m_dwBufferNum++;
-						m_cFilemgr.FileRead(m_cPackageInfo.m_pbySFileName,m_dwBufferNum,m_cPackageInfo.m_dwFileSize);
-						m_dwBufferNum++;
-						ProcSendMsg(pcMsg);				
-					}
-					
 				}
 				else
 				{

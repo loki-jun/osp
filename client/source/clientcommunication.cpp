@@ -21,9 +21,8 @@ using namespace std;
 
 CClientApp g_CClientApp;
 
-//CConfigData g_CConfigData;
+CConfigData g_CConfigData;
 CFileManager g_CFileManager;
-//CBuffer g_CBuffer;
 /*********************************************************************
     初始化函数
 *********************************************************************/
@@ -88,6 +87,7 @@ void CClientInstance::DaemonDisConnectServer()
 /*********************************************************************
     客户端接收服务器数据函数
 *********************************************************************/
+/*
 void CClientInstance::ProcClientRecData(CMessage *const pcMsg,u32 dwBufferNum,u16 wIdCount)
 {
 	memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
@@ -98,6 +98,7 @@ void CClientInstance::ProcClientRecData(CMessage *const pcMsg,u32 dwBufferNum,u1
 //	OspLog(LOG_LVL_DETAIL,"包大小：%d\n",sizeof(g_CFileManager.m_cBuffer[wIdCount].m_dwBuffer));
 
 }
+*/
 
 /*********************************************************************
     DaemonInstanceEntry函数
@@ -272,18 +273,18 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 //			g_CFileManager.CreateSpace(m_cFileInfo.m_pbyFileName,m_cFileInfo.m_dwFileSize);
 			if ( TRANSFER_STATE == CurState() )
 			{
-				m_cPackageInfo.m_wDownloadState = 0;
+				m_cPackageInfo.setdownloadstate(0);
 				//下载的文件名跟配置文件中的文件去对比，若文件在配置中，则m_cPackageInfo.m_wDownloadState设为1，反之为0
 				//后续还需加上文件重命名
-				if (0 == m_cPackageInfo.m_wDownloadState) 
+				if (0 == m_cPackageInfo.getdownloadstate()) 
 				{
 					u32 idcount = 0;
-					u32 MaxId = m_cFileInfo.m_dwFileSize/TransferSize;
+					u32 MaxId = m_cFileInfo.getfilesize()/TransferSize;
 					OspLog(LOG_LVL_DETAIL,"包的总数目为：%u\n",MaxId+1);
-
-					memcpy(m_cPackageInfo.m_pbySFileName,m_cFileInfo.m_pbyFileName,sizeof(m_cPackageInfo.m_pbySFileName));
-					m_cPackageInfo.m_dwFileSize = m_cFileInfo.m_dwFileSize;
-					m_cPackageInfo.m_wPackageId = idcount;//若为断点续传，此值为配置中读取的ID值
+					m_cPackageInfo.setsfilename(m_cFileInfo.getfilename());
+//					memcpy(m_cPackageInfo.m_pbySFileName,m_cFileInfo.getfilename(),sizeof(m_cPackageInfo.m_pbySFileName));
+					m_cPackageInfo.setfilesize(m_cFileInfo.getfilesize());
+					m_cPackageInfo.setpackageid(idcount);//若为断点续传，此值为配置中读取的ID值
 //					post(m_dwDstId, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
 					post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
 				}
@@ -300,13 +301,16 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 //			m_cPackageInfo.printf();
 			memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
 			//判断是正常下载还是断点续传
-			if (0 == m_cPackageInfo.m_wDownloadState)
+			if (0 == m_cPackageInfo.getdownloadstate)
 			{
 				u16 wIdCount =0;
 				u32 MaxId =0;
 				//将instance与buffer绑定
 				wIdCount = GetInsID()-1;
-				MaxId = m_cFileInfo.m_dwFileSize/TransferSize;
+				MaxId = m_cFileInfo.getfilesize()/TransferSize;
+
+				g_CFileManager.FileWrite(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent());
+/*
 //				OspPrintf(TRUE,FALSE,"MaxId:%d\n",MaxId);
 				//判断数据包是否传完
 				if (m_cPackageInfo.m_wPackageId <= MaxId)
@@ -362,13 +366,14 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 							post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
 //						}
 					}
-*/
+
 				}
 				else
 				{
 					//post(C_U_DOWNLOAD_NOTIFY);
 					NextState(READY_STATE);
 				}
+*/
 			}
 			else
 			{

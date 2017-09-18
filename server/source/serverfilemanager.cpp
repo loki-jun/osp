@@ -50,30 +50,60 @@ void CReadFile::ReadCache()
 }
 */
 
-//void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 &m_wPackageSize,s8* pbyPackageContent)
-void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwBufferId,u32 dwFileSize)
+void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent)
+//void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwBufferId,u32 dwFileSize)
 {
 	s8 achFileName[STRING_LENGTH] = SERVER_FILE_PATH;
 	strcat(achFileName,"\\");
-	strcat(achFileName,lpstrFileName);
+	strcat(achFileName,m_pbySFileName);
 
-	ifstream in;
+	ifstream cFileToBuffer;
 	
-    in.open(achFileName,ios::in|ios::binary);
+    
 //	OspLog(LOG_LVL_DETAIL,"服务器读取文件成功\n");
 	
-    u32 dwPosition = SERVER_BUFFERSIZE*dwBufferId;
+    
 	
-    in.seekg(dwPosition,ios::beg);
-    memset(m_Buffer,0x00,sizeof(m_Buffer));
+	if ((PACKAGENUM_EACHBUFFER == m_wPackageId) || (0 == m_wPackageId))
+	{
+		cFileToBuffer.open(achFileName,ios::in|ios::binary);
+		u32 dwPosition = m_wPackageId*TransferSize;
+		cFileToBuffer.seekg(dwPosition,ios::beg);
+        memset(m_Buffer,0x00,sizeof(m_Buffer));
+		cFileToBuffer.read(m_Buffer,sizeof(m_Buffer));
+		cFileToBuffer.close();
+	}
+
+	//计算buffer中包的偏移量
+	u32 dwShift = (m_wPackageId%PACKAGENUM_EACHBUFFER)*TransferSize;
+	//判断是否是最后一包，不是最后一包则以TransferSize拷贝，是则以最后一包大小拷贝
+	if ( m_dwFileSize/TransferSize != m_wPackageId)
+	{
+		
+		memset(m_pbyPackageContent,0x00,sizeof(m_pbyPackageContent));
+		memcpy(m_pbyPackageContent,m_Buffer+dwShift,TransferSize);
+//		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
+	}
+	else
+	{
+		OspLog(LOG_LVL_DETAIL,"服务器发送最后一包数据\n");
+		m_wPackageSize = m_dwFileSize%TransferSize;
+		memset(m_pbyPackageContent,0x00,sizeof(m_pbyPackageContent));
+		memcpy(m_pbyPackageContent,m_Buffer+dwShift,m_dwFileSize%TransferSize);
+		OspLog(LOG_LVL_DETAIL,"包大小：%d\n",m_dwFileSize%TransferSize);
+//		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
+//		m_cPackageInfo.printf();
+//		NextState(READY_STATE);
+	}
+    
 //	if (dwBufferId != (dwFileSize/SERVER_BUFFERSIZE+1))
 //	{
-		in.read(m_Buffer,sizeof(m_Buffer));
+		
 //	}
 //	else
 //	{
 //		in.read(m_Buffer,sizeof(dwFileSize-dwBufferId*SERVER_BUFFERSIZE));
 //	}
     
-	in.close();
+	
 }

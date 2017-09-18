@@ -66,7 +66,7 @@ public:
 	void DaemonCheckConnect(){};
 	void DaemonGetlist(CMessage *const pcMsg);
 	void ProcCheckFile(CMessage *const pcMsg);
-	void ProcSendMsg(CMessage *const pcMsg);
+//	void ProcSendMsg(CMessage *const pcMsg);
 	
 };
 

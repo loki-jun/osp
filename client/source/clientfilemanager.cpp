@@ -17,7 +17,9 @@
 
 using namespace std;
 
+extern CConfigData g_CConfigData;
 extern CFileManager g_CFileManager;
+
 void CheckSpace()
 {
 
@@ -60,15 +62,11 @@ void CFileManager::CreateSpace(LPSTR lpstrFileName,u32 dwFileSize)
 
 }
 
-void CFileManager::FileWrite(LPSTR lpstrFileName,u16 dwBufferId,u32 FileSize,u32 PackageId,u32 PackageNum,u16 IdCount)
+void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent)
 {
-	s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
-	strcat(achFileName,"\\");
-	strcat(achFileName,lpstrFileName);
+/*
 
-//	OspPrintf(TRUE,FALSE,"bufferid:%d,文件大小:%d,包id:%d\n",dwBufferId,FileSize,PackageId);
-
-	ofstream out(achFileName, ios::binary|ios::app);
+	
 	//判断buffer是否写满，写满则将buffer写到文件中，否则应该是最后一个buffer的情况
 	if ( PackageId == ((dwBufferId+1)*PACKAGENUM_EACHBUFFER-1))
 	{
@@ -81,4 +79,39 @@ void CFileManager::FileWrite(LPSTR lpstrFileName,u16 dwBufferId,u32 FileSize,u32
 	}
 	memset(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer,0x00,sizeof(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer));
 	out.close();
+*/
+
+
+	
+	//计算buffer中包的偏移量
+	u32 dwShift = (m_wPackageId%PACKAGENUM_EACHBUFFER)*TransferSize;
+	//判断是否是最后一包，不是最后一包则以TransferSize拷贝，是则以最后一包大小拷贝
+	if ( m_dwFileSize/TransferSize != m_wPackageId)
+	{
+		
+		g_CFileManager.setbufferone(m_pbyPackageContent,dwShift,TransferSize);
+		//		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
+	}
+	else
+	{
+		OspLog(LOG_LVL_DETAIL,"客户端接收最后一包数据\n");
+		m_wPackageSize = m_dwFileSize%TransferSize;
+		g_CFileManager.setbufferone(m_pbyPackageContent,dwShift,m_dwFileSize%TransferSize);
+		OspLog(LOG_LVL_DETAIL,"包大小：%d\n",m_dwFileSize%TransferSize);
+		//		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
+		//		m_cPackageInfo.printf();
+		//		NextState(READY_STATE);
+	}
+
+	s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+	strcat(achFileName,"\\");
+	strcat(achFileName,m_pbySFileName);
+	ofstream cBufferToFile(achFileName, ios::binary|ios::app);
+
+	if ((PACKAGENUM_EACHBUFFER == m_wPackageId) || (m_dwFileSize/TransferSize == m_wPackageId))
+	{
+		cBufferToFile.write(g_CFileManager.getbufferone(),sizeof(g_CFileManager.getbufferone()));
+	}
+	memset(g_CFileManager.getbufferone(),0x00,sizeof(g_CFileManager.getbufferone()));
+	cBufferToFile.close();
 }

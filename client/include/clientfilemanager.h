@@ -15,49 +15,67 @@
 
 #include "../include/clientcommon.h"
 
-class CBuffer
-{
-public:
-	s8 m_dwBuffer[CLIENT_BUFFERSIZE];
-	u16 m_wBufferState;
-	u16 m_wBufferAlias;
-	u32 m_dwBufferNum;
-public:
-    CBuffer()
-    {
-        m_wBufferState = 0;
-		m_dwBufferNum = 0;
-		memset(m_dwBuffer,0,sizeof(m_dwBuffer));
-		
-    }
-    ~CBuffer()
-    {
-    }
-
-};
 
 class CConfigData
 {
-public:
+private:
 	u16 m_wFileId;
 	u16 m_wNameLen;
-	s8 m_pbyCFileName[256];
-	s8 m_pbySFileName[256];
+	s8 m_pbyCFileName[STRING_LENGTH];
+	s8 m_pbySFileName[STRING_LENGTH];
 	u16 m_wPartPackageId;
 	u32 m_dwPackageSize;
 };
 
 class CFileManager
 {
-public:
+private:
+	s8 m_wBufferone[CLIENT_BUFFERSIZE];
+	s8 m_wBuffertwo[CLIENT_BUFFERSIZE];
+	s8 m_wBufferthree[CLIENT_BUFFERSIZE];
 	u16 m_wFileNumber;
-	CBuffer m_cBuffer[3];
-	CConfigData m_cConfigInfo[3];
+	CConfigData m_cConfigInfo[MAX_CLIENT_INS_NUM];
 
 public:
-	void FileWrite(LPSTR lpstrFileName,u16 dwBufferId,u32 FileSize,u32 PackageId,u32 PackageNum,u16 IdCount);
+    CFileManager()
+    {
+		memset(m_wBufferone,0,sizeof(m_wBufferone));
+		memset(m_wBuffertwo,0,sizeof(m_wBuffertwo));
+		memset(m_wBufferthree,0,sizeof(m_wBufferthree));
+    }
+    ~CFileManager()
+    {
+    }
+	s8* getbufferone()
+	{
+		return m_wBufferone;
+	}
+	s8* getbuffertwo()
+	{
+		return m_wBuffertwo;
+	}
+	s8* getbufferthree()
+	{
+		return m_wBufferthree;
+	}
+
+	void setbufferone(s8* bufferone,u32 dwshiftone,u32 dwsizeone)
+	{
+		memcpy(m_wBufferone+dwshiftone,bufferone,dwsizeone);
+	}
+	void setbuffertwo(s8* buffertwo,u32 dwshifttwo,u32 dwsizetwo)
+	{
+		memcpy(m_wBuffertwo+dwshifttwo,buffertwo,dwsizetwo);
+	}
+	void setbufferthree(s8* bufferthree,u32 dwshiftthree,u32 dwsizethree)
+	{
+		memcpy(m_wBufferthree+dwshiftthree,bufferthree,dwsizethree);
+	}
+public:
+	void FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent);
 //	void ReadAndGetConfigData(u16 m_wNameLen,s8* m_pbyFileName,struct m_tConfigData){};
 	void CreateSpace(LPSTR lpstrFileName,u32 dwFileSize);
+
 
 private:
 	void CheckSpace(){};
