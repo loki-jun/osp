@@ -230,11 +230,11 @@ public:
 	//°üid
 	u16 getpackageid()
 	{
-		return ntohl(m_wPackageId);
+		return ntohs(m_wPackageId);
 	}
 	void setnetpackageid(u16 hostpackageid)
 	{
-		m_wPackageId = htonl(hostpackageid);
+		m_wPackageId = htons(hostpackageid);
 	}
 	void setpackageid(u16 packageid)
 	{
@@ -247,7 +247,7 @@ public:
 	}
 	void setnetpackagesize(u16 hostpackagesize)
 	{
-		m_wPackageSize = htonl(hostpackagesize);
+		m_wPackageSize = htons(hostpackagesize);
 	}
 	void setpackagesize(u16 packagesize)
 	{

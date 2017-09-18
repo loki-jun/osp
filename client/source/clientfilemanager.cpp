@@ -80,8 +80,7 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 	memset(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer,0x00,sizeof(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer));
 	out.close();
 */
-
-
+    OspLog(LOG_LVL_DETAIL,"客户端开始写文件！\n");
 	
 	//计算buffer中包的偏移量
 	u32 dwShift = (m_wPackageId%PACKAGENUM_EACHBUFFER)*TransferSize;

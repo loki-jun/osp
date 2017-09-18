@@ -300,16 +300,40 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 		case S_C_DOWNLOADDATA_ACK:
 //			m_cPackageInfo.printf();
 			memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
-			//判断是正常下载还是断点续传
-			if (0 == m_cPackageInfo.getdownloadstate)
+			OspLog(LOG_LVL_DETAIL,"文件大小：%d\n",m_cPackageInfo.getfilesize());
+			if (TRANSFER_STATE == CurState())
 			{
-				u16 wIdCount =0;
-				u32 MaxId =0;
-				//将instance与buffer绑定
-				wIdCount = GetInsID()-1;
-				MaxId = m_cFileInfo.getfilesize()/TransferSize;
-
-				g_CFileManager.FileWrite(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent());
+				//判断是正常下载还是断点续传
+				if (0 == m_cPackageInfo.getdownloadstate())
+				{
+					u16 wIdCount =0;
+					u32 MaxId =0;
+					//将instance与buffer绑定
+					//wIdCount = GetInsID()-1;
+					MaxId = m_cPackageInfo.getfilesize()/TransferSize;
+					
+					g_CFileManager.FileWrite(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent());
+					m_cPackageInfo.setnetpackageid(m_cPackageInfo.getpackageid()+1);
+					OspLog(LOG_LVL_DETAIL,"客户端下载的包数：%d\n",m_cPackageInfo.getpackageid());
+					if (MaxId != m_cPackageInfo.getpackageid())
+					{
+						post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
+						OspLog(LOG_LVL_DETAIL,"客户端下载的包数：%d\n",m_cPackageInfo.getpackageid());
+					}
+					else
+					{
+						g_CFileManager.FileWrite(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent());
+						OspLog(LOG_LVL_DETAIL,"客户端下载任务结束！\n");
+						NextState(READY_STATE);
+					}
+				}
+				else
+				{
+					OspLog(LOG_LVL_DETAIL,"2断点续传功能待开发……\n");
+				}
+			}
+			break;
+				
 /*
 //				OspPrintf(TRUE,FALSE,"MaxId:%d\n",MaxId);
 				//判断数据包是否传完
@@ -374,13 +398,8 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 					NextState(READY_STATE);
 				}
 */
-			}
-			else
-			{
-				OspLog(LOG_LVL_DETAIL,"2断点续传功能待开发……\n");
-			}
 			
-			break;
+			
 
 
 

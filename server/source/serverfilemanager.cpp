@@ -60,7 +60,7 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 	ifstream cFileToBuffer;
 	
     
-//	OspLog(LOG_LVL_DETAIL,"服务器读取文件成功\n");
+	OspLog(LOG_LVL_DETAIL,"服务器读取文件成功\n");
 	
     
 	
@@ -73,7 +73,7 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 		cFileToBuffer.read(m_Buffer,sizeof(m_Buffer));
 		cFileToBuffer.close();
 	}
-
+	
 	//计算buffer中包的偏移量
 	u32 dwShift = (m_wPackageId%PACKAGENUM_EACHBUFFER)*TransferSize;
 	//判断是否是最后一包，不是最后一包则以TransferSize拷贝，是则以最后一包大小拷贝
