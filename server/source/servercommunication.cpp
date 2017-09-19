@@ -149,7 +149,7 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 		memcpy(achFileName,pcMsg->content,pcMsg->length);
 		memcpy(achServerFileName,&fileNames[wCount][0u],sizeof(achServerFileName));
 
-        m_cFileInfo.setfilesize(fileSizes[wCount]);
+        m_cFileInfo.setnetfilesize(fileSizes[wCount]);
 //		memcpy(&m_cFileInfo.m_dwFileSize,&fileSizes[wCount],sizeof(m_cFileInfo.m_dwFileSize));
 		m_cFileInfo.setfilename(&fileNames[wCount][0u]);
 //		memcpy(&m_cFileInfo.getfilename(),&fileNames[wCount][0u],sizeof(m_cFileInfo.getfilename()));
@@ -285,6 +285,7 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 					OspLog(LOG_LVL_DETAIL,"正常下载请求\n");
 					m_cFilemgr.FileRead(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent());
 					post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
+//					OspLog(LOG_LVL_DETAIL,"文件内容：%s\n",m_cPackageInfo.getpackagecontent());
 					if (m_cPackageInfo.getfilesize()/TransferSize == m_cPackageInfo.getpackageid())
 					{
 						NextState(READY_STATE);

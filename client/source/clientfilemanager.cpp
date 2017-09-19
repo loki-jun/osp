@@ -64,6 +64,7 @@ void CFileManager::CreateSpace(LPSTR lpstrFileName,u32 dwFileSize)
 
 void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent)
 {
+	
 /*
 
 	
@@ -80,7 +81,7 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 	memset(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer,0x00,sizeof(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer));
 	out.close();
 */
-    OspLog(LOG_LVL_DETAIL,"客户端开始写文件！\n");
+//    OspLog(LOG_LVL_DETAIL,"客户端开始写文件！\n");
 	
 	//计算buffer中包的偏移量
 	u32 dwShift = (m_wPackageId%PACKAGENUM_EACHBUFFER)*TransferSize;
@@ -89,28 +90,37 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 	{
 		
 		g_CFileManager.setbufferone(m_pbyPackageContent,dwShift,TransferSize);
+		OspLog(LOG_LVL_DETAIL,"包偏移量：%d\n", dwShift);
+//		OspLog(LOG_LVL_DETAIL,"内容长度：%d\n", sizeof(m_pbyPackageContent));
+//		OspLog(LOG_LVL_DETAIL,"包内容：%s\n", m_pbyPackageContent);
 		//		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
 	}
 	else
 	{
 		OspLog(LOG_LVL_DETAIL,"客户端接收最后一包数据\n");
-		m_wPackageSize = m_dwFileSize%TransferSize;
+//		m_wPackageSize = m_dwFileSize%TransferSize;
 		g_CFileManager.setbufferone(m_pbyPackageContent,dwShift,m_dwFileSize%TransferSize);
-		OspLog(LOG_LVL_DETAIL,"包大小：%d\n",m_dwFileSize%TransferSize);
+		OspLog(LOG_LVL_DETAIL,"包偏移量：%d\n", dwShift);
+//		OspLog(LOG_LVL_DETAIL,"包内容长度：%d\n", sizeof(m_pbyPackageContent));
+//		OspLog(LOG_LVL_DETAIL,"包内容：%s\n", m_pbyPackageContent);
 		//		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
 		//		m_cPackageInfo.printf();
 		//		NextState(READY_STATE);
 	}
 
-	s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
-	strcat(achFileName,"\\");
-	strcat(achFileName,m_pbySFileName);
-	ofstream cBufferToFile(achFileName, ios::binary|ios::app);
+
 
 	if ((PACKAGENUM_EACHBUFFER == m_wPackageId) || (m_dwFileSize/TransferSize == m_wPackageId))
 	{
+		s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+		strcat(achFileName,"\\");
+		strcat(achFileName,m_pbySFileName);
+	    ofstream cBufferToFile(achFileName, ios::binary|ios::app);
 		cBufferToFile.write(g_CFileManager.getbufferone(),sizeof(g_CFileManager.getbufferone()));
+		memset(g_CFileManager.getbufferone(),0x00,sizeof(g_CFileManager.getbufferone()));
+		OspLog(LOG_LVL_DETAIL,"客户端buffer计数\n");
+		cBufferToFile.close();
 	}
-	memset(g_CFileManager.getbufferone(),0x00,sizeof(g_CFileManager.getbufferone()));
-	cBufferToFile.close();
+	
+	
 }

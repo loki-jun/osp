@@ -82,7 +82,18 @@ API void downloadfile(s8* FileName[256])
 	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_DOWNLOADFILE_CMD,FileName,256);
 }
 
+/* 暂停文件下载 */
+API void pausetask(u16 wTaskId)
+{
+	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_PAUSETASK_CMD,&wTaskId,sizeof(wTaskId));
+}
 
+
+/* 恢复文件下载 */
+API void resumetask(u16 wTaskId)
+{
+	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_RESUMETASK_CMD,&wTaskId,sizeof(wTaskId));
+}
 /*********************************************************************
     单字母调试接口
 *********************************************************************/
@@ -111,4 +122,14 @@ API void dis()
 API void d(s8* FileName[256])
 {
 	downloadfile(FileName);
+}
+
+API void p(u16 wTaskId)
+{
+	pausetask(wTaskId);
+}
+
+API void r(u16 wTaskId)
+{
+	resumetask(wTaskId);
 }

@@ -192,11 +192,46 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
              break;
          /* 暂停下载 */
          case U_C_PAUSETASK_CMD:
-           
+			 if (CONNECT_STATE == CurState())   //判断daemon状态
+			 {
+				 u16 wTaskId = 0;
+			     memcpy(&wTaskId,pcMsg->content,sizeof(wTaskId));
+				 pCInstance = (CClientInstance*)pcApp->GetInstance(wTaskId);
+				 if (TRANSFER_STATE == pCInstance->CurState())
+				 {
+					 post(MAKEIID(CLIENT_APP_NO, wTaskId), C_C_PAUSETASK_CMD,pcMsg->content,pcMsg->length);
+				 }
+				 else
+				 {
+					 OspLog(LOG_LVL_DETAIL,"instance状态：%d\n",pCInstance->CurState());
+				 }
+			 }
+			 else
+			 {
+				 OspLog(LOG_LVL_WARNING,"未连接，请先连接服务器！\n");
+			 }
             break;
+
 		/* 恢复下载 */
          case U_C_RESUMETASK_CMD:
-			 
+			 if (CONNECT_STATE == CurState())   //判断daemon状态
+			 {
+				 u16 wTaskId = 0;
+				 memcpy(&wTaskId,pcMsg->content,sizeof(wTaskId));
+				 pCInstance = (CClientInstance*)pcApp->GetInstance(wTaskId);
+				 if (PAUSE_STATE == pCInstance->CurState())
+				 {
+					 post(MAKEIID(CLIENT_APP_NO, wTaskId), C_C_RESUMETASK_CMD,pcMsg->content,pcMsg->length);
+				 }
+				 else
+				 {
+					 OspLog(LOG_LVL_DETAIL,"instance状态：%d\n",pCInstance->CurState());
+				 }
+			 }
+			 else
+			 {
+				 OspLog(LOG_LVL_WARNING,"未连接，请先连接服务器！\n");
+			 }
             break;
 		/* 取消下载 */
          case U_C_CANCELTASK_CMD:
@@ -246,6 +281,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 
 void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 {
+
 	u16 curEvent = pcMsg->event;
 	switch(curEvent)
 	{
@@ -268,6 +304,9 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 
 		/* 服务器返回文件存在响应 */
 		case S_C_FILENAME_ACK:
+			m_dwDstId = pcMsg->srcid;
+            m_dwDstNode = pcMsg->srcnode;
+
 			memcpy(&m_cFileInfo,pcMsg->content,pcMsg->length);
 			OspLog(LOG_LVL_DETAIL,"服务器文件存在，放心大胆地下载吧，骚年！！\n");
 //			g_CFileManager.CreateSpace(m_cFileInfo.m_pbyFileName,m_cFileInfo.m_dwFileSize);
@@ -280,12 +319,13 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 				{
 					u32 idcount = 0;
 					u32 MaxId = m_cFileInfo.getfilesize()/TransferSize;
-					OspLog(LOG_LVL_DETAIL,"包的总数目为：%u\n",MaxId+1);
+					OspLog(LOG_LVL_DETAIL,"包的总数目为：%u\n",MaxId);
 					m_cPackageInfo.setsfilename(m_cFileInfo.getfilename());
 //					memcpy(m_cPackageInfo.m_pbySFileName,m_cFileInfo.getfilename(),sizeof(m_cPackageInfo.m_pbySFileName));
-					m_cPackageInfo.setfilesize(m_cFileInfo.getfilesize());
+					m_cPackageInfo.setnetfilesize(m_cFileInfo.getfilesize());
 					m_cPackageInfo.setpackageid(idcount);//若为断点续传，此值为配置中读取的ID值
 //					post(m_dwDstId, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
+					m_cPackageInfo.setnetpackagesize(TransferSize);
 					post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
 				}
 				else
@@ -312,17 +352,19 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 					//wIdCount = GetInsID()-1;
 					MaxId = m_cPackageInfo.getfilesize()/TransferSize;
 					
-					g_CFileManager.FileWrite(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent());
-					m_cPackageInfo.setnetpackageid(m_cPackageInfo.getpackageid()+1);
-					OspLog(LOG_LVL_DETAIL,"客户端下载的包数：%d\n",m_cPackageInfo.getpackageid());
+					
+					OspLog(LOG_LVL_DETAIL,"客户端下载的包id：%d\n",m_cPackageInfo.getpackageid());
 					if (MaxId != m_cPackageInfo.getpackageid())
 					{
+						g_CFileManager.FileWrite(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent());
+					    m_cPackageInfo.setnetpackageid(m_cPackageInfo.getpackageid()+1);
 						post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
-						OspLog(LOG_LVL_DETAIL,"客户端下载的包数：%d\n",m_cPackageInfo.getpackageid());
+//						OspLog(LOG_LVL_DETAIL,"客户端下载的包内容：%s\n",m_cPackageInfo.getpackagecontent());
 					}
 					else
 					{
 						g_CFileManager.FileWrite(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent());
+//						OspLog(LOG_LVL_DETAIL,"客户端下载的包内容：%s\n",m_cPackageInfo.getpackagecontent());
 						OspLog(LOG_LVL_DETAIL,"客户端下载任务结束！\n");
 						NextState(READY_STATE);
 					}
@@ -333,75 +375,17 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 				}
 			}
 			break;
-				
-/*
-//				OspPrintf(TRUE,FALSE,"MaxId:%d\n",MaxId);
-				//判断数据包是否传完
-				if (m_cPackageInfo.m_wPackageId <= MaxId)
-				{
-					u32 dwBufferNum = g_CFileManager.m_cBuffer[wIdCount].m_dwBufferNum;
-					//判断包id是否在当前的缓存区，在则写缓存，不在则将前一个缓存写到文件中，并写下一个缓存
-					if (m_cPackageInfo.m_wPackageId >= dwBufferNum*PACKAGENUM_EACHBUFFER && 
-						m_cPackageInfo.m_wPackageId < (dwBufferNum+1)*PACKAGENUM_EACHBUFFER)
-					{
-						ProcClientRecData(pcMsg,dwBufferNum,wIdCount);
-						//判断buffer是否写满
 
-						if (m_cPackageInfo.m_wPackageId == ((dwBufferNum+1)*PACKAGENUM_EACHBUFFER-1))
-						{
-							g_CFileManager.FileWrite(m_cPackageInfo.m_pbySFileName,dwBufferNum,m_cPackageInfo.m_dwFileSize,m_cPackageInfo.m_wPackageId,MaxId,wIdCount);
-							dwBufferNum++;
-							OspPrintf(TRUE,FALSE,"重新写一个buffer，buffer计数号为：%d\n",dwBufferNum);
-						}
-						//判断是否到最后一包
-						if(MaxId == m_cPackageInfo.m_wPackageId)
-						{
-							g_CFileManager.FileWrite(m_cPackageInfo.m_pbySFileName,dwBufferNum,m_cPackageInfo.m_dwFileSize,m_cPackageInfo.m_wPackageId,MaxId,wIdCount);
-							NextState(READY_STATE);
-							OspPrintf(TRUE,FALSE,"instance号为：%d,buffer号为：%d\n",GetInsID(),wIdCount);
-                            break;
-						}
-						//包的数目加1
-						m_cPackageInfo.m_wPackageId++;
-						//包数据写完停止给服务器发请求
-//						if (m_cPackageInfo.m_wPackageId <= MaxId)
-//						{
-						
-							post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
-//						}						
-					}
-/*
-				    else
-					{
-						g_CFileManager.m_cBuffer[wIdCount].m_dwBufferNum++;
+			/* 暂停文件下载 */
+		case C_C_PAUSETASK_CMD:
+			NextState(READY_STATE);
+			break;
 
-						ProcClientRecData(pcMsg,dwBufferNum,wIdCount);	
-						if(MaxId == m_cPackageInfo.m_wPackageId)
-						{
-							g_CFileManager.FileWrite(m_cPackageInfo.m_pbySFileName,dwBufferNum,m_cPackageInfo.m_dwFileSize,m_cPackageInfo.m_wPackageId,MaxId,wIdCount);
-							NextState(READY_STATE);
-							OspPrintf(TRUE,FALSE,"instance号为：%d",GetInsID);
-                            break;
-						}
-								
-						m_cPackageInfo.m_wPackageId++;
-//						if (m_cPackageInfo.m_wPackageId <= MaxId)
-//						{
-							post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
-//						}
-					}
-
-				}
-				else
-				{
-					//post(C_U_DOWNLOAD_NOTIFY);
-					NextState(READY_STATE);
-				}
-*/
-			
-			
-
-
+			/* 恢复文件下载指令 */
+		case C_C_RESUMETASK_CMD:
+			NextState(TRANSFER_STATE);
+			post(m_dwDstId, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
+			break;
 
 		/* 服务器返回文件不存在响应 */
 		case S_C_FILENAME_NACK:
