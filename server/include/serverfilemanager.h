@@ -38,6 +38,14 @@ public:
     {
     }
 
+	s8* getbuffer()
+	{
+		return m_Buffer;
+	}
+//	void setbuffer(s8* buffer)
+//	{
+//		memcpy(m_Buffer,buffer,sizeof(m_Buffer));
+//	}
 
 	
 public:

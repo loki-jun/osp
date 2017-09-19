@@ -16,7 +16,7 @@
 #include "../include/serverfilemanager.h"
 
 using namespace std;
-
+CReadFile CFilemgr;
 
 /**************************************************
 将文件内容读入缓存，
@@ -69,8 +69,9 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 		cFileToBuffer.open(achFileName,ios::in|ios::binary);
 		u32 dwPosition = m_wPackageId*TransferSize;
 		cFileToBuffer.seekg(dwPosition,ios::beg);
-		memset(m_Buffer,0x00,sizeof(m_Buffer));
-		cFileToBuffer.read(m_Buffer,sizeof(m_Buffer));
+//		CFilemgr.setbuffer(0x00);
+//		memset(m_Buffer,0x00,sizeof(m_Buffer));
+		cFileToBuffer.read(CFilemgr.getbuffer(),sizeof(CFilemgr.getbuffer()));
 		cFileToBuffer.close();
 	}
 	
@@ -81,7 +82,7 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 	{
 //		OspLog(LOG_LVL_DETAIL,"服务器发送包数据\n");
 		memset(m_pbyPackageContent,0x00,sizeof(m_pbyPackageContent));
-		memcpy(m_pbyPackageContent,m_Buffer+dwShift,TransferSize);
+		memcpy(m_pbyPackageContent,CFilemgr.getbuffer()+dwShift,TransferSize);
 //		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
 	}
 	else
@@ -89,7 +90,7 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 		OspLog(LOG_LVL_DETAIL,"服务器发送最后一包数据\n");
 		m_wPackageSize = m_dwFileSize%TransferSize;
 		memset(m_pbyPackageContent,0x00,sizeof(m_pbyPackageContent));
-		memcpy(m_pbyPackageContent,m_Buffer+dwShift,m_dwFileSize%TransferSize);
+		memcpy(m_pbyPackageContent,CFilemgr.getbuffer()+dwShift,m_dwFileSize%TransferSize);
 		OspLog(LOG_LVL_DETAIL,"包大小：%d\n",m_dwFileSize%TransferSize);
 //		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
 //		m_cPackageInfo.printf();

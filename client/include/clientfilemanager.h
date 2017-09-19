@@ -30,46 +30,46 @@ private:
 class CFileManager
 {
 private:
-	s8 m_wBufferone[CLIENT_BUFFERSIZE];
-	s8 m_wBuffertwo[CLIENT_BUFFERSIZE];
-	s8 m_wBufferthree[CLIENT_BUFFERSIZE];
+	s8 m_Bufferone[CLIENT_BUFFERSIZE];
+	s8 m_Buffertwo[CLIENT_BUFFERSIZE];
+	s8 m_Bufferthree[CLIENT_BUFFERSIZE];
 	u16 m_wFileNumber;
 	CConfigData m_cConfigInfo[MAX_CLIENT_INS_NUM];
 
 public:
     CFileManager()
     {
-		memset(m_wBufferone,0,sizeof(m_wBufferone));
-		memset(m_wBuffertwo,0,sizeof(m_wBuffertwo));
-		memset(m_wBufferthree,0,sizeof(m_wBufferthree));
+		memset(m_Bufferone,0,sizeof(m_Bufferone));
+		memset(m_Buffertwo,0,sizeof(m_Buffertwo));
+		memset(m_Bufferthree,0,sizeof(m_Bufferthree));
     }
     ~CFileManager()
     {
     }
 	s8* getbufferone()
 	{
-		return m_wBufferone;
+		return m_Bufferone;
 	}
 	s8* getbuffertwo()
 	{
-		return m_wBuffertwo;
+		return m_Buffertwo;
 	}
 	s8* getbufferthree()
 	{
-		return m_wBufferthree;
+		return m_Bufferthree;
 	}
 
 	void setbufferone(s8* bufferone,u32 dwshiftone,u32 dwsizeone)
 	{
-		memcpy(m_wBufferone+dwshiftone,bufferone,dwsizeone);
+		memcpy(m_Bufferone+dwshiftone,bufferone,dwsizeone);
 	}
 	void setbuffertwo(s8* buffertwo,u32 dwshifttwo,u32 dwsizetwo)
 	{
-		memcpy(m_wBuffertwo+dwshifttwo,buffertwo,dwsizetwo);
+		memcpy(m_Buffertwo+dwshifttwo,buffertwo,dwsizetwo);
 	}
 	void setbufferthree(s8* bufferthree,u32 dwshiftthree,u32 dwsizethree)
 	{
-		memcpy(m_wBufferthree+dwshiftthree,bufferthree,dwsizethree);
+		memcpy(m_Bufferthree+dwshiftthree,bufferthree,dwsizethree);
 	}
 public:
 	void FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent);

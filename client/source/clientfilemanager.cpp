@@ -91,7 +91,7 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 		
 		g_CFileManager.setbufferone(m_pbyPackageContent,dwShift,TransferSize);
 		OspLog(LOG_LVL_DETAIL,"包偏移量：%d\n", dwShift);
-//		OspLog(LOG_LVL_DETAIL,"内容长度：%d\n", sizeof(m_pbyPackageContent));
+		OspLog(LOG_LVL_DETAIL,"包大小：%d\n", m_wPackageSize);
 //		OspLog(LOG_LVL_DETAIL,"包内容：%s\n", m_pbyPackageContent);
 		//		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
 	}
@@ -101,7 +101,7 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 //		m_wPackageSize = m_dwFileSize%TransferSize;
 		g_CFileManager.setbufferone(m_pbyPackageContent,dwShift,m_dwFileSize%TransferSize);
 		OspLog(LOG_LVL_DETAIL,"包偏移量：%d\n", dwShift);
-//		OspLog(LOG_LVL_DETAIL,"包内容长度：%d\n", sizeof(m_pbyPackageContent));
+		OspLog(LOG_LVL_DETAIL,"包大小：%d\n", m_wPackageSize);
 //		OspLog(LOG_LVL_DETAIL,"包内容：%s\n", m_pbyPackageContent);
 		//		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
 		//		m_cPackageInfo.printf();

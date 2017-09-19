@@ -325,7 +325,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 					m_cPackageInfo.setnetfilesize(m_cFileInfo.getfilesize());
 					m_cPackageInfo.setpackageid(idcount);//若为断点续传，此值为配置中读取的ID值
 //					post(m_dwDstId, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
-					m_cPackageInfo.setnetpackagesize(TransferSize);
+					m_cPackageInfo.setnetpackagesize(TransferSize);//不加也不影响
 					post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
 				}
 				else
