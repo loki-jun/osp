@@ -62,76 +62,138 @@ void CFileManager::CreateSpace(s8* m_pbySFileName,u32 m_dwFileSize)
 
 }
 
-void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent)
+void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent,u16 wInstanceId)
 {
-	
-/*
-
-	
-	//判断buffer是否写满，写满则将buffer写到文件中，否则应该是最后一个buffer的情况
-	if ( PackageId == ((dwBufferId+1)*PACKAGENUM_EACHBUFFER-1))
+	if (1 == wInstanceId)
 	{
-		out.write(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer,sizeof(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer));
-	}
-	else
-	{
-		out.write(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer,FileSize-dwBufferId*CLIENT_BUFFERSIZE);
-//		OspPrintf(TRUE,FALSE,"文件大小:%d,传输大小:%d,最后一个buffer大小:%d\n",FileSize,TransferSize,FileSize-dwBufferId*CLIENT_BUFFERSIZE);
-	}
-	memset(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer,0x00,sizeof(g_CFileManager.m_cBuffer[IdCount].m_dwBuffer));
-	out.close();
-*/
-//    OspLog(LOG_LVL_DETAIL,"客户端开始写文件！\n");
-	
-	//计算buffer中包的偏移量
-	u32 dwShift = (m_wPackageId%PACKAGENUM_EACHBUFFER)*TransferSize;
-	//判断是否是最后一包，不是最后一包则以TransferSize拷贝，是则以最后一包大小拷贝
-	if ( m_dwFileSize/TransferSize != m_wPackageId)
-	{
+		//计算buffer中包的偏移量
+		u32 dwShift = (m_wPackageId%PACKAGENUM_EACHBUFFER)*TransferSize;
+		//判断是否是最后一包，不是最后一包则以TransferSize拷贝，是则以最后一包大小拷贝
+		if ( m_dwFileSize/TransferSize != m_wPackageId)
+		{
+			
+			g_CFileManager.setbufferone(m_pbyPackageContent,dwShift,TransferSize);
+//			OspLog(LOG_LVL_DETAIL,"包偏移量：%d\n", dwShift);
+//			OspLog(LOG_LVL_DETAIL,"包大小：%d\n", m_wPackageSize);
+		}
+		else
+		{
+//			OspLog(LOG_LVL_DETAIL,"********客户端接收最后一包数据*********\n");
+			g_CFileManager.setbufferone(m_pbyPackageContent,dwShift,m_dwFileSize%TransferSize);
+//			OspLog(LOG_LVL_DETAIL,"包偏移量：%d\n", dwShift);
+//			OspLog(LOG_LVL_DETAIL,"包大小：%d\n", m_dwFileSize%TransferSize);
+		}
 		
-		g_CFileManager.setbufferone(m_pbyPackageContent,dwShift,TransferSize);
-		OspLog(LOG_LVL_DETAIL,"包偏移量：%d\n", dwShift);
-		OspLog(LOG_LVL_DETAIL,"包大小：%d\n", m_wPackageSize);
-//		OspLog(LOG_LVL_DETAIL,"包内容：%s\n", m_pbyPackageContent);
-		//		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
+		if (0 == (m_wPackageId+1)%PACKAGENUM_EACHBUFFER)
+		{
+			s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+			strcat(achFileName,"\\");
+			strcat(achFileName,m_pbySFileName);
+			ofstream cBufferToFile(achFileName, ios::binary|ios::app);
+			cBufferToFile.write(g_CFileManager.getbufferone(),CLIENT_BUFFERSIZE);
+			memset(g_CFileManager.getbufferone(),0x00,CLIENT_BUFFERSIZE);
+//			OspLog(LOG_LVL_DETAIL,"***************客户端buffer计数****************\n");
+			cBufferToFile.close();
+		}
+		else if (m_dwFileSize/TransferSize == m_wPackageId)
+		{
+			s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+			strcat(achFileName,"\\");
+			strcat(achFileName,m_pbySFileName);
+			ofstream cBufferToFile(achFileName, ios::binary|ios::app);
+			cBufferToFile.write(g_CFileManager.getbufferone(),m_dwFileSize%CLIENT_BUFFERSIZE);
+			memset(g_CFileManager.getbufferone(),0x00,CLIENT_BUFFERSIZE);
+//			OspLog(LOG_LVL_DETAIL,"***************客户端buffer计数****************\n");
+			cBufferToFile.close();
+		}
+	}
+	else if (2 == wInstanceId)
+	{
+		//计算buffer中包的偏移量
+		u32 dwShift = (m_wPackageId%PACKAGENUM_EACHBUFFER)*TransferSize;
+		//判断是否是最后一包，不是最后一包则以TransferSize拷贝，是则以最后一包大小拷贝
+		if ( m_dwFileSize/TransferSize != m_wPackageId)
+		{
+			
+			g_CFileManager.setbuffertwo(m_pbyPackageContent,dwShift,TransferSize);
+//			OspLog(LOG_LVL_DETAIL,"包偏移量：%d\n", dwShift);
+//			OspLog(LOG_LVL_DETAIL,"包大小：%d\n", m_wPackageSize);
+		}
+		else
+		{
+//			OspLog(LOG_LVL_DETAIL,"********客户端接收最后一包数据*********\n");
+			g_CFileManager.setbuffertwo(m_pbyPackageContent,dwShift,m_dwFileSize%TransferSize);
+//			OspLog(LOG_LVL_DETAIL,"包偏移量：%d\n", dwShift);
+//			OspLog(LOG_LVL_DETAIL,"包大小：%d\n", m_dwFileSize%TransferSize);
+		}
+		
+		if (0 == (m_wPackageId+1)%PACKAGENUM_EACHBUFFER)
+		{
+			s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+			strcat(achFileName,"\\");
+			strcat(achFileName,m_pbySFileName);
+			ofstream cBufferToFile(achFileName, ios::binary|ios::app);
+			cBufferToFile.write(g_CFileManager.getbuffertwo(),CLIENT_BUFFERSIZE);
+			memset(g_CFileManager.getbuffertwo(),0x00,CLIENT_BUFFERSIZE);
+//			OspLog(LOG_LVL_DETAIL,"***************客户端buffer计数****************\n");
+			cBufferToFile.close();
+		}
+		else if (m_dwFileSize/TransferSize == m_wPackageId)
+		{
+			s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+			strcat(achFileName,"\\");
+			strcat(achFileName,m_pbySFileName);
+			ofstream cBufferToFile(achFileName, ios::binary|ios::app);
+			cBufferToFile.write(g_CFileManager.getbuffertwo(),m_dwFileSize%CLIENT_BUFFERSIZE);
+			memset(g_CFileManager.getbuffertwo(),0x00,CLIENT_BUFFERSIZE);
+//			OspLog(LOG_LVL_DETAIL,"***************客户端buffer计数****************\n");
+			cBufferToFile.close();
+		}
 	}
 	else
 	{
-		OspLog(LOG_LVL_DETAIL,"********客户端接收最后一包数据*********\n");
-//		m_wPackageSize = m_dwFileSize%TransferSize;
-		g_CFileManager.setbufferone(m_pbyPackageContent,dwShift,m_dwFileSize%TransferSize);
-		OspLog(LOG_LVL_DETAIL,"包偏移量：%d\n", dwShift);
-		OspLog(LOG_LVL_DETAIL,"包大小：%d\n", m_dwFileSize%TransferSize);
-//		OspLog(LOG_LVL_DETAIL,"包内容：%s\n", m_pbyPackageContent);
-		//		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
-		//		m_cPackageInfo.printf();
-		//		NextState(READY_STATE);
+		//计算buffer中包的偏移量
+		u32 dwShift = (m_wPackageId%PACKAGENUM_EACHBUFFER)*TransferSize;
+		//判断是否是最后一包，不是最后一包则以TransferSize拷贝，是则以最后一包大小拷贝
+		if ( m_dwFileSize/TransferSize != m_wPackageId)
+		{
+			
+			g_CFileManager.setbufferthree(m_pbyPackageContent,dwShift,TransferSize);
+//			OspLog(LOG_LVL_DETAIL,"包偏移量：%d\n", dwShift);
+//			OspLog(LOG_LVL_DETAIL,"包大小：%d\n", m_wPackageSize);
+		}
+		else
+		{
+//			OspLog(LOG_LVL_DETAIL,"********客户端接收最后一包数据*********\n");
+			g_CFileManager.setbufferthree(m_pbyPackageContent,dwShift,m_dwFileSize%TransferSize);
+//			OspLog(LOG_LVL_DETAIL,"包偏移量：%d\n", dwShift);
+//			OspLog(LOG_LVL_DETAIL,"包大小：%d\n", m_dwFileSize%TransferSize);
+		}
+		
+		if (0 == (m_wPackageId+1)%PACKAGENUM_EACHBUFFER)
+		{
+			s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+			strcat(achFileName,"\\");
+			strcat(achFileName,m_pbySFileName);
+			ofstream cBufferToFile(achFileName, ios::binary|ios::app);
+			cBufferToFile.write(g_CFileManager.getbufferthree(),CLIENT_BUFFERSIZE);
+			memset(g_CFileManager.getbufferthree(),0x00,CLIENT_BUFFERSIZE);
+//			OspLog(LOG_LVL_DETAIL,"***************客户端buffer计数****************\n");
+			cBufferToFile.close();
+		}
+		else if (m_dwFileSize/TransferSize == m_wPackageId)
+		{
+			s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+			strcat(achFileName,"\\");
+			strcat(achFileName,m_pbySFileName);
+			ofstream cBufferToFile(achFileName, ios::binary|ios::app);
+			cBufferToFile.write(g_CFileManager.getbufferthree(),m_dwFileSize%CLIENT_BUFFERSIZE);
+			memset(g_CFileManager.getbufferthree(),0x00,CLIENT_BUFFERSIZE);
+//			OspLog(LOG_LVL_DETAIL,"***************客户端buffer计数****************\n");
+			cBufferToFile.close();
+		}
 	}
 
-
-
-	if (0 == (m_wPackageId+1)%PACKAGENUM_EACHBUFFER)
-	{
-		s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
-		strcat(achFileName,"\\");
-		strcat(achFileName,m_pbySFileName);
-	    ofstream cBufferToFile(achFileName, ios::binary|ios::app);
-		cBufferToFile.write(g_CFileManager.getbufferone(),CLIENT_BUFFERSIZE);
-		memset(g_CFileManager.getbufferone(),0x00,CLIENT_BUFFERSIZE);
-		OspLog(LOG_LVL_DETAIL,"***************客户端buffer计数****************\n");
-		cBufferToFile.close();
-	}
-	else if (m_dwFileSize/TransferSize == m_wPackageId)
-	{
-		s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
-		strcat(achFileName,"\\");
-		strcat(achFileName,m_pbySFileName);
-		ofstream cBufferToFile(achFileName, ios::binary|ios::app);
-		cBufferToFile.write(g_CFileManager.getbufferone(),m_dwFileSize%CLIENT_BUFFERSIZE);
-		memset(g_CFileManager.getbufferone(),0x00,CLIENT_BUFFERSIZE);
-		OspLog(LOG_LVL_DETAIL,"***************客户端buffer计数****************\n");
-		cBufferToFile.close();
-	}
 	
 	
 }

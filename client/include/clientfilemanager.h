@@ -72,7 +72,7 @@ public:
 		memcpy(m_Bufferthree+dwshiftthree,bufferthree,dwsizethree);
 	}
 public:
-	void FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent);
+	void FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent,u16 wInstanceId);
 //	void ReadAndGetConfigData(u16 m_wNameLen,s8* m_pbyFileName,struct m_tConfigData){};
 	void CreateSpace(s8* m_pbySFileName,u32 m_dwFileSize);
 

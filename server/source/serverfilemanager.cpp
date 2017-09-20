@@ -16,39 +16,11 @@
 #include "../include/serverfilemanager.h"
 
 using namespace std;
-CReadFile CFilemgr;
+//extern CReadFile m_cFilemgr;
 
 /**************************************************
 将文件内容读入缓存，
 ***************************************************/
-
-/*
-void CReadFile::ReadCache()
-{
-
-	
-    if ((!in.eof())||(in.gcount() != 0))
-    {
-		
-        if( OSP_OK != post(pMsg->srcid, SERVER_CLIENT_SENDFILEINFO_REQ, m_chFileStr, in.gcount(), pMsg->srcnode) )
-        {
-            OspPrintf( TRUE , FALSE , "CAliasInstance::InstanceEntry post  failed.\n" );
-        }
-        in.close();
-        //OspDelay(1000);
-    }
-    else
-    {
-        printf("download file sucess \n");
-        dwPosition = 0;
-        post(pMsg->srcid, SERVER_CLIENT_ENDSEND_NOTIFY, NULL, 0, pMsg->srcnode);
-        in.close();
-        NextState(READY_STATE);
-	}
-
-
-}
-*/
 
 void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent)
 //void CReadFile::FileRead(LPSTR lpstrFileName,u32 dwBufferId,u32 dwFileSize)
@@ -71,7 +43,7 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 		cFileToBuffer.seekg(dwPosition,ios::beg);
 //		CFilemgr.setbuffer(0x00);
 //		memset(m_Buffer,0x00,sizeof(m_Buffer));
-		cFileToBuffer.read(CFilemgr.getbuffer(),SERVER_BUFFERSIZE);
+		cFileToBuffer.read(getbuffer(),SERVER_BUFFERSIZE);
 //		cout << sizeof(CFilemgr.getbuffer()) << endl; //直接sizeof取大小值为4，出错
 		cFileToBuffer.close();
 	}
@@ -83,7 +55,7 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 	{
 //		OspLog(LOG_LVL_DETAIL,"服务器发送包数据\n");
 		memset(m_pbyPackageContent,0x00,sizeof(m_pbyPackageContent));
-		memcpy(m_pbyPackageContent,CFilemgr.getbuffer()+dwShift,TransferSize);
+		memcpy(m_pbyPackageContent,getbuffer()+dwShift,TransferSize);
 //		cout << m_pbyPackageContent << endl;
 		
 //		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
@@ -93,7 +65,7 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 		OspLog(LOG_LVL_DETAIL,"服务器发送最后一包数据\n");
 		m_wPackageSize = m_dwFileSize%TransferSize;
 		memset(m_pbyPackageContent,0x00,sizeof(m_pbyPackageContent));
-		memcpy(m_pbyPackageContent,CFilemgr.getbuffer()+dwShift,m_dwFileSize%TransferSize);
+		memcpy(m_pbyPackageContent,getbuffer()+dwShift,m_dwFileSize%TransferSize);
 //		cout << m_pbyPackageContent << endl;
 		OspLog(LOG_LVL_DETAIL,"包大小：%d\n",m_dwFileSize%TransferSize);
 //		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);

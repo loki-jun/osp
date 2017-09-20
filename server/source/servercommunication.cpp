@@ -285,7 +285,7 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 //					OspLog(LOG_LVL_DETAIL,"正常下载请求\n");
 					m_cFilemgr.FileRead(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent());
 					post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
-//					cout << m_cPackageInfo.getpackagecontent() <<endl;
+					OspLog(LOG_LVL_DETAIL,"服务器传输的包Id:%d\n",m_cPackageInfo.getpackageid());
 					if (m_cPackageInfo.getfilesize()/TransferSize == m_cPackageInfo.getpackageid())
 					{
 						NextState(READY_STATE);

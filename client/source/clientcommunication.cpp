@@ -340,7 +340,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 		case S_C_DOWNLOADDATA_ACK:
 //			m_cPackageInfo.printf();
 			memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
-			OspLog(LOG_LVL_DETAIL,"文件大小：%d\n",m_cPackageInfo.getfilesize());
+////		OspLog(LOG_LVL_DETAIL,"文件大小：%d\n",m_cPackageInfo.getfilesize());
 			if (TRANSFER_STATE == CurState())
 			{
 				//判断是正常下载还是断点续传
@@ -353,18 +353,17 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 					MaxId = m_cPackageInfo.getfilesize()/TransferSize;
 //					cout << m_cPackageInfo.getfilesize() << endl;
 					
-					OspLog(LOG_LVL_DETAIL,"客户端下载的包id：%d\n",m_cPackageInfo.getpackageid());
+					u16 wInstanceId = GetInsID();
+////				OspLog(LOG_LVL_DETAIL,"客户端下载的包id：%d\n",m_cPackageInfo.getpackageid());
 					if (MaxId != m_cPackageInfo.getpackageid())
 					{
-						g_CFileManager.FileWrite(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent());
+						g_CFileManager.FileWrite(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent(),wInstanceId);
 					    m_cPackageInfo.setnetpackageid(m_cPackageInfo.getpackageid()+1);
 						post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
-//						OspLog(LOG_LVL_DETAIL,"客户端下载的包内容：%s\n",m_cPackageInfo.getpackagecontent());
 					}
 					else
 					{
-						g_CFileManager.FileWrite(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent());
-//						OspLog(LOG_LVL_DETAIL,"客户端下载的包内容：%s\n",m_cPackageInfo.getpackagecontent());
+						g_CFileManager.FileWrite(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent(),wInstanceId);
 						OspLog(LOG_LVL_DETAIL,"客户端下载任务结束！\n");
 						NextState(READY_STATE);
 					}
@@ -378,7 +377,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 
 			/* 暂停文件下载 */
 		case C_C_PAUSETASK_CMD:
-			NextState(READY_STATE);
+			NextState(PAUSE_STATE);
 			break;
 
 			/* 恢复文件下载指令 */
