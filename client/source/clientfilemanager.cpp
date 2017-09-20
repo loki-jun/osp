@@ -110,14 +110,25 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 
 
 
-	if ((PACKAGENUM_EACHBUFFER == m_wPackageId) || (m_dwFileSize/TransferSize == m_wPackageId))
+	if (PACKAGENUM_EACHBUFFER == m_wPackageId)
 	{
 		s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
 		strcat(achFileName,"\\");
 		strcat(achFileName,m_pbySFileName);
 	    ofstream cBufferToFile(achFileName, ios::binary|ios::app);
-		cBufferToFile.write(g_CFileManager.getbufferone(),sizeof(g_CFileManager.getbufferone()));
-		memset(g_CFileManager.getbufferone(),0x00,sizeof(g_CFileManager.getbufferone()));
+		cBufferToFile.write(g_CFileManager.getbufferone(),CLIENT_BUFFERSIZE);
+		memset(g_CFileManager.getbufferone(),0x00,CLIENT_BUFFERSIZE);
+		OspLog(LOG_LVL_DETAIL,"客户端buffer计数\n");
+		cBufferToFile.close();
+	}
+	else if (m_dwFileSize/TransferSize == m_wPackageId)
+	{
+		s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+		strcat(achFileName,"\\");
+		strcat(achFileName,m_pbySFileName);
+		ofstream cBufferToFile(achFileName, ios::binary|ios::app);
+		cBufferToFile.write(g_CFileManager.getbufferone(),m_dwFileSize%CLIENT_BUFFERSIZE);
+		memset(g_CFileManager.getbufferone(),0x00,CLIENT_BUFFERSIZE);
 		OspLog(LOG_LVL_DETAIL,"客户端buffer计数\n");
 		cBufferToFile.close();
 	}

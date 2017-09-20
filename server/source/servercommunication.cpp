@@ -275,17 +275,17 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 
 			 /* 下载文件数据请求 */
 		case C_S_DOWNLOADDATA_REQ:
-			OspLog(LOG_LVL_DETAIL,"客户端数据请求进来了\n");
+//			OspLog(LOG_LVL_DETAIL,"客户端数据请求进来了\n");
 			if (TRANSFER_STATE == CurState())
 			{
 				memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
 				//判断为正常下载还是断点续传
 				if (0 == m_cPackageInfo.getdownloadstate()) 
 				{
-					OspLog(LOG_LVL_DETAIL,"正常下载请求\n");
+//					OspLog(LOG_LVL_DETAIL,"正常下载请求\n");
 					m_cFilemgr.FileRead(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize(),m_cPackageInfo.getpackageid(),m_cPackageInfo.getpackagesize(),m_cPackageInfo.getpackagecontent());
 					post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
-					cout << m_cPackageInfo.getpackagecontent() <<endl;
+//					cout << m_cPackageInfo.getpackagecontent() <<endl;
 					if (m_cPackageInfo.getfilesize()/TransferSize == m_cPackageInfo.getpackageid())
 					{
 						NextState(READY_STATE);
