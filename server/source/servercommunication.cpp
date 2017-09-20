@@ -304,6 +304,20 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 			
 			 break;
 
+			 /* 客户端取消文件下载请求  */
+		case C_S_CANCELFILE_REQ:
+			NextState(READY_STATE);
+			post(pcMsg->srcid, S_C_CANCELFILE_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
+			OspLog(LOG_LVL_DETAIL,"******客户端取消文件下载******\n");
+			clear();
+			m_cFilemgr.clear();
+			m_cFileInfo.clear();
+			m_cFileListInfo.clear();
+			m_cPackageInfo.clear();
+
+			break;
+
+
 		default:
             OspLog(LOG_LVL_DETAIL,".......**.....\n");
             break;

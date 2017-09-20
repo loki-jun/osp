@@ -31,6 +31,16 @@ void WriteEmptyFile()
 	
 }
 
+
+void CFileManager::FileDelete(s8* m_pbySFileName)
+{
+	s8 FileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+	strcat(FileName,"\\");
+	strcat(FileName,m_pbySFileName);
+	remove(FileName);
+}
+
+
 void CFileManager::CreateSpace(s8* m_pbySFileName,u32 m_dwFileSize)
 {
 	s8 FileName[STRING_LENGTH] = CLIENT_FILE_PATH;

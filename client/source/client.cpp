@@ -94,6 +94,13 @@ API void resumetask(u16 wTaskId)
 {
 	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_RESUMETASK_CMD,&wTaskId,sizeof(wTaskId));
 }
+
+/* 恢复文件下载 */
+API void canceltask(u16 wTaskId)
+{
+	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CANCELTASK_CMD,&wTaskId,sizeof(wTaskId));
+}
+
 /*********************************************************************
     单字母调试接口
 *********************************************************************/
@@ -132,4 +139,9 @@ API void p(u16 wTaskId)
 API void r(u16 wTaskId)
 {
 	resumetask(wTaskId);
+}
+
+API void ct(u16 wTaskId)
+{
+	canceltask(wTaskId);
 }

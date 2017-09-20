@@ -18,7 +18,8 @@
 #define C_C_CONNECTSUCCESS_CMD          (u16)(OSP_USEREVENT_BASE+0x001E) //客户端连接服务器成功，准备注册命令，client(daemon->instance)
 #define C_C_DOWNLOADFILE_CMD            (u16)(OSP_USEREVENT_BASE+0x0020) //下载文件指令，client(daemon->instance)，消息体内容为0 or 1，表示断点和正常下载
 #define C_C_PAUSETASK_CMD               (u16)(OSP_USEREVENT_BASE+0x0021) //暂停文件下载指令 client(daemon->instance)
-#define C_C_RESUMETASK_CMD              (u16)(OSP_USEREVENT_BASE+0x0022) //回复文件下载指令 client(daemon->instance)
+#define C_C_RESUMETASK_CMD              (u16)(OSP_USEREVENT_BASE+0x0022) //恢复文件下载指令 client(daemon->instance)
+#define C_C_CANCELTASK_CMD              (u16)(OSP_USEREVENT_BASE+0x0023) //取消文件下载指令 client(daemon->instance)
 
 class CUserData
 {

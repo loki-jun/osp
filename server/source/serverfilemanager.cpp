@@ -44,7 +44,7 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 //		CFilemgr.setbuffer(0x00);
 //		memset(m_Buffer,0x00,sizeof(m_Buffer));
 		cFileToBuffer.read(getbuffer(),SERVER_BUFFERSIZE);
-//		cout << sizeof(CFilemgr.getbuffer()) << endl; //直接sizeof取大小值为4，出错
+//		cout << sizeof(getbuffer()) << endl; //直接sizeof取大小值为4，出错
 		cFileToBuffer.close();
 	}
 	
@@ -56,9 +56,6 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 //		OspLog(LOG_LVL_DETAIL,"服务器发送包数据\n");
 		memset(m_pbyPackageContent,0x00,sizeof(m_pbyPackageContent));
 		memcpy(m_pbyPackageContent,getbuffer()+dwShift,TransferSize);
-//		cout << m_pbyPackageContent << endl;
-		
-//		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
 	}
 	else
 	{
@@ -66,11 +63,7 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 		m_wPackageSize = m_dwFileSize%TransferSize;
 		memset(m_pbyPackageContent,0x00,sizeof(m_pbyPackageContent));
 		memcpy(m_pbyPackageContent,getbuffer()+dwShift,m_dwFileSize%TransferSize);
-//		cout << m_pbyPackageContent << endl;
 		OspLog(LOG_LVL_DETAIL,"包大小：%d\n",m_dwFileSize%TransferSize);
-//		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
-//		m_cPackageInfo.printf();
-//		NextState(READY_STATE);
 	}
     
 //	if (dwBufferId != (dwFileSize/SERVER_BUFFERSIZE+1))

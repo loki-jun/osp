@@ -20,23 +20,25 @@ class CReadFile
 private:
 	//¿ª±Ù»º´æ
 	s8 m_Buffer[SERVER_BUFFERSIZE] ;
-	s8 m_pbyFileName[STRING_LENGTH];
-	//»º´æ¼ÆÊý
-//	u32 m_dwBufferNum;
-	u32 m_wPackageId;
-	u16 m_wPackageSize;
+//	s8 m_pbyFileName[STRING_LENGTH];
+//	u32 m_wPackageId;
+//	u16 m_wPackageSize;
 
 public:
     CReadFile()
     {
-        memset(m_Buffer,0,sizeof(m_Buffer));
+        clear();
 //		m_dwBufferNum = 0;
-		m_wPackageId = 0;
+//		m_wPackageId = 0;
 		
     }
     ~CReadFile()
     {
     }
+	void clear()
+	{
+		memset(m_Buffer,0,sizeof(m_Buffer));
+	}
 
 	s8* getbuffer()
 	{

@@ -51,13 +51,17 @@ private:
 public:
     CServerInstance()
     {
-        m_dwDstIid = 0;
-		m_dwDstNode = 0;
-		m_dwBufferNum = 0;
+		clear();
     }
     ~CServerInstance()
     {
     }
+	void clear()
+	{
+        m_dwDstIid = 0;
+		m_dwDstNode = 0;
+		m_dwBufferNum = 0;
+	}
 	
 public:
     void InstanceEntry(CMessage *const pcMsg);

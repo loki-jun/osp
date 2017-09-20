@@ -235,7 +235,25 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
             break;
 		/* 取消下载 */
          case U_C_CANCELTASK_CMD:
-			 
+			 if (CONNECT_STATE == CurState())   //判断daemon状态
+			 {
+				 u16 wTaskId = 0;
+				 memcpy(&wTaskId,pcMsg->content,sizeof(wTaskId));
+				 pCInstance = (CClientInstance*)pcApp->GetInstance(wTaskId);
+				 //暂停态和传输态都可以取消
+				 if ((PAUSE_STATE == pCInstance->CurState()) || (TRANSFER_STATE == pCInstance->CurState()))
+				 {
+					 post(MAKEIID(CLIENT_APP_NO, wTaskId), C_C_CANCELTASK_CMD,pcMsg->content,pcMsg->length);
+				 }
+				 else
+				 {
+					 OspLog(LOG_LVL_DETAIL,"instance状态：%d\n",pCInstance->CurState());
+				 }
+			 }
+			 else
+			 {
+				 OspLog(LOG_LVL_WARNING,"未连接，请先连接服务器！\n");
+			 }
             break;
 		/* 下载断点续传文件 */
          case U_C_DOWNLOADPARTFILE_CMD:
@@ -384,6 +402,18 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 		case C_C_RESUMETASK_CMD:
 			NextState(TRANSFER_STATE);
 			post(m_dwDstId, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
+			break;
+
+			/* 取消文件下载指令 */
+		case C_C_CANCELTASK_CMD:
+			NextState(READY_STATE);
+			post(m_dwDstId, C_S_CANCELFILE_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
+			break;
+
+			/* 服务器返回取消文件下载响应 */
+		case S_C_CANCELFILE_ACK:
+			g_CFileManager.FileDelete(m_cPackageInfo.getsfilename());
+			OspLog(LOG_LVL_DETAIL,"******文件下载取消成功！******\n");
 			break;
 
 		/* 服务器返回文件不存在响应 */
