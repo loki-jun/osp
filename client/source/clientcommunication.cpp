@@ -309,7 +309,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 
 			memcpy(&m_cFileInfo,pcMsg->content,pcMsg->length);
 			OspLog(LOG_LVL_DETAIL,"服务器文件存在，放心大胆地下载吧，骚年！！\n");
-//			g_CFileManager.CreateSpace(m_cFileInfo.m_pbyFileName,m_cFileInfo.m_dwFileSize);
+//			g_CFileManager.CreateSpace(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize());//野指针问题待解决……
 			if ( TRANSFER_STATE == CurState() )
 			{
 				m_cPackageInfo.setdownloadstate(0);
@@ -351,7 +351,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 					//将instance与buffer绑定
 					//wIdCount = GetInsID()-1;
 					MaxId = m_cPackageInfo.getfilesize()/TransferSize;
-					
+//					cout << m_cPackageInfo.getfilesize() << endl;
 					
 					OspLog(LOG_LVL_DETAIL,"客户端下载的包id：%d\n",m_cPackageInfo.getpackageid());
 					if (MaxId != m_cPackageInfo.getpackageid())

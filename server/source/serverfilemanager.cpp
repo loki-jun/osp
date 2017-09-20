@@ -62,9 +62,9 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 	
     
 	
-	if ((PACKAGENUM_EACHBUFFER == m_wPackageId) || (0 == m_wPackageId))
+	if ((0 == m_wPackageId%PACKAGENUM_EACHBUFFER) || (0 == m_wPackageId))
 	{
-		OspLog(LOG_LVL_DETAIL,"服务器开始读取文件\n");
+//		OspLog(LOG_LVL_DETAIL,"服务器开始读取文件\n");
 		ifstream cFileToBuffer;
 		cFileToBuffer.open(achFileName,ios::in|ios::binary);
 		u32 dwPosition = m_wPackageId*TransferSize;
@@ -72,7 +72,7 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 //		CFilemgr.setbuffer(0x00);
 //		memset(m_Buffer,0x00,sizeof(m_Buffer));
 		cFileToBuffer.read(CFilemgr.getbuffer(),SERVER_BUFFERSIZE);
-		cout << sizeof(CFilemgr.getbuffer()) << endl;
+//		cout << sizeof(CFilemgr.getbuffer()) << endl; //直接sizeof取大小值为4，出错
 		cFileToBuffer.close();
 	}
 	

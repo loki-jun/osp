@@ -74,7 +74,7 @@ public:
 public:
 	void FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent);
 //	void ReadAndGetConfigData(u16 m_wNameLen,s8* m_pbyFileName,struct m_tConfigData){};
-	void CreateSpace(LPSTR lpstrFileName,u32 dwFileSize);
+	void CreateSpace(s8* m_pbySFileName,u32 m_dwFileSize);
 
 
 private:

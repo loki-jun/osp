@@ -31,14 +31,14 @@ void WriteEmptyFile()
 	
 }
 
-void CFileManager::CreateSpace(LPSTR lpstrFileName,u32 dwFileSize)
+void CFileManager::CreateSpace(s8* m_pbySFileName,u32 m_dwFileSize)
 {
 	s8 FileName[STRING_LENGTH] = CLIENT_FILE_PATH;
 	strcat(FileName,"\\");
-	strcat(FileName,lpstrFileName);
+	strcat(FileName,m_pbySFileName);
 	FILE *fp;	
 	fp=fopen(FileName,"wb+");
-	fseek(fp, dwFileSize,SEEK_END);
+	fseek(fp, m_dwFileSize,SEEK_END);
 	putw(0,fp);
     fclose(fp);
 
@@ -97,11 +97,11 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 	}
 	else
 	{
-		OspLog(LOG_LVL_DETAIL,"客户端接收最后一包数据\n");
+		OspLog(LOG_LVL_DETAIL,"********客户端接收最后一包数据*********\n");
 //		m_wPackageSize = m_dwFileSize%TransferSize;
 		g_CFileManager.setbufferone(m_pbyPackageContent,dwShift,m_dwFileSize%TransferSize);
 		OspLog(LOG_LVL_DETAIL,"包偏移量：%d\n", dwShift);
-		OspLog(LOG_LVL_DETAIL,"包大小：%d\n", m_wPackageSize);
+		OspLog(LOG_LVL_DETAIL,"包大小：%d\n", m_dwFileSize%TransferSize);
 //		OspLog(LOG_LVL_DETAIL,"包内容：%s\n", m_pbyPackageContent);
 		//		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
 		//		m_cPackageInfo.printf();
@@ -110,7 +110,7 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 
 
 
-	if (PACKAGENUM_EACHBUFFER == m_wPackageId)
+	if (0 == (m_wPackageId+1)%PACKAGENUM_EACHBUFFER)
 	{
 		s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
 		strcat(achFileName,"\\");
@@ -118,7 +118,7 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 	    ofstream cBufferToFile(achFileName, ios::binary|ios::app);
 		cBufferToFile.write(g_CFileManager.getbufferone(),CLIENT_BUFFERSIZE);
 		memset(g_CFileManager.getbufferone(),0x00,CLIENT_BUFFERSIZE);
-		OspLog(LOG_LVL_DETAIL,"客户端buffer计数\n");
+		OspLog(LOG_LVL_DETAIL,"***************客户端buffer计数****************\n");
 		cBufferToFile.close();
 	}
 	else if (m_dwFileSize/TransferSize == m_wPackageId)
@@ -129,7 +129,7 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 		ofstream cBufferToFile(achFileName, ios::binary|ios::app);
 		cBufferToFile.write(g_CFileManager.getbufferone(),m_dwFileSize%CLIENT_BUFFERSIZE);
 		memset(g_CFileManager.getbufferone(),0x00,CLIENT_BUFFERSIZE);
-		OspLog(LOG_LVL_DETAIL,"客户端buffer计数\n");
+		OspLog(LOG_LVL_DETAIL,"***************客户端buffer计数****************\n");
 		cBufferToFile.close();
 	}
 	
