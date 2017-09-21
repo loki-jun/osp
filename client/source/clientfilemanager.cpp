@@ -17,7 +17,7 @@
 
 using namespace std;
 
-extern CConfigData g_CConfigData;
+//extern CConfigData g_CConfigData;
 extern CFileManager g_CFileManager;
 
 void CheckSpace()
@@ -38,6 +38,8 @@ void CFileManager::FileDelete(s8* m_pbySFileName)
 	strcat(FileName,"\\");
 	strcat(FileName,m_pbySFileName);
 	remove(FileName);
+
+
 }
 
 
@@ -69,6 +71,21 @@ void CFileManager::CreateSpace(s8* m_pbySFileName,u32 m_dwFileSize)
    方法三无法实现system中输入变量
 	system("fsutil file createnew E:\\客户端测试文件夹\\lpstrFileName 1dwFileSize");
 */
+
+}
+
+void CFileManager::ReadAndGetConfigData(s8* pbyConfigName)//CConfigData m_cConfigInfo
+{
+	OspLog(LOG_LVL_DETAIL,"配置文件:%s\n",pbyConfigName);
+	s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+	strcat(achFileName,"\\");
+	strcat(achFileName, pbyConfigName);
+//	strcat(achFileName,".ini");
+
+	FILE *fp;	
+	fp=fopen(achFileName,"ab+");
+	fclose(fp);
+
 
 }
 

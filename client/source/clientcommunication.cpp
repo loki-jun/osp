@@ -21,7 +21,7 @@ using namespace std;
 
 CClientApp g_CClientApp;
 
-CConfigData g_CConfigData;
+//CConfigData g_CConfigData;
 CFileManager g_CFileManager;
 /*********************************************************************
     初始化函数
@@ -269,6 +269,11 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 			 OspLog(LOG_LVL_DETAIL,"服务器连接成功\n");
 			 NextState(CONNECT_STATE);
 			 OspLog(LOG_LVL_DETAIL,"daemon状态：%u\n",CurState());
+
+			 //服务器连接成功后，运行配置文件读取
+			 s8 configname[256];
+//			 memcpy(configname,s8(g_CClientApp.m_dwIp),sizeof(configname));
+			 g_CFileManager.ReadAndGetConfigData(itoa(g_CClientApp.m_dwIp,configname,256));
 
 			 for( dwInsCout = 1; dwInsCout <= MAX_CLIENT_INS_NUM; dwInsCout++)
 			 {	 

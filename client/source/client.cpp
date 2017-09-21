@@ -101,6 +101,12 @@ API void canceltask(u16 wTaskId)
 	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CANCELTASK_CMD,&wTaskId,sizeof(wTaskId));
 }
 
+/* 下载断点续传文件 */
+//API void downpartfile(s8* FileName[256])
+//{
+
+//}
+
 /*********************************************************************
     单字母调试接口
 *********************************************************************/

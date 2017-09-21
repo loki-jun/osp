@@ -59,6 +59,17 @@ public:
 		return m_Bufferthree;
 	}
 
+
+//	CConfigData* getconfiginfo()
+//	{
+//		return m_cConfigInfo;
+//	}
+
+	void setfileinfo(CConfigData* configinfo)
+	{
+		memcpy(m_cConfigInfo,configinfo,sizeof(configinfo));
+	}
+
 	void setbufferone(s8* bufferone,u32 dwshiftone,u32 dwsizeone)
 	{
 		memcpy(m_Bufferone+dwshiftone,bufferone,dwsizeone);
@@ -72,6 +83,7 @@ public:
 		memcpy(m_Bufferthree+dwshiftthree,bufferthree,dwsizethree);
 	}
 public:
+	void ReadAndGetConfigData(s8* pbyConfigName);//CConfigData m_cConfigInfo
 	void FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u16 m_wPackageSize,s8* m_pbyPackageContent,u16 wInstanceId);
 //	void ReadAndGetConfigData(u16 m_wNameLen,s8* m_pbyFileName,struct m_tConfigData){};
 	void CreateSpace(s8* m_pbySFileName,u32 m_dwFileSize);
@@ -81,6 +93,7 @@ public:
 private:
 	void CheckSpace(){};
 	void WriteEmptyFile(){};
+	void WriteConfigData(s8* pbyConfigName,CConfigData m_cConfigInfo);
 	
 
 };

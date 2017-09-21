@@ -225,13 +225,6 @@ void CServerInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 			OspLog(LOG_LVL_DETAIL,"服务器测试文件列表生成\n");
             DaemonGetlist(pcMsg);
             break;
-		
-	
-
-		/* 取消下载 */
-		case C_S_CANCELFILE_REQ:
-			 
-            break;
 
         default:
             OspLog(LOG_LVL_DETAIL,".......**.....\n");
@@ -314,7 +307,6 @@ void CServerInstance::InstanceEntry(CMessage *const pcMsg)
 			m_cFileInfo.clear();
 			m_cFileListInfo.clear();
 			m_cPackageInfo.clear();
-
 			break;
 
 
