@@ -15,6 +15,8 @@
 #include "../include/clientcommunication.h"
 #include "../include/clientinterface.h"
 #include "../include/clientcommon.h"
+#include <io.h>
+#include <direct.h>
 
 int main()
 {
@@ -150,4 +152,23 @@ API void r(u16 wTaskId)
 API void ct(u16 wTaskId)
 {
 	canceltask(wTaskId);
+}
+
+API void ll()
+{
+	long file;
+	struct _finddata_t find;
+
+	_chdir("e:\\测试文件夹");
+	if((file = _findfirst("*.*",&find)) == -1L)
+	{
+		OspPrintf(TRUE,FALSE,"空文件夹！");
+		exit(0);
+	}
+	OspPrintf(TRUE,FALSE,"%s\n",find.name);
+	while(_findnext(file,&find) == 0)
+	{
+		OspPrintf(TRUE,FALSE,"filename.%s size.%d\n",find.name,find.size);
+	}
+	_findclose(file);
 }

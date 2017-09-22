@@ -9,7 +9,8 @@
 日  期	   	  版本		 修改人		  走读人      修改记录
   
 ===========================================================*/
-
+#include <io.h>
+#include <direct.h>
 #include <stdio.h>
 #include <iostream>
 #include <fstream> 
@@ -99,6 +100,35 @@ void CServerInstance::DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp
 *********************************************************************/
 void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 {
+	
+	u32 file;
+	struct _finddata_t find;
+	
+	_chdir("e:\\测试文件夹\\");
+	if((file = _findfirst("*.*",&find)) == -1L)
+	{
+		OspPrintf(TRUE,FALSE,"空文件夹！");
+		exit(0);
+	}
+	OspPrintf(TRUE,FALSE,"%s\n",find.name);
+
+	CFileInfo cFileInfo;
+	u32 dwFileNum = 0;
+	while(_findnext(file,&find) == 0)
+	{
+		cFileInfo.clear();
+		cFileInfo.setnetfilesize(find.size);
+		cFileInfo.setfilename(find.name);
+		m_cFileListInfo.setfileinfo(&cFileInfo,dwFileNum);
+//		OspPrintf(TRUE,FALSE,"filename:%s size:%d\n",cFileInfo.getfilename(),cFileInfo.getfilesize());
+		dwFileNum++;
+	}
+	_findclose(file);
+	m_cFileListInfo.setfilenum(dwFileNum);
+	post(pcMsg->srcid,S_C_GETLIST_ACK, &m_cFileListInfo,sizeof(m_cFileListInfo),pcMsg->srcnode);
+	m_cFileListInfo.printf();
+	OspLog(LOG_LVL_DETAIL,"文件列表大小：%d\n",sizeof(m_cFileListInfo));
+	/*
 	vector<string> fileNames;
 	vector<u32> fileSizes;
 	vector<u8> filemd5s;
@@ -118,8 +148,6 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 		cFileInfo.setnetfilesize(fileSizes[wCount]);
 		cFileInfo.setfilename(&fileNames[wCount][0u]);
 		m_cFileListInfo.setfileinfo(&cFileInfo);
-//		memcpy(&cFileInfo.getfilename(),&fileNames[wCount][0u],sizeof(cFileInfo.getfilename()));//加[0u]可以解决乱码问题
-//		memcpy(&m_cFileListInfo.m_pbyFileInfo[wCount],&cFileInfo,sizeof(cFileInfo));
 		OspPrintf(TRUE,FALSE,"[DaemonGetlist] 3 fileSizes[%d].%d m_dwFileSize.%d \n", 
 			wCount, fileSizes[wCount],cFileInfo.getfilesize());
 
@@ -128,6 +156,7 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 	m_cFileListInfo.printf();
 	post(pcMsg->srcid,S_C_GETLIST_ACK, &m_cFileListInfo,sizeof(m_cFileListInfo),pcMsg->srcnode);
 	OspLog(LOG_LVL_DETAIL,"文件列表大小：%d\n",sizeof(m_cFileListInfo));
+	*/
 }
 
 /*********************************************************************
@@ -135,6 +164,8 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 *********************************************************************/
 void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 {
+
+
 	vector<string> fileNames;
 	vector<u32> fileSizes;
 

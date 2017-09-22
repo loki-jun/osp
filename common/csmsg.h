@@ -70,8 +70,8 @@ public:
 	}
 	void printf()
 	{
-		OspPrintf(TRUE,FALSE,"size:%d,filename:%s,Md5:%s\n",
-			m_dwFileSize,m_pbyFileName,m_dwMD5Value);
+		OspPrintf(TRUE,FALSE,"size:%d,filename:%s\n",
+			getfilesize(),m_pbyFileName);//,Md5:%s
 	}
 
 	s8* getfilename()
@@ -134,14 +134,25 @@ public:
 	}
 
 	//文件列表中的文件个数
+	u8 getfilenum()
+	{
+		return m_wFileNum;
+	}
 	void setfilenum(u8 filenum)
 	{
 		m_wFileNum = filenum;
 	}
 
-	void setfileinfo(CFileInfo* fileinfo)
+	//文件列表信息
+	CFileInfo* getfileinfo()
 	{
-		memcpy(m_pbyFileInfo,fileinfo,sizeof(fileinfo));
+		return m_pbyFileInfo;
+	}
+
+
+	void setfileinfo(CFileInfo* fileinfo,u32 fileid)
+	{
+		memcpy(&m_pbyFileInfo[fileid],fileinfo,sizeof(m_pbyFileInfo[fileid]));
 	}
 
 

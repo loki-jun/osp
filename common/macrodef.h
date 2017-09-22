@@ -26,7 +26,7 @@
 #define SERVER_APP_NO               1
 #define STRING_LENGTH               256                 //文件名长度
 #define TransferSize                (u32)25600          //每次传输的包大小，25k
-#define MAX_FILELIST_NUM            80                  //最大文件列表个数
+#define MAX_FILELIST_NUM            100                //最大文件列表个数
 
 
 // log等级定义

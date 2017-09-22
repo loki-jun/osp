@@ -271,9 +271,10 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 			 OspLog(LOG_LVL_DETAIL,"daemon状态：%u\n",CurState());
 
 			 //服务器连接成功后，运行配置文件读取
-			 s8 configname[256];
-//			 memcpy(configname,s8(g_CClientApp.m_dwIp),sizeof(configname));
-			 g_CFileManager.ReadAndGetConfigData(itoa(g_CClientApp.m_dwIp,configname,256));
+			 s8 configname[32];
+			 cout << g_CClientApp.m_dwIp << endl;
+//			 g_CFileManager.ReadAndGetConfigData(inet_ntoa(g_CClientApp.m_dwIp));
+			 g_CFileManager.ReadAndGetConfigData(itoa(g_CClientApp.m_dwIp,configname,32));
 
 			 for( dwInsCout = 1; dwInsCout <= MAX_CLIENT_INS_NUM; dwInsCout++)
 			 {	 
@@ -288,6 +289,12 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
         case S_C_GETLIST_ACK:
 			OspPrintf(TRUE,FALSE,"测试文件列表客户端接收\n");
 			memcpy(&m_cFileListInfo,pcMsg->content,pcMsg->length);
+//			OspPrintf(TRUE,FALSE,"size:%d\n",m_cFileListInfo.getfileinfo());
+//			for (u16 i=0;i<m_cFileListInfo.getfilenum();i++)
+
+//				OspPrintf(TRUE,FALSE,"文件个数：%s\n",m_cFileListInfo.getfileinfo()[5].getfilename());
+
+
 			m_cFileListInfo.printf();
 			break;
 

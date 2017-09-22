@@ -80,10 +80,11 @@ void CFileManager::ReadAndGetConfigData(s8* pbyConfigName)//CConfigData m_cConfi
 	s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
 	strcat(achFileName,"\\");
 	strcat(achFileName, pbyConfigName);
-//	strcat(achFileName,".ini");
+	strcat(achFileName,".ini");
 
 	FILE *fp;	
 	fp=fopen(achFileName,"ab+");
+
 	fclose(fp);
 
 
