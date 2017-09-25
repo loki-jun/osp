@@ -104,7 +104,7 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 	u32 file;
 	struct _finddata_t find;
 	
-	_chdir("e:\\测试文件夹\\");
+	_chdir("e:\\测试文件夹");
 	if((file = _findfirst("*.*",&find)) == -1L)
 	{
 		OspPrintf(TRUE,FALSE,"空文件夹！");
@@ -164,8 +164,60 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 *********************************************************************/
 void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 {
+	//获取文件夹中的文件个数
+	u32 filenum;
+	struct _finddata_t findnum;
+	_chdir("e:\\测试文件夹");
+	if((filenum = _findfirst("*.*",&findnum)) == -1L)
+	{
+		OspPrintf(TRUE,FALSE,"空文件夹！");
+		exit(0);
+	}
+	u32 dwFileNum = 0;
+	while(_findnext(filenum,&findnum) == 0)
+	{
+		dwFileNum++;
+	}
+	_findclose(filenum);
 
 
+	u32 file;
+	struct _finddata_t find;	
+	_chdir("e:\\测试文件夹");
+	if((file = _findfirst("*.*",&find)) == -1L)
+	{
+		OspPrintf(TRUE,FALSE,"空文件夹！");
+		exit(0);
+	}
+
+	u16 wCount = 0;
+	_chdir("e:\\测试文件夹");
+	while(_findnext(file,&find) == 0)
+	{
+
+		s8 achFileName[STRING_LENGTH];
+		s8 achServerFileName[STRING_LENGTH];
+		memcpy(achFileName,pcMsg->content,pcMsg->length);
+		memcpy(achServerFileName,find.name,sizeof(achServerFileName));
+		
+        m_cFileInfo.setnetfilesize(find.size);
+		m_cFileInfo.setfilename(find.name);
+		if (0 == strcmp(achServerFileName,achFileName))
+		{
+			post(pcMsg->srcid,S_C_FILENAME_ACK,&m_cFileInfo,sizeof(m_cFileInfo),pcMsg->srcnode);
+			break;
+		}
+		wCount++;
+	}
+	if (wCount == dwFileNum)
+	{
+		post(pcMsg->srcid,S_C_FILENAME_NACK,NULL,0,pcMsg->srcnode);
+	}
+	_findclose(file);
+
+
+
+/*
 	vector<string> fileNames;
 	vector<u32> fileSizes;
 
@@ -181,9 +233,7 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 		memcpy(achServerFileName,&fileNames[wCount][0u],sizeof(achServerFileName));
 
         m_cFileInfo.setnetfilesize(fileSizes[wCount]);
-//		memcpy(&m_cFileInfo.m_dwFileSize,&fileSizes[wCount],sizeof(m_cFileInfo.m_dwFileSize));
 		m_cFileInfo.setfilename(&fileNames[wCount][0u]);
-//		memcpy(&m_cFileInfo.getfilename(),&fileNames[wCount][0u],sizeof(m_cFileInfo.getfilename()));
 
 		if (0 == strcmp(achServerFileName,achFileName))
 		{
@@ -195,6 +245,7 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 	{
 		post(pcMsg->srcid,S_C_FILENAME_NACK,NULL,0,pcMsg->srcnode);
 	}
+*/
 }
 
 
