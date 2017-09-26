@@ -94,10 +94,6 @@ SOURCE=.\source\servercommunication.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\source\servercreatefilelist.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\source\serverfilemanager.cpp
 # End Source File
 # End Group
@@ -139,10 +135,6 @@ SOURCE=.\include\servercommon.h
 # Begin Source File
 
 SOURCE=.\include\servercommunication.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\servercreatefilelist.h
 # End Source File
 # Begin Source File
 

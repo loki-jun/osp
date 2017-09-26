@@ -15,7 +15,7 @@
 
 #include "../include/servercommon.h"
 #include "../include/serverfilemanager.h"
-#include "../include/servercreatefilelist.h"
+//#include "../include/servercreatefilelist.h"
 
 class CUserData
 {
@@ -43,9 +43,9 @@ private:
 	CFileInfo m_cFileInfo;
 	CFileListInfo m_cFileListInfo;
 	CPackageInfo m_cPackageInfo;
-	CFindFiles m_cFindFiles;
-	CFindSizes m_cFindSizes;
-	CFindMd5 m_cFindMd5;
+//	CFindFiles m_cFindFiles;
+//	CFindSizes m_cFindSizes;
+//	CFindMd5 m_cFindMd5;
 
 
 public:

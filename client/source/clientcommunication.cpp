@@ -58,7 +58,7 @@ void UserInit()
 *********************************************************************/
 void CClientInstance::DaemonConnectServer()
 {	
-    s32 dwRet = 0;
+    u32 dwRet = 0;
 	dwRet = OspConnectTcpNode(g_CClientApp.m_dwIp,SERVER_LISTEN_PORT,TIME_WATING,NUM_WATING);
 	if(dwRet != INVALID_NODE)
 	{
@@ -66,12 +66,12 @@ void CClientInstance::DaemonConnectServer()
 		m_dwDstNode = dwRet;
 		post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_CONNECT_REQ,NULL,0,m_dwDstNode);
 		OspSetHBParam(m_dwDstNode,NODE_TIME_WATING,NUM_WATING);
-//		OspNodeDiscCBRegQ(g_CClientApp.m_dwDstNode,CLIENT_APP_NO,DAEMON);
+		OspNodeDiscCBReg(m_dwDstNode,CLIENT_APP_NO,DAEMON);
 	}
 	else
 	{
-		OspLog(LOG_LVL_WARNING,"连接超时！\n");
-//		SetTimer(CONNECT_TIME_EVENT, TIME_WATING);
+		SetTimer(TIME_CONNECT, TIME_WATING);
+//		OspLog(LOG_LVL_WARNING,"连接超时！\n");
 	}
 }
 
@@ -113,10 +113,29 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 
     switch(pcMsg->event)
     {
-//        case OSP_DISCONNECT:
-//			OspLog(LOG_LVL_WARNING,"服务器已断链，重连中……\n");
-//			NextState(IDLE_STATE);
-//			break;
+		//断链检测
+        case OSP_DISCONNECT:			
+			if (CONNECT_STATE == CurState())
+			{
+				for( dwInsCout = 1; dwInsCout <= MAX_CLIENT_INS_NUM; dwInsCout++)
+				{	 
+				    //获取实例对象指针
+				    pCInstance = (CClientInstance*)pcApp->GetInstance(dwInsCout);
+				    pCInstance->NextState(IDLE_STATE);
+				}
+				NextState(IDLE_STATE);
+				OspLog(LOG_LVL_WARNING,"服务器已断链！\n");
+				SetTimer(TIME_CONNECT, TIME_WATING);
+
+			}			
+
+			break;
+
+
+		case TIME_CONNECT:	
+			OspLog(LOG_LVL_DETAIL,"重连中……\n");
+			DaemonConnectServer();
+			break;
 
 		/* 连接服务器 */
         case U_C_CONNECT_CMD:
@@ -144,7 +163,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 				}  
 				OspDisconnectTcpNode(m_dwDstNode);
 				NextState(IDLE_STATE);
-				OspLog(LOG_LVL_WARNING,"服务器已断开！\n");
+				OspLog(LOG_LVL_WARNING,"断开与服务器的连接！\n");
 			}
 			else
 			{
@@ -338,7 +357,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
             m_dwDstNode = pcMsg->srcnode;
 
 			memcpy(&m_cFileInfo,pcMsg->content,pcMsg->length);
-			OspLog(LOG_LVL_DETAIL,"服务器文件存在，放心大胆地下载吧，骚年！！\n");
+			OspLog(LOG_LVL_DETAIL,"服务器文件存在，放心大胆地下载吧！！\n");
 //			g_CFileManager.CreateSpace(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize());//野指针问题待解决……
 			if ( TRANSFER_STATE == CurState() )
 			{
@@ -350,12 +369,12 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 					u32 idcount = 0;
 					u32 MaxId = m_cFileInfo.getfilesize()/TransferSize;
 					OspLog(LOG_LVL_DETAIL,"包的总数目为：%u\n",MaxId);
+
 					m_cPackageInfo.setsfilename(m_cFileInfo.getfilename());
-//					memcpy(m_cPackageInfo.m_pbySFileName,m_cFileInfo.getfilename(),sizeof(m_cPackageInfo.m_pbySFileName));
 					m_cPackageInfo.setnetfilesize(m_cFileInfo.getfilesize());
 					m_cPackageInfo.setpackageid(idcount);//若为断点续传，此值为配置中读取的ID值
-//					post(m_dwDstId, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),m_dwDstNode);
 					m_cPackageInfo.setnetpackagesize(TransferSize);//不加也不影响
+					
 					post(pcMsg->srcid, C_S_DOWNLOADDATA_REQ,&m_cPackageInfo,sizeof(m_cPackageInfo),pcMsg->srcnode);
 				}
 				else
@@ -378,8 +397,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 				{
 					u16 wIdCount =0;
 					u32 MaxId =0;
-					//将instance与buffer绑定
-					//wIdCount = GetInsID()-1;
+
 					MaxId = m_cPackageInfo.getfilesize()/TransferSize;
 //					cout << m_cPackageInfo.getfilesize() << endl;
 					
@@ -430,7 +448,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 
 		/* 服务器返回文件不存在响应 */
 		case S_C_FILENAME_NACK:
-			OspLog(LOG_LVL_WARNING,"骚年，文件被丢到火星了，重新选一个吧！\n");
+			OspLog(LOG_LVL_WARNING,"文件被丢到火星了，重新选一个吧！\n");
 			break;
 
 		default:

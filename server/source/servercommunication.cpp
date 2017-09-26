@@ -16,8 +16,6 @@
 #include <fstream> 
 #include "../include/servercommon.h"
 #include "../include/servercommunication.h"
-//#include "../include/servercreatefilelist.h"
-//#include "../include/serverfilemanager.h"
 
 using namespace std;
 
@@ -39,7 +37,7 @@ void UserInit()
 		}
 	}
 
-	// 在6682端口上创建本地监听结点 
+//  在6682端口上创建本地监听结点 
 //	u32 dwRetCreateTcpNode = OspCreateTcpNode( inet_addr("127.0.0.1"), SERVER_LISTEN_PORT );   
 	u32 dwRetCreateTcpNode = OspCreateTcpNode( 0, SERVER_LISTEN_PORT );	
 	if( dwRetCreateTcpNode == INVALID_SOCKET )
@@ -73,26 +71,7 @@ void CServerInstance::DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp
 	{
         post(pcMsg->srcid, S_C_CONNECT_NACK,NULL,0,pcMsg->srcnode);
 	}
-	/*
-    u16 curEvent = pcMsg->event;
-	CServerInstance* pCInstance = NULL;
-    u32 dwInsCout=0;
 
-    for( dwInsCout = 1; dwInsCout <= MAX_SERVER_INS_NUM; dwInsCout++)
-    {
-        pCInstance = (CServerInstance* )pcApp->GetInstance(dwInsCout);
-        if ( IDLE_STATE == pCInstance->CurState() )
-        {
-            post(pcMsg->srcid, S_C_CONNECT_ACK,NULL,0,pcMsg->srcnode);
-            pCInstance->NextState(READY_STATE);
-            break;
-        }
-    }
-    if ( MAX_SERVER_INS_NUM < dwInsCout )
-    {
-        OspPost(MAKEIID(pcMsg->srcid, DAEMON), S_C_CONNECT_NACK, pcMsg->content, sizeof(u32));
-    }
-	*/
 }
 
 /*********************************************************************
@@ -104,7 +83,7 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 	u32 file;
 	struct _finddata_t find;
 	
-	_chdir("e:\\测试文件夹");
+	_chdir(SERVER_FILE_PATH);
 	if((file = _findfirst("*.*",&find)) == -1L)
 	{
 		OspPrintf(TRUE,FALSE,"空文件夹！");
@@ -124,6 +103,7 @@ void CServerInstance::DaemonGetlist(CMessage *const pcMsg)
 		dwFileNum++;
 	}
 	_findclose(file);
+
 	m_cFileListInfo.setfilenum(dwFileNum);
 	post(pcMsg->srcid,S_C_GETLIST_ACK, &m_cFileListInfo,sizeof(m_cFileListInfo),pcMsg->srcnode);
 	m_cFileListInfo.printf();
@@ -167,7 +147,7 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 	//获取文件夹中的文件个数
 	u32 filenum;
 	struct _finddata_t findnum;
-	_chdir("e:\\测试文件夹");
+	_chdir(SERVER_FILE_PATH);
 	if((filenum = _findfirst("*.*",&findnum)) == -1L)
 	{
 		OspPrintf(TRUE,FALSE,"空文件夹！");
@@ -183,7 +163,7 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 
 	u32 file;
 	struct _finddata_t find;	
-	_chdir("e:\\测试文件夹");
+	_chdir(SERVER_FILE_PATH);
 	if((file = _findfirst("*.*",&find)) == -1L)
 	{
 		OspPrintf(TRUE,FALSE,"空文件夹！");
@@ -191,7 +171,7 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 	}
 
 	u16 wCount = 0;
-	_chdir("e:\\测试文件夹");
+	_chdir(SERVER_FILE_PATH);
 	while(_findnext(file,&find) == 0)
 	{
 
@@ -248,37 +228,6 @@ void CServerInstance::ProcCheckFile(CMessage *const pcMsg)
 */
 }
 
-
-/*********************************************************************
-    服务器发送消息函数
-*********************************************************************/
-
-/*
-void CServerInstance::ProcSendMsg(CMessage *const pcMsg)
-{
-	memcpy(&m_cPackageInfo,pcMsg->content,pcMsg->length);
-	//计算buffer中包的偏移量
-	u32 dwShift = (m_cPackageInfo.m_wPackageId - (m_dwBufferNum-1)*PACKAGENUM_EACHBUFFER)*TransferSize;
-	//判断是否是最后一包，不是最后一包则以TransferSize拷贝，是则以最后一包大小拷贝
-	if ( m_cPackageInfo.m_dwFileSize/TransferSize != m_cPackageInfo.m_wPackageId)
-	{
-
-		memset(m_cPackageInfo.m_pbyPackageContent,0x00,sizeof(m_cPackageInfo.m_pbyPackageContent));
-		memcpy(m_cPackageInfo.m_pbyPackageContent,m_cFilemgr.m_Buffer+dwShift,TransferSize);
-		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
-	}
-	else
-	{
-		OspLog(LOG_LVL_DETAIL,"服务器发送最后一包数据\n");
-		memset(m_cPackageInfo.m_pbyPackageContent,0x00,sizeof(m_cPackageInfo.m_pbyPackageContent));
-		memcpy(m_cPackageInfo.m_pbyPackageContent,m_cFilemgr.m_Buffer+dwShift,m_cPackageInfo.m_dwFileSize%TransferSize);
-		OspLog(LOG_LVL_DETAIL,"包大小：%d\n",m_cPackageInfo.m_dwFileSize%TransferSize);
-		post(pcMsg->srcid, S_C_DOWNLOADDATA_ACK, &m_cPackageInfo, sizeof(m_cPackageInfo), pcMsg->srcnode);
-		m_cPackageInfo.printf();
-		NextState(READY_STATE);
-	}
-}
-*/
 
 
 /*********************************************************************

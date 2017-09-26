@@ -97,7 +97,7 @@ API void resumetask(u16 wTaskId)
 	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_RESUMETASK_CMD,&wTaskId,sizeof(wTaskId));
 }
 
-/* 恢复文件下载 */
+/* 取消文件下载 */
 API void canceltask(u16 wTaskId)
 {
 	OspPost(MAKEIID(CLIENT_APP_NO, CInstance::DAEMON), U_C_CANCELTASK_CMD,&wTaskId,sizeof(wTaskId));
@@ -117,11 +117,11 @@ API void h()
 	help();
 }
 
-//API void c(LPSTR ip)
-API void c()
+API void c(LPSTR ip)
+//API void c()
 {
-//	connectserver(ip);
-	connectserver("127.0.0.1");
+	connectserver(ip);
+//	connectserver("127.0.0.1");
 }
 
 API void l()

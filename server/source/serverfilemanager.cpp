@@ -16,7 +16,6 @@
 #include "../include/serverfilemanager.h"
 
 using namespace std;
-//extern CReadFile m_cFilemgr;
 
 /**************************************************
 将文件内容读入缓存，
@@ -65,15 +64,5 @@ void CReadFile::FileRead(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageId,u1
 		memcpy(m_pbyPackageContent,getbuffer()+dwShift,m_dwFileSize%TransferSize);
 		OspLog(LOG_LVL_DETAIL,"包大小：%d\n",m_dwFileSize%TransferSize);
 	}
-    
-//	if (dwBufferId != (dwFileSize/SERVER_BUFFERSIZE+1))
-//	{
-		
-//	}
-//	else
-//	{
-//		in.read(m_Buffer,sizeof(dwFileSize-dwBufferId*SERVER_BUFFERSIZE));
-//	}
-    
 	
 }

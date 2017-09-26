@@ -28,8 +28,9 @@
 
 #define CONNECT_TIME_EVENT   (u16)(OSP_USEREVENT_BASE+0x0014)
 #define REGISTER_TIME_EVENT  (u16)(OSP_USEREVENT_BASE+0x0015)
-#define TIME_WATING          10
-#define NODE_TIME_WATING      5
+#define TIME_CONNECT         (u16)(OSP_USEREVENT_BASE+0x0024)
+#define TIME_WATING          1000
+#define NODE_TIME_WATING      10
 #define NUM_WATING            3
 
 #define CLIENT_BUFFERSIZE     (u32)2560000                     //ª∫¥Ê¥Û–°
