@@ -291,7 +291,7 @@ void CClientInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 
 			 //服务器连接成功后，运行配置文件读取
 			 s8 configname[32];
-			 cout << g_CClientApp.m_dwIp << endl;
+//			 cout << g_CClientApp.m_dwIp << endl;
 //			 g_CFileManager.ReadAndGetConfigData(inet_ntoa(g_CClientApp.m_dwIp));
 			 g_CFileManager.ReadAndGetConfigData(itoa(g_CClientApp.m_dwIp,configname,32));
 

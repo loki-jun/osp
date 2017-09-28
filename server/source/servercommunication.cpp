@@ -65,7 +65,12 @@ void CServerInstance::DaemonDealClientConnect(CMessage *const pcMsg, CApp* pcApp
 {
 	if ( g_CServerApp.m_dwNodeNum <= MAX_SERVER_NODE_SIZE)
 	{
+		cout << pcMsg->srcnode <<endl;
+		memcpy(&m_dwDstNode,&(pcMsg->srcnode),sizeof(m_dwDstNode));
 		post(pcMsg->srcid, S_C_CONNECT_ACK,NULL,0,pcMsg->srcnode);
+		NextState(CONNECT_STATE);
+		OspSetHBParam(m_dwDstNode,NODE_TIME_WATING,NUM_WATING);
+		OspNodeDiscCBReg(m_dwDstNode,SERVER_APP_NO,DAEMON);
 	}
 	else
 	{
@@ -243,8 +248,19 @@ void CServerInstance::DaemonInstanceEntry(CMessage *const pcMsg, CApp* pcApp)
 
     switch(curEvent)
     {
+
+	    case OSP_DISCONNECT:			
+			for( dwInsCout = 1; dwInsCout <= MAX_SERVER_INS_NUM; dwInsCout++)
+			{	 
+				//获取实例对象指针
+				pCInstance = (CServerInstance*)pcApp->GetInstance(dwInsCout);
+				pCInstance->NextState(IDLE_STATE);
+			}
+		    g_CServerApp.m_dwNodeNum--;
+			OspLog(LOG_LVL_WARNING,"客户端断链！\n");		
+			break;
+
         /* 连接请求 */
-//        case CONNECT_TIME_EVENT:
         case C_S_CONNECT_REQ:
 			g_CServerApp.m_dwNodeNum++;
 //			OspLog(LOG_LVL_DETAIL,"连接请求进入daemon\n");
