@@ -12,6 +12,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
+//#include <direct.h>  
+#include <io.h> 
 #include "../include/clientcommon.h"
 #include "../include/clientfilemanager.h"
 
@@ -45,7 +47,11 @@ void CFileManager::FileDelete(s8* m_pbySFileName)
 
 void CFileManager::CreateSpace(s8* m_pbySFileName,u32 m_dwFileSize)
 {
+	/*
 	s8 FileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+
+	CreateDirectory(FileName, NULL);
+
 	strcat(FileName,"\\");
 	strcat(FileName,m_pbySFileName);
 	FILE *fp;	
@@ -53,19 +59,37 @@ void CFileManager::CreateSpace(s8* m_pbySFileName,u32 m_dwFileSize)
 	fseek(fp, m_dwFileSize,SEEK_END);
 	putw(0,fp);
     fclose(fp);
+	*/
 
 
-/*
+
 //	方法二
 	s8 end=EOF;
-	s8 FileName[STRING_LENGTH] = "E:\\客户端测试文件夹\\";
-	strcat(FileName,lpstrFileName);
-	FILE *fp=fopen(FileName,"wb+"); 
-	fseek(fp,dwFileSize-1,SEEK_SET);   //将文件位置指针移动到文件末尾,-1是为了给后面要写入的“结束标志”留空间
-	fwrite(&end,1,1,fp);
-	fclose(fp);
-*/
+	s8 FileName[STRING_LENGTH] = CLIENT_FILE_PATH;
 
+    CreateDirectory(FileName, NULL);
+	
+	strcat(FileName,"\\");
+	strcat(FileName,m_pbySFileName);
+
+	OspLog(LOG_LVL_WARNING,"文件名：%s",m_pbySFileName);
+	
+	FILE *fp=fopen(FileName,"wb+"); 
+	if(fp == NULL)
+	{
+		OspLog(LOG_LVL_WARNING,"开始创建空文件！");
+	}
+	
+	fseek(fp,m_dwFileSize-1,SEEK_SET);   //将文件位置指针移动到文件末尾,-1是为了给后面要写入的“结束标志”留空间
+	OspLog(LOG_LVL_WARNING,"seek有问题？");
+	fwrite(&end,1,1,fp);
+	OspLog(LOG_LVL_WARNING,"write有问题？");
+	if(!fclose(fp))
+	{
+		OspLog(LOG_LVL_WARNING,"文件关闭失败！");
+	}
+
+	return;
 
 /*
    方法三无法实现system中输入变量
@@ -78,6 +102,9 @@ void CFileManager::ReadAndGetConfigData(s8* pbyConfigName)//CConfigData m_cConfi
 {
 	OspLog(LOG_LVL_DETAIL,"配置文件:%s\n",pbyConfigName);
 	s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+
+    CreateDirectory(achFileName, NULL);
+
 	strcat(achFileName,"\\");
 	strcat(achFileName, pbyConfigName);
 	strcat(achFileName,".ini");
@@ -115,6 +142,9 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 		if (0 == (m_wPackageId+1)%PACKAGENUM_EACHBUFFER)
 		{
 			s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+			//检查文件夹是否存在，不存在则创建
+			CreateDirectory(achFileName, NULL);
+
 			strcat(achFileName,"\\");
 			strcat(achFileName,m_pbySFileName);
 			ofstream cBufferToFile(achFileName, ios::binary|ios::app);
@@ -126,6 +156,9 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 		else if (m_dwFileSize/TransferSize == m_wPackageId)
 		{
 			s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+
+			CreateDirectory(achFileName, NULL);
+
 			strcat(achFileName,"\\");
 			strcat(achFileName,m_pbySFileName);
 			ofstream cBufferToFile(achFileName, ios::binary|ios::app);
@@ -158,6 +191,9 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 		if (0 == (m_wPackageId+1)%PACKAGENUM_EACHBUFFER)
 		{
 			s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+
+			CreateDirectory(achFileName, NULL);
+
 			strcat(achFileName,"\\");
 			strcat(achFileName,m_pbySFileName);
 			ofstream cBufferToFile(achFileName, ios::binary|ios::app);
@@ -169,6 +205,9 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 		else if (m_dwFileSize/TransferSize == m_wPackageId)
 		{
 			s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+
+			CreateDirectory(achFileName, NULL);
+
 			strcat(achFileName,"\\");
 			strcat(achFileName,m_pbySFileName);
 			ofstream cBufferToFile(achFileName, ios::binary|ios::app);
@@ -201,6 +240,10 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 		if (0 == (m_wPackageId+1)%PACKAGENUM_EACHBUFFER)
 		{
 			s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+
+
+			CreateDirectory(achFileName, NULL);
+
 			strcat(achFileName,"\\");
 			strcat(achFileName,m_pbySFileName);
 			ofstream cBufferToFile(achFileName, ios::binary|ios::app);
@@ -212,6 +255,9 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 		else if (m_dwFileSize/TransferSize == m_wPackageId)
 		{
 			s8 achFileName[STRING_LENGTH] = CLIENT_FILE_PATH;
+
+			CreateDirectory(achFileName, NULL);
+
 			strcat(achFileName,"\\");
 			strcat(achFileName,m_pbySFileName);
 			ofstream cBufferToFile(achFileName, ios::binary|ios::app);
@@ -222,6 +268,5 @@ void CFileManager::FileWrite(s8* m_pbySFileName,u32 m_dwFileSize,u16 m_wPackageI
 		}
 	}
 
-	
-	
+
 }
