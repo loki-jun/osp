@@ -62,7 +62,7 @@ void CClientInstance::DaemonConnectServer()
 	dwRet = OspConnectTcpNode(g_CClientApp.m_dwIp,SERVER_LISTEN_PORT,TIME_WATING,NUM_WATING);
 	if(dwRet != INVALID_NODE)
 	{
-	    OspLog(LOG_LVL_DETAIL,"成功获取服务器node\n");
+	    OspLog(LOG_LVL_DETAIL,"客户端成功获取服务器node！\n");
 		m_dwDstNode = dwRet;
 		post(MAKEIID(SERVER_APP_NO, DAEMON), C_S_CONNECT_REQ,NULL,0,m_dwDstNode);
 		OspSetHBParam(m_dwDstNode,NODE_TIME_WATING,NUM_WATING);
@@ -358,7 +358,7 @@ void CClientInstance::InstanceEntry(CMessage *const pcMsg)
 
 			memcpy(&m_cFileInfo,pcMsg->content,pcMsg->length);
 			OspLog(LOG_LVL_DETAIL,"服务器文件存在，放心大胆地下载吧！！\n");
-			g_CFileManager.CreateSpace(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize());//野指针问题待解决……
+//			g_CFileManager.CreateSpace(m_cPackageInfo.getsfilename(),m_cPackageInfo.getfilesize());//野指针问题待解决……
 			if ( TRANSFER_STATE == CurState() )
 			{
 				m_cPackageInfo.setdownloadstate(0);
