@@ -1,0 +1,2 @@
+Warning: ignoring unknown project: prj_win32 - Win32 Release
+Error: There are no valid targets to build.
